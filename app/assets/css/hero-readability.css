@@ -1,0 +1,49 @@
+/* Give the hero copy a readable scale and space above the workflow rail. */
+.mdh-hero .mdh-offer,
+.mdh-hero .mdh-survey { font-size: 15px; line-height: 1.55; }
+.mdh-hero .mdh-survey { margin-top: 11px; }
+.mdh-hero .mdh-current strong { font-size: 15px; }
+.mdh-hero .mdh-current p { font-size: 13px; line-height: 1.55; }
+.mdh-hero .mdh-orbit-label { font-size: 10px; letter-spacing: .8px; color: #c7d9ef; }
+.mdh-hero .mdh-rail-heading { font-size: 10px; letter-spacing: .8px; color: #b9cce4; }
+.mdh-hero .mdh-stage { font-size: 11px; }
+
+/* The window is an illustration, but its primary labels should survive at normal zoom. */
+.mdh-app .mdh-app-titlebar { font-size: 10px; }
+.mdh-app .mdh-app-local,
+.mdh-app .mdh-app-matter > small,
+.mdh-app .mdh-app-tag { font-size: 9px; }
+.mdh-app .mdh-app-matter { font-size: 11px; }
+.mdh-app .mdh-ui-eyebrow,
+.mdh-app .mdh-app-save { font-size: 9px; }
+.mdh-app .mdh-app-nav-item { font-size: 10.5px; }
+.mdh-app .mdh-doc-hint { font-size: 10px; }
+.mdh-app .mdh-doc-copy strong { font-size: 11.5px; }
+.mdh-app .mdh-doc-copy small { font-size: 9.5px; }
+.mdh-app .mdh-document-total { font-size: 10px; }
+.mdh-app .mdh-preview-toolbar small,
+.mdh-app .mdh-paper-text,
+.mdh-app .mdh-paper-highlight { font-size: 9px; }
+.mdh-app .mdh-paper-kind,
+.mdh-app .mdh-paper-case,
+.mdh-app .mdh-paper-footer { font-size: 8px; }
+.mdh-app .mdh-document-meta > div > span { font-size: 9px; }
+.mdh-app .mdh-document-meta strong { font-size: 10px; white-space: normal; }
+.mdh-app .mdh-app-status { font-size: 9px; flex-wrap: wrap; }
+.mdh-hero .mdh-float-heading p { font-size: 9px; letter-spacing: .45px; }
+.mdh-hero .mdh-panel-footnote,
+.mdh-hero .mdh-index-summary > span { font-size: 9px; }
+
+@media (min-width: 1201px) {
+  .mdh-hero .mdh-canvas { min-height: 1040px; max-height: 1160px; }
+}
+
+@media (max-width: 760px) {
+  .mdh-hero .mdh-offer,
+  .mdh-hero .mdh-survey { font-size: 14px; line-height: 1.55; }
+  .mdh-hero .mdh-trust { font-size: 12px; white-space: normal; }
+  .mdh-hero .mdh-rail-heading { flex-wrap: wrap; font-size: 10px; }
+  .mdh-hero .mdh-workflow-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .mdh-hero .mdh-stage { font-size: 11px; }
+  .mdh-hero .mdh-stage-node { width: 27px; height: 27px; }
+}

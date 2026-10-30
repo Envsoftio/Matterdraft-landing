@@ -35,7 +35,7 @@ This serves `dist/` at `http://localhost:3000` with the generated security heade
 | `npm run typecheck` | Run Nuxt/Vue type checking. Normal development and build commands do not run this check automatically. |
 | `npm test` | Run focused configuration, discovery, legal-publication, compression-negotiation and cache tests. |
 | `npm run generate` | Regenerate content, prerender the site and recreate the complete static `dist/` export. |
-| `npm run verify` | Check the current `dist/` and write `BUILD-REPORT.json`. Run after generation. |
+| `npm run verify` | Check the current `dist/` and print the size report. Run after generation. |
 | `npm run preview` | Serve the generated static export. It accepts GET/HEAD requests, not form submissions. |
 | `npm run build` | Create the optional Nuxt server build in `.output/`. This does not run the static export step. |
 | `npm run preview:ssr` | Run `.output/server/index.mjs` after a server build. This is separate from the delivered static deployment. |
@@ -57,7 +57,7 @@ This serves `dist/` at `http://localhost:3000` with the generated security heade
 | `tests/seo.test.mjs` | URL validation, indexing controls, XML escaping and generated-content tests. |
 | `tests/static-response.test.mjs` | Compression quality values, fallback/rejection behavior and static cache rules. |
 | `dist/` | Ready-to-host static output. Generation replaces this directory. |
-| `deploy/headers.json` and `vercel.json` | Generated deployment settings matching the exported HTML. |
+| `deploy/headers.json` | Generated header settings matching the exported HTML; Netlify uses `dist/_headers`. |
 
 The product interfaces remain HTML/SVG illustrations with real controls. They are not flattened screenshots. Preserve the documented IDs and `data-*` hooks when editing their markup.
 
@@ -89,7 +89,7 @@ Deploy the regenerated `dist/` and its matching header configuration together. C
 
 ### Preview indexing
 
-With `NUXT_PUBLIC_INDEXABLE=false`, page metadata requests `noindex`, `robots.txt` disallows crawling, and the sitemap contains no page entries. The generated `_headers` file and local preview also add a noindex response header; Vercel uses the page's robots metadata for build-specific indexing settings. Search directives are not access controls; use the hosting provider's access protection when a preview must be private.
+With `NUXT_PUBLIC_INDEXABLE=false`, page metadata requests `noindex`, `robots.txt` disallows crawling, and the sitemap contains no page entries. The generated `_headers` file and local preview also add a noindex response header. Search directives are not access controls; use the hosting provider's access protection when a preview must be private.
 
 ## Policy drafts and publication
 
@@ -138,19 +138,18 @@ The export produces three related header artifacts:
 | --- | --- |
 | `dist/_headers` | Static header rules for hosts that support this format, including Netlify and Cloudflare Pages. |
 | `deploy/headers.json` | Shared header values consumed by the included preview server; useful when configuring another host. |
-| `vercel.json` | Vercel static build/output settings and stable HTTP header rules. Build-specific script restrictions travel in the HTML. |
 
 The Content Security Policy allows local scripts and hashes of the actual generated inline scripts. It does not enable script `unsafe-inline` or `unsafe-eval`. Inline styles remain allowed because the illustrations and interactions use style attributes. Fonts and network connections are limited to the same origin.
 
-The build-specific policy is embedded in each exported HTML page, so the script hashes travel with the content they protect on every static host. Netlify/Cloudflare `_headers` and the local preview also deliver the full policy as an HTTP header. Vercel's HTTP policy contains only stable `frame-ancestors`, `object-src` and `base-uri` restrictions, while the HTML meta policy supplies the script, style and connection rules. This keeps remote builds independent of previously generated hashes in project configuration. Framing restrictions require the HTTP headers; they are not supplied by the meta tag.
+The build-specific policy is embedded in each exported HTML page, so the script hashes travel with the content they protect. Netlify reads `_headers` and delivers the full policy as an HTTP header. The local preview does the same. Framing restrictions require the HTTP headers; they are not supplied by the meta tag.
 
 Additional headers include `X-Content-Type-Options`, frame restrictions, `Referrer-Policy`, a camera/microphone/geolocation `Permissions-Policy`, discovery links and applicable indexing controls. Hashed `/_nuxt/` assets receive a long immutable cache lifetime; the mutable `/_nuxt/builds/latest.json` has an explicit no-cache override. Inspect the generated files for the full rules.
 
-**HTML, CSP hashes and compressed copies must match.** Regenerate and deploy them together after changes. The export overwrites `vercel.json` and `deploy/headers.json`; permanent changes belong in the export script. Retain the supplied Vercel configuration when deploying there, or apply the equivalent HTTP rules on another host. Inspect the deployed response headers as part of release verification.
+**HTML, CSP hashes and compressed copies must match.** Regenerate and deploy them together after changes. The export overwrites `deploy/headers.json`; permanent changes belong in the export script. Netlify reads the generated `dist/_headers`. Inspect the deployed response headers as part of release verification.
 
 Hosts do not universally interpret `_headers` or automatically select `.br`/`.gz` files. Configure equivalent headers and content negotiation where necessary, or let the CDN compress the original assets. The included preview server demonstrates negotiation with the correct content type, content encoding and `Vary: Accept-Encoding`.
 
-Primary hosting references: [Netlify custom headers](https://docs.netlify.com/manage/routing/headers/), [Cloudflare Pages headers](https://developers.cloudflare.com/pages/configuration/headers/), and [Vercel project configuration](https://vercel.com/docs/project-configuration).
+Hosting reference: [Netlify custom headers](https://docs.netlify.com/manage/routing/headers/).
 
 ## Validation and maintenance
 
@@ -165,7 +164,7 @@ npm run verify
 npm run preview
 ```
 
-The verifier checks generated page metadata, one H1 per route, duplicate IDs, draft-policy indexing, required assets, structured-data consistency and inline-script hashes against the HTML CSP. It also records asset-size checks in `BUILD-REPORT.json`. See `VALIDATION.md` for the completed browser checks and their scope. These checks are not a Lighthouse score or a real-user loading-time measurement.
+The verifier checks generated page metadata, one H1 per route, duplicate IDs, draft-policy indexing, required assets, structured-data consistency and inline-script hashes against the HTML CSP. It prints asset-size checks to the terminal. See `VALIDATION.md` for the completed browser checks and their scope. These checks are not a Lighthouse score or a real-user loading-time measurement.
 
 Review responsive layouts and interactive flows in a browser after meaningful markup or behavior changes, including keyboard navigation, reduced motion, product-view dialogs and navigation back from a policy route. Test the deployed host's routes and headers as well as the local preview.
 

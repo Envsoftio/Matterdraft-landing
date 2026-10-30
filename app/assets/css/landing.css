@@ -10484,7 +10484,6 @@ dialog[open] {
   right: 0;
   bottom: 25px;
   padding-top: 18px;
-  border-top: 1px solid #86aade2b;
 }
 
 .mdh-hero .mdh-rail-heading {
@@ -10495,24 +10494,6 @@ dialog[open] {
   letter-spacing: 1.25px;
   color: #90a8c8;
   margin-bottom: 17px;
-}
-
-.mdh-hero .mdh-replay {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  color: #b8cce7;
-  font-size: 8px;
-  letter-spacing: 0;
-  min-height: 20px;
-}
-
-.mdh-hero .mdh-replay .icon {
-  width: 11px;
-  height: 11px;
 }
 
 .mdh-hero .mdh-workflow-rail {
@@ -11333,15 +11314,6 @@ dialog[open] {
     gap: 16px;
     margin-bottom: 18px;
     line-height: 1.7;
-  }
-  .mdh-hero .mdh-replay {
-    font-size: 7px;
-    white-space: nowrap;
-    gap: 5px;
-  }
-  .mdh-hero .mdh-replay .icon {
-    width: 10px;
-    height: 10px;
   }
   .mdh-hero .mdh-workflow-rail {
     grid-template-columns: repeat(4,1fr);

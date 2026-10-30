@@ -7,7 +7,7 @@ import LandingFooter from '~/components/landing/LandingFooter.vue'
 import LandingOverlays from '~/components/landing/LandingOverlays.vue'
 
 const title = 'MatterDraft Studio | Legal Document Workspace'
-const description = 'Organise legal documents, OCR scans and prepare indexed, numbered, bookmarked PDF bundles. MatterDraft Studio is in development for Windows and macOS.'
+const description = 'Organise legal documents, OCR scans and prepare indexed, numbered, bookmarked PDF bundles in one workspace.'
 useSiteSeo({ title, description, path: '/', markdownPath: '/index.md' })
 useLandingExperience()
 
@@ -26,7 +26,6 @@ const schema = {
       '@type': 'SoftwareApplication', '@id': `${origin}/#software`, name: 'MatterDraft Studio',
       url: `${origin}/`, description,
       applicationCategory: 'BusinessApplication', operatingSystem: 'Windows, macOS',
-      creativeWorkStatus: 'In development',
       featureList: [
         'Matter and document organisation', 'PDF page operations', 'OCR-assisted document text',
         'Template-based document generation', 'Document collation', 'Pagination and indexes',

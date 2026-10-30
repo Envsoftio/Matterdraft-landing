@@ -18,7 +18,6 @@ html[data-theme="light"] .mdh-hero .mdh-survey a { color: #174878; }
 .early-access-copy > p:not(.eyebrow) { margin-top: 22px; max-width: 470px; color: #475d79; font-size: 16px; line-height: 1.75; }
 .early-access-copy .early-access-offer { padding-top: 22px; border-top: 1px solid #d3deeb; color: #1c4266; }
 .early-access-offer strong { display: block; color: #145a95; font-size: 22px; line-height: 1.35; }
-.early-access-copy .early-access-timing { font-size: 13px !important; color: #637792 !important; }
 .early-access-panel { padding: clamp(26px, 3.2vw, 44px); border: 1px solid #d5e2ef; border-radius: 20px; background: #fff; box-shadow: 0 22px 55px rgba(12, 42, 80, .09); }
 .early-access-panel-head h3 { color: #102c4d; font-size: 25px; line-height: 1.25; font-weight: 650; letter-spacing: -.025em; }
 .early-access-panel-head p { margin-top: 8px; color: #5a6e88; font-size: 14px; line-height: 1.65; }
@@ -47,7 +46,6 @@ html[data-theme="dark"] .early-access-copy .eyebrow { color: #8cc8ff; }
 html[data-theme="dark"] .early-access-copy > p:not(.eyebrow) { color: #bacbe0; }
 html[data-theme="dark"] .early-access-copy .early-access-offer { border-top-color: #3a526f; }
 html[data-theme="dark"] .early-access-offer strong { color: #9ad4ff; }
-html[data-theme="dark"] .early-access-copy .early-access-timing { color: #9eb1cb !important; }
 html[data-theme="dark"] .early-access-panel { border-color: #344c6a; background: #122743; box-shadow: 0 22px 55px rgba(0, 0, 0, .15); }
 html[data-theme="dark"] .early-access-panel-head h3,
 html[data-theme="dark"] .early-access-fields label { color: #e6f0ff; }

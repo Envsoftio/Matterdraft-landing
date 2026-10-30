@@ -39,7 +39,6 @@
           <i aria-hidden="true"></i>
           <span>Local processing</span>
         </div>
-        <p class="mdh-development">In development for Windows and macOS.<br>Release timing has not been announced.</p>
         <div class="mdh-current">
           <span class="mdh-current-line" aria-hidden="true"></span>
           <div>
@@ -468,26 +467,10 @@
             <span class="mdh-check-warning"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 10 18H2L12 3ZM12 9v5M12 17v1"/></svg>3 items need review</span>
           </div>
         </aside>
-        <figcaption class="mdh-figure-caption">
-          <span>Interactive product illustration · Fictional matter and documents.</span>
-          <button
-            type="button"
-            class="mdh-enlarge"
-            aria-label="Enlarge workspace"
-            data-enlarge="hero-workspace"
-            data-title="MatterDraft / Coordinated legal document workspace"
-          ><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H3v6M15 3h6v6M21 15v6h-6M9 21H3v-6M3 3l6 6M21 3l-6 6M21 21l-6-6M3 21l6-6"/></svg></button>
-        </figcaption>
       </figure>
       <div class="mdh-rail-wrap">
         <div class="mdh-rail-heading">
           <span>FROM SOURCE FILES TO STRUCTURED OUTPUT</span>
-          <button
-            type="button"
-            class="mdh-replay"
-            data-mdh-replay
-            aria-label="Replay the illustrative workflow sequence"
-          ><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7a9 9 0 0 0-15-2L2 8m0-5v5h5M4 17a9 9 0 0 0 15 2l3-3m0 5v-5h-5"/></svg>Replay workflow</button>
         </div>
         <div class="mdh-workflow-rail" role="group" aria-label="Explore the legal document workflow">
           <button type="button" class="mdh-stage " data-mdh-stage="import" aria-pressed="false">

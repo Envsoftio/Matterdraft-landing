@@ -1,6 +1,6 @@
 {
   "commonHeaders": {
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-WTkFIc8XtbVdPsJqw5C+NCWFjYUOi56b83UHHlQ+/NE=' 'sha256-fXv3EBwEHskVVbX402l3KaWHNhpComgW3INOb71ctbg=' 'sha256-OggU2PWTnCffNOAt5bm6OjZepRQkw2UBfV+ptGrgscM=' 'sha256-f6cmfPOXpSLrAm17KWTuTJlekbDOK+8fcYWZ8wQnH6A=' 'sha256-A5hdP5ezNYSnp291gPM+hHQ3b1YW1r1gCb/aMDxcC60='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-bl2TU+GNKMMvbQ4KOV89qeooR4Cqq/a4XQA7kcQh1xk=' 'sha256-mMekDnkmYdWBGVKbQSCQaZGFBzKF0D2UlJqJa3zct5g=' 'sha256-QEDmCJF9G4XrtGafMAYYyC9sEz9FJda7cdn3fkQLdDg=' 'sha256-/2kclFibTl8BOG/4l7ZqfQkKLJgaDD0ZH27Hr69miiM=' 'sha256-0yShFqQswq21VWS9KqLmq370yTVnkj3cMvwHto8+RV8='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "strict-origin-when-cross-origin",

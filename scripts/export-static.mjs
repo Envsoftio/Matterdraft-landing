@@ -38,9 +38,8 @@ const csp = [
   "connect-src 'self'",
   "object-src 'none'", "base-uri 'self'", "frame-ancestors 'none'", "form-action 'self'",
 ].join('; ')
-// Keep the hash policy beside the exact HTML it protects. Static hosts may read
-// their project config before the build, so generated hashes cannot safely live
-// only in a checked-in vercel.json. frame-ancestors still requires an HTTP header.
+// Keep the hash policy beside the exact HTML it protects. Netlify serves the
+// matching full policy from _headers; frame-ancestors requires that HTTP header.
 const metaCsp = csp.replace(/; frame-ancestors 'none'/, '')
 const escapedMetaCsp = metaCsp.replaceAll('&', '&amp;').replaceAll('"', '&quot;')
 for (const file of files.filter(file => file.endsWith('.html'))) {
@@ -72,26 +71,8 @@ if (!settings.indexable) headerLines.push('', '/*', '  X-Robots-Tag: noindex, no
 await writeFile(join(destination, '_headers'), `${headerLines.join('\n')}\n`)
 await mkdir(join(root, 'deploy'), { recursive: true })
 await writeFile(join(root, 'deploy/headers.json'), `${JSON.stringify({ commonHeaders, indexable: settings.indexable }, null, 2)}\n`)
-// Build-specific hashes and deployment flags live in HTML, not Vercel's
-// pre-build configuration. These HTTP directives remain stable across builds.
-const vercelHeaders = {
-  ...commonHeaders,
-  'Content-Security-Policy': "frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
-}
-await writeFile(join(root, 'vercel.json'), `${JSON.stringify({
-  $schema: 'https://openapi.vercel.sh/vercel.json', buildCommand: 'npm run generate', outputDirectory: 'dist',
-  framework: null, cleanUrls: true, trailingSlash: false,
-  headers: [
-    { source: '/(.*)', headers: Object.entries(vercelHeaders).map(([key,value])=>({key,value})) },
-    { source: '/_nuxt/(.*)', headers: [{key:'Cache-Control',value:'public, max-age=31536000, immutable'}] },
-    { source: '/_nuxt/builds/latest.json', headers: [{key:'Cache-Control',value:'no-cache'}] },
-    { source: '/fonts/(.*)', headers: [{key:'Cache-Control',value:'public, max-age=86400'}] },
-    { source: '/404.html', headers: [{key:'X-Robots-Tag',value:'noindex, follow'}] },
-  ],
-},null,2)}\n`)
-
 // Static compression is included for hosts that can negotiate these sidecars.
-// Netlify/Cloudflare/Vercel can also compress the original files themselves.
+// Netlify can also compress the original files itself.
 let compressed = 0
 for (const file of files) {
   if (!['.html','.css','.js','.json','.svg','.txt','.xml','.md'].includes(extname(file))) continue

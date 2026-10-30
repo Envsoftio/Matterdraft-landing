@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { readFile, readdir, stat, writeFile } from 'node:fs/promises'
+import { readFile, readdir, stat } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { gzipSync } from 'node:zlib'
@@ -54,5 +54,4 @@ assert(jsGzip<250*1024,`All-route JS gzip budget exceeded: ${jsGzip}`)
 assert(cssGzip<48*1024,`CSS gzip budget exceeded: ${cssGzip}`)
 assert(fontBytes<180*1024,`Font budget exceeded: ${fontBytes}`)
 const report={checkedAt:new Date().toISOString(),result:'passed',pages:pageReports,assets:{allRoutesJsBytes:jsBytes,allRoutesJsGzipBytes:jsGzip,allCssBytes:cssBytes,allCssGzipBytes:cssGzip,fontBytes},note:'All-route totals include policy chunks; these are size checks, not a Lighthouse score or a real-user loading-time guarantee.'}
-await writeFile(join(root,'BUILD-REPORT.json'),JSON.stringify(report,null,2)+'\n')
 console.log(JSON.stringify(report,null,2))

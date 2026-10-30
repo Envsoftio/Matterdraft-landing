@@ -5,7 +5,7 @@
       <div class="split-copy" data-reveal>
         <p class="section-index">10 / Local-first by design</p>
         <h2>Serious document work.<br>On your own computer.</h2>
-        <p class="lead">MatterDraft is being built as an offline-first desktop application for Windows and macOS. Core processing happens locally, with the interface and processing engine kept separate.</p>
+        <p class="lead">MatterDraft is designed as an offline-first desktop workspace for Windows and macOS. Its architecture keeps core processing local and separates the interface from the processing engine.</p>
         <div class="source-flow">
           <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 11 3 3 5-5"/></svg>Originals preserved</span>
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">

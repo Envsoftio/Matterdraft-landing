@@ -12,7 +12,7 @@ The project was installed and built with Node.js **24.22.1** and npm **11.9.0**.
 | `npm run typecheck` | Passed. |
 | `npm test` | Both test files passed: 11 configuration/content cases and 7 encoding/cache cases. |
 | `npm run generate` | Completed successfully; generated the homepage, all three policy routes, fallback pages, payloads and static assets. |
-| `npm run verify` | Passed; wrote the accompanying `BUILD-REPORT.json`. |
+| `npm run verify` | Passed; its size report is printed to the terminal. |
 | Component compilation | All 20 landing Vue components passed client and SSR compilation checks. |
 | Controller lifecycle | Listener/timer cleanup and repeat disposal were checked; an in-flight mock request was cancelled on cleanup. |
 
@@ -53,7 +53,7 @@ The responsive/no-JS test harness is excluded from the delivery. Production fram
 
 ## Size checks
 
-The numbers below come from `BUILD-REPORT.json`. Gzip values are computed from the generated files for comparison and budgeting; they are not a network-timing benchmark. The export also includes gzip and Brotli sidecars.
+The numbers below were recorded by the verifier for this historical validation. Gzip values are computed from the generated files for comparison and budgeting; they are not a network-timing benchmark. The export also includes gzip and Brotli sidecars.
 
 | Resource | Measured size |
 | --- | ---: |

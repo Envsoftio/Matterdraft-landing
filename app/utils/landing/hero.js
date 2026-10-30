@@ -62,11 +62,11 @@ export function mountHeroExperience(scope) {
     const write = (selector, value) => all(selector).forEach(node => { node.textContent = value; });
     const stageButtons = all('[data-mdh-stage]').filter(button => STAGES[button.dataset.mdhStage]);
     const documentButtons = all('#hero-workspace [data-document]');
-    const replayButtons = all('[data-mdh-replay]');
     const reducedMotion = typeof window.matchMedia === 'function'
       ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
     let timers = [];
     let running = false;
+    let restartTimer = null;
 
     function activateStage(stage, title, copy) {
       const content = STAGES[stage];
@@ -89,6 +89,20 @@ export function mountHeroExperience(scope) {
       running = false;
     }
 
+    function clearRestart() {
+      if (restartTimer !== null) scope.clearTimeout(restartTimer);
+      restartTimer = null;
+    }
+
+    function queueRestart(delay) {
+      clearRestart();
+      if (reducedMotion?.matches || document.hidden) return;
+      restartTimer = scope.timeout(() => {
+        restartTimer = null;
+        if (root.isConnected) playSequence();
+      }, delay);
+    }
+
     function settleSequence(sequenceState = 'settled') {
       clearSequence();
       root.dataset.mdhSequence = sequenceState;
@@ -101,6 +115,7 @@ export function mountHeroExperience(scope) {
 
     function interruptSequence() {
       if (running) settleSequence('interrupted');
+      queueRestart(8000);
     }
 
     function chooseStage(stage) {
@@ -115,6 +130,7 @@ export function mountHeroExperience(scope) {
     }
 
     function playSequence() {
+      clearRestart();
       clearSequence();
       if (reducedMotion?.matches || document.hidden) {
         settleSequence();
@@ -144,7 +160,10 @@ export function mountHeroExperience(scope) {
         write('[data-mdh-bookmark-state]', 'Bookmarks ready');
         activateStage('index', 'A hierarchy you can navigate.', 'Document groups, bookmarks and page references follow the same 196-page example bundle.');
       });
-      schedule(3900, () => settleSequence());
+      schedule(3900, () => {
+        settleSequence();
+        queueRestart(1800);
+      });
     }
 
     function syncSelectedDocument(button) {
@@ -161,7 +180,7 @@ export function mountHeroExperience(scope) {
       root.dataset.mdhDocument = known.title.toLowerCase().replace(/\s+/g, '-');
     }
 
-    // User control takes precedence over the short automatic introduction.
+    // Let people inspect a stage before the automatic loop resumes.
     scope.on(root, 'pointerdown', interruptSequence, {passive: true});
     scope.on(root, 'keydown', interruptSequence);
     scope.on(root, 'focusin', interruptSequence);
@@ -191,12 +210,17 @@ export function mountHeroExperience(scope) {
       interruptSequence();
       syncSelectedDocument(button);
     }));
-    replayButtons.forEach(button => scope.on(button, 'click', playSequence));
     scope.on(document, 'visibilitychange', () => {
-      if (document.hidden && running) settleSequence();
+      if (document.hidden) {
+        clearRestart();
+        if (running) settleSequence();
+      } else queueRestart(600);
     });
     const onMotionPreferenceChange = event => {
-      if (event.matches) settleSequence();
+      if (event.matches) {
+        clearRestart();
+        if (running) settleSequence();
+      } else queueRestart(600);
     };
     if (reducedMotion?.addEventListener) scope.on(reducedMotion, 'change', onMotionPreferenceChange);
     else if (reducedMotion?.addListener) scope.onMedia(reducedMotion, onMotionPreferenceChange);

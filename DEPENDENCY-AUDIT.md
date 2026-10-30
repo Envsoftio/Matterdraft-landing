@@ -104,4 +104,4 @@ npm run verify
 
 `npm audit` and `npm view` require registry access. The audit can return a non-zero status while reporting the recorded low-severity finding; that status is not a build failure or proof of an exposed website exploit. Review the current report and dependency path before deciding on changes.
 
-This assessment applies to the inspected dependency versions and static delivery architecture. New runtime services, external content pipelines or different dependency versions need their own usage review. Generated asset sizes and final browser/build validation belong in the build report; no performance benchmark is asserted by this audit.
+This assessment applies to the inspected dependency versions and static delivery architecture. New runtime services, external content pipelines or different dependency versions need their own usage review. Generated asset sizes and final browser/build validation belong in build verification; no performance benchmark is asserted by this audit.

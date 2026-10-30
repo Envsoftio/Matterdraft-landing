@@ -6,7 +6,6 @@
         <h2 id="early-access-title">Be among the first to use MatterDraft.</h2>
         <p>When registration opens, join the early access list for launch updates and an invitation when access becomes available.</p>
         <p class="early-access-offer"><strong>Six months free after launch</strong> for people who sign up for early access.</p>
-        <p class="early-access-timing">MatterDraft is in development for Windows and macOS. A launch date has not been announced.</p>
       </div>
 
       <div class="early-access-panel">
