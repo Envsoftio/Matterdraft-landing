@@ -1,0 +1,226 @@
+<!-- Approved navigation, skip link, mobile menu and source SVG brand mark. -->
+<template>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="top"></div>
+  <header class="site-header" data-pen-name="Navigation">
+    <nav class="container nav-shell" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="MatterDraft Studio home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="brand-mark" viewBox="0 0 512 512" aria-hidden="true">
+          <defs>
+            <linearGradient id="v2-nav-bg" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+              <stop offset="0" stop-color="#123F7A" />
+              <stop offset="0.28" stop-color="#0A2A54" />
+              <stop offset="0.74" stop-color="#061A39" />
+              <stop offset="1" stop-color="#031128" />
+            </linearGradient>
+            <radialGradient id="v2-nav-bgSheen" cx=".2" cy=".06" r=".94">
+              <stop offset="0" stop-color="#1651A0" stop-opacity=".3" />
+              <stop offset=".6" stop-color="#0A284A" stop-opacity=".07" />
+              <stop offset="1" stop-color="#031128" stop-opacity="0" />
+            </radialGradient>
+            <linearGradient
+              id="v2-nav-leftStem"
+              x1="90"
+              y1="105"
+              x2="75"
+              y2="457"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0" stop-color="#2EC8F7" />
+              <stop offset=".28" stop-color="#217BFF" />
+              <stop offset=".54" stop-color="#6A36EE" />
+              <stop offset=".8" stop-color="#B12BEB" />
+              <stop offset="1" stop-color="#ED5DF1" />
+            </linearGradient>
+            <linearGradient
+              id="v2-nav-frontRibbon"
+              x1="45"
+              y1="100"
+              x2="326"
+              y2="353"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0" stop-color="#38D3FA" />
+              <stop offset=".18" stop-color="#20A6FB" />
+              <stop offset=".59" stop-color="#1F6AFF" />
+              <stop offset="1" stop-color="#3155F2" />
+            </linearGradient>
+            <linearGradient
+              id="v2-nav-ribbonShade"
+              x1="37"
+              y1="182"
+              x2="220"
+              y2="388"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0" stop-color="#064EF7" stop-opacity=".0" />
+              <stop offset=".6" stop-color="#2537E7" stop-opacity=".32" />
+              <stop offset="1" stop-color="#4E1DD5" stop-opacity=".0" />
+            </linearGradient>
+            <linearGradient
+              id="v2-nav-backFold"
+              x1="275"
+              y1="209"
+              x2="442"
+              y2="142"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0" stop-color="#4D32E3" />
+              <stop offset=".4" stop-color="#6C3DF2" />
+              <stop offset=".74" stop-color="#8E64F9" />
+              <stop offset="1" stop-color="#B59BFF" />
+            </linearGradient>
+            <linearGradient
+              id="v2-nav-paper"
+              x1="299"
+              y1="246"
+              x2="483"
+              y2="432"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0" stop-color="#FDFDFF" />
+              <stop offset=".45" stop-color="#FFFFFF" />
+              <stop offset="1" stop-color="#E8EEFF" />
+            </linearGradient>
+            <linearGradient
+              id="v2-nav-paperStroke"
+              x1="320"
+              y1="229"
+              x2="479"
+              y2="436"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0" stop-color="#FFFFFF" stop-opacity=".8" />
+              <stop offset="1" stop-color="#B7C7F5" stop-opacity=".62" />
+            </linearGradient>
+            <linearGradient
+              id="v2-nav-ruleBlue"
+              x1="334"
+              y1="386"
+              x2="436"
+              y2="242"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0" stop-color="#24A4FF" />
+              <stop offset="1" stop-color="#2855EF" />
+            </linearGradient>
+            <radialGradient id="v2-nav-sparkle" cx=".52" cy=".39" r=".7">
+              <stop offset="0" stop-color="#8FF6FF" />
+              <stop offset=".36" stop-color="#34DAFF" />
+              <stop offset="1" stop-color="#029AF9" />
+            </radialGradient>
+            <filter id="v2-nav-starGlow" x="-70%" y="-70%" width="240%" height="240%">
+              <feGaussianBlur stdDeviation="9" />
+            </filter>
+            <filter id="v2-nav-pageShadow" x="-25%" y="-25%" width="150%" height="160%">
+              <feGaussianBlur stdDeviation="5" />
+            </filter>
+          </defs>
+          <rect width="512" height="512" rx="114" fill="url(#v2-nav-bg)" />
+          <rect width="512" height="512" rx="114" fill="url(#v2-nav-bgSheen)" />
+          <rect
+            x="1.5"
+            y="1.5"
+            width="509"
+            height="509"
+            rx="112.5"
+            fill="none"
+            stroke="#2860A0"
+            stroke-opacity=".45"
+            stroke-width="3"
+          />
+          <g transform="translate(68 66) scale(.80 .76)">
+            <!-- Rear ribbon peeks above the folded front-facing M and page. -->
+            <path
+              d="M 270 211 L 390 141 C 410 128 426 132 438 144 C 444 151 445 162 445 176 L 445 236 L 322 284 Z"
+              fill="url(#v2-nav-backFold)"
+            />
+            <path
+              d="M 281 212 L 389 145 C 407 134 421 137 432 149"
+              fill="none"
+              stroke="#C9B6FF"
+              stroke-opacity=".25"
+              stroke-width="3"
+            />
+            <!-- Left leg: an uninterrupted folded ribbon, turquoise to violet and fuchsia. -->
+            <path
+              d="M 36 161 C 32 127 50 104 76 101 C 94 96 107 103 123 114 L 169 145.5 L 169 366 C 169 382 164 388 152 397 L 61 457 C 47 467 35 456 35 441 Z"
+              fill="url(#v2-nav-leftStem)"
+            />
+            <!-- diagonal foreground band creating the distinctive M silhouette -->
+            <path
+              d="M 36 161 C 32 127 50 104 76 101 C 94 96 107 103 123 114 L 322 250 L 322 356 L 36 163 Z"
+              fill="url(#v2-nav-frontRibbon)"
+            />
+            <path d="M 36 163 L 166 253 L 315 356 L 36 163 Z" fill="url(#v2-nav-ribbonShade)" />
+            <!-- right white document -->
+            <path
+              d="M 292 268 C 292 249 304 240 317 234 L 443 181 C 463 174 476 185 476 203 L 476 352 C 476 366 470 373 457 380 L 318 453 C 303 460 292 450 292 436 Z"
+              fill="url(#v2-nav-paper)"
+              stroke="url(#v2-nav-paperStroke)"
+              stroke-width="1.7"
+            />
+            <path
+              d="M 300 264 C 301 251 311 244 322 239 L 444 186 C 459 180 470 187 471 200"
+              fill="none"
+              stroke="#FFFFFF"
+              opacity=".55"
+              stroke-width="2"
+            />
+            <!-- three blue document lines, rising at right like the supplied mark -->
+            <g fill="none" stroke="url(#v2-nav-ruleBlue)" stroke-width="19" stroke-linecap="round">
+              <path d="M 338 291 L 431 244" />
+              <path d="M 338 335 L 431 288" />
+              <path d="M 338 379 L 431 332" />
+            </g>
+            <g transform="translate(-16 -33)">
+              <!-- subtle upper edge sparkle; part of the original selected brand -->
+              <path
+                d="M 472 45 C 479 87 485 99 532 107 C 484 115 478 127 472 162 C 465 127 459 115 414 107 C 459 100 465 86 472 45 Z"
+                fill="#14BFFF"
+                opacity=".75"
+                filter="url(#v2-nav-starGlow)"
+              />
+              <path
+                d="M 472 45 C 479 87 485 99 532 107 C 484 115 478 127 472 162 C 465 127 459 115 414 107 C 459 100 465 86 472 45 Z"
+                fill="url(#v2-nav-sparkle)"
+              />
+            </g>
+          </g>
+        </svg>
+        <span>
+          <span class="brand-word">MatterDraft</span>
+          <span class="brand-sub">STUDIO</span>
+        </span>
+      </a>
+      <div class="nav-links">
+        <a href="#product">Product</a>
+        <a href="#pdf-engine">PDF Engine</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#automation">Automation</a>
+        <a href="#local-processing">Local Processing</a>
+      </div>
+      <button class="button button-small" type="button" data-demo>Request a demo<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+      <button
+        class="menu-button"
+        id="menu-button"
+        type="button"
+        aria-controls="mobile-nav"
+        aria-expanded="false"
+        aria-label="Open navigation"
+      >
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </nav>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation" hidden>
+      <a href="#product">Product</a>
+      <a href="#pdf-engine">PDF Engine</a>
+      <a href="#workflow">Workflow</a>
+      <a href="#automation">Automation</a>
+      <a href="#local-processing">Local Processing</a>
+      <button class="button " type="button" data-demo>Request a demo<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+    </nav>
+  </header>
+</template>

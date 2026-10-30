@@ -1,0 +1,71 @@
+{
+  "name": "MatterDraft Studio",
+  "shortName": "MatterDraft",
+  "defaultOrigin": "https://matterdraft.legal",
+  "language": "en-IN",
+  "title": "MatterDraft Studio — Legal document workflows",
+  "description": "A local-first legal document desktop workspace in development for Windows and macOS. Organise, OCR, collate and review matter documents.",
+  "summary": "MatterDraft is being developed as a local-first desktop workspace for preparing and organising legal documents, from source files to a reviewed, indexed document bundle.",
+  "status": "in-development",
+  "platforms": ["Windows", "macOS"],
+  "qualifications": [
+    "The product is in development. Ask about current availability; illustrated features are intended workflows, not evidence of a released production feature.",
+    "Website demonstrations use fictional documents and sample data. They do not process or upload a real legal matter.",
+    "The website does not offer checkout, process purchases or create customer accounts.",
+    "Local-first describes local document workflows. Separately offered sharing or other connected features may require a network connection and their own disclosure.",
+    "OCR output is editable recognised text; it is not a promise of generative legal drafting or error-free recognition.",
+    "Electronic signature placement is distinct from digital certification. Court acceptance and legal validity require separate review.",
+    "Users must review document content, ordering, page ranges, indexes, bookmarks and other outputs before use or filing."
+  ],
+  "capabilities": [
+    {
+      "title": "Import and organise",
+      "description": "Bring PDF, Word and image source material into matter workflows. Organise documents into categories and parts, work across matter tabs, and choose the order of included documents."
+    },
+    {
+      "title": "Recognise text and prepare documents",
+      "description": "Intended OCR workflows turn scanned content into editable text for review. Structured templates use supplied fields to prepare documents; the website examples do not generate legal arguments."
+    },
+    {
+      "title": "Edit and manage pages",
+      "description": "Intended document tools cover merging, splitting, extracting, replacing, reordering, cropping, rotating, deleting and inserting pages."
+    },
+    {
+      "title": "Collate, paginate and index",
+      "description": "Arrange documents within parts and rebuild a coordinated bundle, page numbering and index. Review updated page ranges after a change to the source order."
+    },
+    {
+      "title": "Create and edit bookmarks",
+      "description": "Generate bookmarks from the document structure and review them alongside manual bookmark labels, page references and hierarchy."
+    },
+    {
+      "title": "Plan document-aware volumes",
+      "description": "Plan volumes around an approximate 300-page target while considering document boundaries. The target is not an absolute limit; an oversized individual document needs separate review."
+    },
+    {
+      "title": "Check and export",
+      "description": "Review validation findings before export. Intended output workflows include PDF and other supported document or archive formats; support depends on the relevant feature and release."
+    },
+    {
+      "title": "Apply document controls",
+      "description": "Intended tools include password protection, redaction, electronic signature placement, watermarks and timestamps. Users remain responsible for checking the resulting documents and applicable requirements."
+    }
+  ],
+  "legalDocuments": [
+    {
+      "slug": "privacy",
+      "title": "Privacy Policy",
+      "description": "How MatterDraft Studio describes local processing, information it receives, privacy choices and contact responsibilities."
+    },
+    {
+      "slug": "terms",
+      "title": "Terms and Conditions",
+      "description": "Terms for MatterDraft Studio, including product availability, permitted use, professional review and applicable rights."
+    },
+    {
+      "slug": "refund-policy",
+      "title": "Refund and Cancellation Policy",
+      "description": "MatterDraft Studio's no-voluntary-refunds position, subject to mandatory remedies, billing corrections and binding purchase commitments."
+    }
+  ]
+}
