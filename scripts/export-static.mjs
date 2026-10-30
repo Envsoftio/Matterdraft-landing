@@ -32,12 +32,11 @@ for (const file of files.filter(file => file.endsWith('.html'))) {
     }
   }
 }
-const endpointOrigin = settings.demoEndpoint ? new URL(settings.demoEndpoint, settings.siteUrl).origin : ''
 const csp = [
   "default-src 'self'", `script-src 'self' ${[...scriptHashes].join(' ')}`,
   "style-src 'self' 'unsafe-inline'", "img-src 'self' data:", "font-src 'self'",
-  `connect-src 'self'${endpointOrigin ? ` ${endpointOrigin}` : ''}`,
-  "object-src 'none'", "base-uri 'self'", "frame-ancestors 'none'", "form-action 'self' mailto:",
+  "connect-src 'self'",
+  "object-src 'none'", "base-uri 'self'", "frame-ancestors 'none'", "form-action 'self'",
 ].join('; ')
 // Keep the hash policy beside the exact HTML it protects. Static hosts may read
 // their project config before the build, so generated hashes cannot safely live
@@ -68,13 +67,11 @@ const headerLines = ['/*', ...Object.entries(commonHeaders).map(([name,value]) =
   '', '/', '  Link: </index.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"',
   '', '/404.html', '  X-Robots-Tag: noindex, follow',
 ]
-if (!settings.legalPublished) {
-  for (const route of ['/privacy', '/terms', '/refund-policy']) headerLines.push('', route, '  X-Robots-Tag: noindex, follow')
-}
+for (const route of ['/privacy', '/terms', '/refund-policy']) headerLines.push('', route, '  X-Robots-Tag: noindex, follow')
 if (!settings.indexable) headerLines.push('', '/*', '  X-Robots-Tag: noindex, nofollow')
 await writeFile(join(destination, '_headers'), `${headerLines.join('\n')}\n`)
 await mkdir(join(root, 'deploy'), { recursive: true })
-await writeFile(join(root, 'deploy/headers.json'), `${JSON.stringify({ commonHeaders, indexable: settings.indexable, legalPublished: settings.legalPublished }, null, 2)}\n`)
+await writeFile(join(root, 'deploy/headers.json'), `${JSON.stringify({ commonHeaders, indexable: settings.indexable }, null, 2)}\n`)
 // Build-specific hashes and deployment flags live in HTML, not Vercel's
 // pre-build configuration. These HTTP directives remain stable across builds.
 const vercelHeaders = {

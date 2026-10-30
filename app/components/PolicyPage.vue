@@ -2,31 +2,30 @@
 import LandingFooter from '~/components/landing/LandingFooter.vue'
 
 const props = defineProps<{ title: string; description: string; slug: string; html: string }>()
-const config = useRuntimeConfig()
-const published = config.public.legalPublished === true || String(config.public.legalPublished) === 'true'
 useSiteSeo({
   title: `${props.title} | MatterDraft Studio`, description: props.description,
-  path: `/${props.slug}`, indexable: published,
-  markdownPath: published ? `/legal/${props.slug}.md` : undefined,
+  path: `/${props.slug}`, indexable: false,
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-white text-ink flex flex-col">
+  <div class="policy-page min-h-screen bg-white text-ink flex flex-col">
     <a class="skip-link" href="#policy-content">Skip to policy</a>
-    <header class="border-b border-slate-200 bg-white">
+    <header class="policy-header border-b border-slate-200 bg-white">
       <div class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-5">
         <NuxtLink to="/" :prefetch="false" class="flex items-center gap-3 text-ink" aria-label="MatterDraft Studio home">
-          <img src="/brand/matterdraft-mark.svg" width="40" height="40" alt="" class="h-10 w-10" />
-          <span class="text-lg font-semibold tracking-tight">MatterDraft <span class="font-normal text-slate-500">Studio</span></span>
+          <BrandLogo class="policy-logo" />
         </NuxtLink>
-        <NuxtLink to="/" :prefetch="false" class="text-sm font-medium text-brand underline-offset-4 hover:underline">Back to the workspace</NuxtLink>
+        <div class="flex items-center gap-4">
+          <NuxtLink to="/" :prefetch="false" class="text-sm font-medium text-brand underline-offset-4 hover:underline" aria-label="Back to the workspace"><span class="policy-back-full">Back to the workspace</span><span class="policy-back-short">Back</span></NuxtLink>
+          <ThemeToggle />
+        </div>
       </div>
     </header>
     <main id="policy-content" class="mx-auto max-w-4xl px-6 py-14 sm:py-20 flex-1 w-full">
       <p class="mb-4 text-xs font-semibold tracking-[0.18em] text-brand uppercase">MatterDraft Studio</p>
       <h1 class="max-w-3xl text-4xl leading-tight font-medium tracking-tight text-ink sm:text-5xl">{{ title }}</h1>
-      <aside v-if="!published" class="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950" aria-label="Draft policy status">
+      <aside class="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950" aria-label="Draft policy status">
         <strong class="font-semibold">Review draft.</strong> The business and service details marked below need to be completed before this policy is published. This draft is excluded from search indexing.
       </aside>
       <!-- Trusted, repository-owned Markdown is converted to HTML at build time. -->
@@ -45,7 +44,7 @@ useSiteSeo({
 .policy-prose ul { list-style: disc; } .policy-prose ol { list-style: decimal; }
 .policy-prose li { margin: .5rem 0; }
 .policy-prose strong { color: #14263d; font-weight: 600; }
-.policy-prose a { color: #245cdb; text-decoration: underline; text-underline-offset: 3px; }
+.policy-prose a { color: #217bff; text-decoration: underline; text-underline-offset: 3px; }
 .policy-prose table { width: 100%; margin: 1.5rem 0; border-collapse: collapse; font-size: .875rem; }
 .policy-prose th, .policy-prose td { border: 1px solid #dce4ee; padding: .75rem; text-align: left; vertical-align: top; }
 .policy-prose th { color: #14263d; background: #f5f7fb; font-weight: 600; }

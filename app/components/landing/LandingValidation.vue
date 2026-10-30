@@ -98,9 +98,10 @@
           <button
             type="button"
             class="zoom-button"
+            aria-label="Enlarge product view"
             data-enlarge="validation-visual"
             data-title="Rule-based bundle validation"
-          ><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H3v6M15 3h6v6M21 15v6h-6M9 21H3v-6M3 3l6 6M21 3l-6 6M21 21l-6-6M3 21l6-6"/></svg>Enlarge view</button>
+          ><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H3v6M15 3h6v6M21 15v6h-6M9 21H3v-6M3 3l6 6M21 3l-6 6M21 21l-6-6M3 21l6-6"/></svg></button>
         </figcaption>
       </figure>
     </div>

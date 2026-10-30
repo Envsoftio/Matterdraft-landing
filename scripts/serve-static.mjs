@@ -19,7 +19,7 @@ createServer(async (request, response) => {
   try {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       response.writeHead(405, { Allow: 'GET, HEAD', 'Content-Type':'text/plain; charset=utf-8' })
-      response.end('Method not allowed. Configure a separate demo-request endpoint to accept submissions.')
+      response.end('Method not allowed. This static site does not accept submissions.')
       return
     }
     const pathname = decodeURIComponent(new URL(request.url || '/', 'http://localhost').pathname)
@@ -34,7 +34,7 @@ createServer(async (request, response) => {
     if (!await exists(file)) { file = join(directory, '404.html'); status = 404 }
     const headers = { ...deployment.commonHeaders, 'Content-Type': mime[extname(file)] || 'application/octet-stream', Vary:'Accept-Encoding' }
     headers['Cache-Control'] = cacheControlForStaticResponse(pathname, status)
-    if (!deployment.indexable || status===404 || (!deployment.legalPublished && ['/privacy','/terms','/refund-policy'].includes(pathname.replace(/\/$/,'')))) headers['X-Robots-Tag'] = 'noindex, follow'
+    if (!deployment.indexable || status===404 || ['/privacy','/terms','/refund-policy'].includes(pathname.replace(/\/$/,''))) headers['X-Robots-Tag'] = 'noindex, follow'
     const [br, gzip] = await Promise.all([exists(`${file}.br`), exists(`${file}.gz`)])
     const encoding = negotiateEncoding(request.headers['accept-encoding'], { br, gzip })
     if (encoding === null) {

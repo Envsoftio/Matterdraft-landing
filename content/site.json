@@ -9,7 +9,7 @@
   "status": "in-development",
   "platforms": ["Windows", "macOS"],
   "qualifications": [
-    "The product is in development. Ask about current availability; illustrated features are intended workflows, not evidence of a released production feature.",
+    "The product is in development. Release timing has not been announced; illustrated features are intended workflows, not evidence of a released production feature.",
     "Website demonstrations use fictional documents and sample data. They do not process or upload a real legal matter.",
     "The website does not offer checkout, process purchases or create customer accounts.",
     "Local-first describes local document workflows. Separately offered sharing or other connected features may require a network connection and their own disclosure.",

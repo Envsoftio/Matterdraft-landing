@@ -9,7 +9,7 @@
       </div>
       <div class="desktop-chrome" data-reveal>
         <div class="desktop-app-menu">
-          <strong>MatterDraft</strong>
+          <BrandLogo class="desktop-menu-logo" />
           <span>File</span>
           <span>Edit</span>
           <span>View</span>

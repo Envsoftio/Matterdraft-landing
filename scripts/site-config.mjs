@@ -57,9 +57,6 @@ export function resolveSiteConfig(env = process.env, facts = defaultFacts) {
   return {
     siteUrl: validateSiteOrigin(env.NUXT_PUBLIC_SITE_URL || facts.defaultOrigin),
     indexable: booleanSetting(env, 'INDEXABLE', true),
-    legalPublished: booleanSetting(env, 'LEGAL_PUBLISHED', false),
-    demoEndpoint: String(env.NUXT_PUBLIC_DEMO_ENDPOINT || '').trim(),
-    demoEmail: String(env.NUXT_PUBLIC_DEMO_EMAIL || '').trim(),
     facts,
   }
 }

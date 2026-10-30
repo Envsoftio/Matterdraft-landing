@@ -4,7 +4,7 @@
 export function mountWorkflowExamples(scope) {
 /* MatterDraft — illustrative legal-workflow demonstrations.
    All examples run in this page. They do not open, process, upload or export
-   the visitor's documents. Actual demo-request handling lives separately. */
+   the visitor's documents. */
 (() => {
   'use strict';
 

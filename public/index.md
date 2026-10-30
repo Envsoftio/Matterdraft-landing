@@ -8,7 +8,7 @@ Status: In development for Windows and macOS.
 
 ## Product scope
 
-- The product is in development. Ask about current availability; illustrated features are intended workflows, not evidence of a released production feature.
+- The product is in development. Release timing has not been announced; illustrated features are intended workflows, not evidence of a released production feature.
 - Website demonstrations use fictional documents and sample data. They do not process or upload a real legal matter.
 - The website does not offer checkout, process purchases or create customer accounts.
 - Local-first describes local document workflows. Separately offered sharing or other connected features may require a network connection and their own disclosure.
@@ -50,10 +50,10 @@ Review validation findings before export. Intended output workflows include PDF 
 
 Intended tools include password protection, redaction, electronic signature placement, watermarks and timestamps. Users remain responsible for checking the resulting documents and applicable requirements.
 
-## Contact and availability
+## Availability
 
-Use the website to prepare a demo enquiry and ask about current availability. Only an explicitly configured contact channel sends an enquiry; no backend or purchase flow is implied.
+MatterDraft Studio is in development. Release timing has not been announced. This website does not accept enquiries or provide a purchase flow.
 
 ## Policies
 
-The website policy pages are review drafts awaiting business details and adoption. They are not final published policies and are excluded from the sitemap and this content export.
+The website policy pages are review drafts awaiting business details and adoption. They are excluded from the sitemap and this content export.

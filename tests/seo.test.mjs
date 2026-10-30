@@ -7,7 +7,7 @@ import {
   canonicalUrl, resolveSiteConfig, validateSiteOrigin, PROJECT_ROOT,
 } from '../scripts/site-config.mjs'
 import {
-  assertLegalPublicationReady, escapeXml, findUnresolvedBusinessFields,
+  escapeXml,
   generateContent, prepareLegalMarkdown, renderLlmsIndex, renderRobots, renderSitemap,
 } from '../scripts/generate-content.mjs'
 
@@ -32,13 +32,12 @@ test('canonical URLs retain the configured origin and reject ambiguous paths', (
   }
 })
 
-test('false remains false and conflicting Nuxt public flags fail explicitly', () => {
-  const config = resolveSiteConfig({ INDEXABLE: 'false', LEGAL_PUBLISHED: 'false' })
-  assert.equal(config.indexable, false)
-  assert.equal(config.legalPublished, false)
+test('indexing defaults to on and preview flags remain explicit', () => {
+  assert.equal(resolveSiteConfig({}).indexable, true)
+  assert.equal(resolveSiteConfig({ INDEXABLE: 'false' }).indexable, false)
   assert.throws(() => resolveSiteConfig({ INDEXABLE: 'perhaps' }), /true or false/)
   assert.throws(() => resolveSiteConfig({
-    LEGAL_PUBLISHED: 'false', NUXT_PUBLIC_LEGAL_PUBLISHED: 'true',
+    INDEXABLE: 'false', NUXT_PUBLIC_INDEXABLE: 'true',
   }), /must agree/)
 })
 
@@ -46,7 +45,6 @@ test('preview builds advertise no sitemap and contain no indexable sitemap URLs'
   const config = resolveSiteConfig({
     NUXT_PUBLIC_SITE_URL: 'https://preview.example.com',
     INDEXABLE: 'false',
-    LEGAL_PUBLISHED: 'true',
   })
   assert.equal(renderRobots(config), 'User-agent: *\nDisallow: /\n')
   assert.doesNotMatch(renderSitemap(config), /<url>/)
@@ -68,35 +66,11 @@ test('draft policies stay out of discovery while remaining crawlable for noindex
   assert.doesNotMatch(llms, /matterdraft\.legal/)
 })
 
-test('published policy discovery uses the same origin and correctly escapes XML', () => {
-  const config = resolveSiteConfig({
-    NUXT_PUBLIC_SITE_URL: 'https://example.com', LEGAL_PUBLISHED: 'true',
-  })
-  const sitemap = renderSitemap(config)
-  assert.equal((sitemap.match(/<url>/g) || []).length, 4)
-  for (const slug of ['privacy', 'terms', 'refund-policy']) {
-    assert.ok(sitemap.includes('<loc>https://example.com/' + slug + '</loc>'))
-    assert.ok(renderLlmsIndex(config).includes('https://example.com/legal/' + slug + '.md'))
-  }
+test('sitemap paths use the configured origin and escape XML', () => {
+  const config = resolveSiteConfig({ NUXT_PUBLIC_SITE_URL: 'https://example.com' })
   assert.match(renderSitemap(config, ['/a&b']), /\/a&amp;b<\/loc>/)
   assert.equal(escapeXml('&<>"\''), '&amp;&lt;&gt;&quot;&apos;')
-  assert.doesNotMatch(sitemap, /lastmod|changefreq|priority/)
-})
-
-test('publication guard recognizes the actual draft field styles', () => {
-  const markdown = [
-    '[LEGAL_OPERATOR_NAME]',
-    '[EFFECTIVE_DATE]',
-    '[APP_DATA_DISCLOSURE — identify versions, files and recipients.]',
-    '[GRIEVANCE_EMAIL_AND_PHONE]',
-    '[Privacy Policy](privacy.md)',
-  ].join('\n')
-  assert.deepEqual(findUnresolvedBusinessFields(markdown), [
-    'APP_DATA_DISCLOSURE', 'EFFECTIVE_DATE', 'GRIEVANCE_EMAIL_AND_PHONE', 'LEGAL_OPERATOR_NAME',
-  ])
-  const documents = [{ slug: 'privacy', markdown }]
-  assert.doesNotThrow(() => assertLegalPublicationReady(documents, false))
-  assert.throws(() => assertLegalPublicationReady(documents, true), /privacy:.*LEGAL_OPERATOR_NAME/s)
+  assert.doesNotMatch(renderSitemap(config), /lastmod|changefreq|priority/)
 })
 
 test('legal preparation retains review status but removes the duplicated title and appendix', () => {
@@ -164,26 +138,12 @@ test('generation prepares HTML modules, preserves sources and does not export ra
   assert.doesNotMatch(await readFile(join(projectRoot, 'public/llms-full.txt'), 'utf8'), /LEGAL_OPERATOR_NAME/)
 })
 
-test('a failed publication guard leaves previously generated files unchanged', async (t) => {
-  const projectRoot = await createFixture(t, true)
-  await generateContent({ projectRoot, env: {} })
-  const sitemapPath = join(projectRoot, 'public/sitemap.xml')
-  const before = await readFile(sitemapPath, 'utf8')
-  await assert.rejects(generateContent({
-    projectRoot, env: { LEGAL_PUBLISHED: 'true' },
-  }), /cannot publish unresolved business fields/)
-  assert.equal(await readFile(sitemapPath, 'utf8'), before)
-})
-
-test('withdrawing publication removes only the generated legal Markdown copies', async (t) => {
+test('generation removes stale policy Markdown exports', async (t) => {
   const projectRoot = await createFixture(t)
-  const env = { NUXT_PUBLIC_SITE_URL: 'https://example.com', LEGAL_PUBLISHED: 'true' }
-  await generateContent({ projectRoot, env })
-  const published = await readFile(join(projectRoot, 'public/legal/privacy.md'), 'utf8')
-  assert.match(published, /https:\/\/example\.com\/legal\/terms\.md/)
-  assert.doesNotMatch(published, /Publication notes/)
+  await mkdir(join(projectRoot, 'public/legal'), { recursive: true })
+  await writeFile(join(projectRoot, 'public/legal/privacy.md'), 'Old published copy.')
   await writeFile(join(projectRoot, 'public/legal/unrelated.md'), 'Keep this file.')
-  await generateContent({ projectRoot, env: { ...env, LEGAL_PUBLISHED: 'false' } })
+  await generateContent({ projectRoot, env: {} })
   await assert.rejects(access(join(projectRoot, 'public/legal/privacy.md')))
   assert.equal(await readFile(join(projectRoot, 'public/legal/unrelated.md'), 'utf8'), 'Keep this file.')
 })

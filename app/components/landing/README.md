@@ -28,9 +28,8 @@ closing sections. It introduces no wrapper that would change their layout.
   all document controls, the floating reference panels and the workflow rail.
 - Feature sections retain their original element IDs and `data-*` attributes.
   These are stable hooks for `useLandingExperience()`.
-- `LandingOverlays` contains `#demo-dialog`, `#demo-form`, the original form
-  fields and local-copy output, plus `#screen-dialog`, `#screen-title` and
-  `#screen-stage`. No form information is sent by the default demo flow.
+- `LandingOverlays` contains `#screen-dialog`, `#screen-title` and
+  `#screen-stage` for enlarged product views.
 - Policy links are Nuxt routes: `/privacy`, `/terms` and `/refund-policy`.
   Automatic prefetch is disabled for these links. The old policy placeholder
   dialog and its `data-notice` controls are omitted.
@@ -60,6 +59,6 @@ distinct definition IDs. No screenshot image replaces the product UI.
 
 ## Content boundaries
 
-The interface examples use fictional matters and documents. The development,
-availability and local-copy disclosures remain in the approved copy. Changes to
+The interface examples use fictional matters and documents. The development
+and availability disclosures remain in the approved copy. Changes to
 product claims should be reviewed independently from presentation changes.

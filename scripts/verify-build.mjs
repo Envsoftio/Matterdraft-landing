@@ -17,7 +17,7 @@ for(const route of pages){
   assert.equal([...html.matchAll(/<h1(?:\s|>)/g)].length,1,`Expected one H1 on /${route}`)
   assert(/<meta\s+name="description"\s+content="[^\"]+"/.test(html),`Missing description on /${route}`)
   assert(html.includes('property="og:image"'),`Missing social image on /${route}`)
-  if(route&&!settings.legalPublished)assert(/name="robots"[^>]+noindex/.test(html),`Draft policy must be noindex: ${route}`)
+  if(route)assert(/name="robots"[^>]+noindex/.test(html),`Draft policy must be noindex: ${route}`)
   assert(!html.includes('data:font/'),'Embedded font data should be externalized')
   assert(!html.includes('fonts.googleapis.com'),'Font must be self-hosted')
   const ids=[...html.matchAll(/\sid="([^\"]+)"/g)].map(m=>m[1])
@@ -34,7 +34,8 @@ for(const route of pages){
   pageReports.push({route:`/${route}`,htmlBytes:Buffer.byteLength(html),gzipBytes:gzipSync(html).length})
 }
 const home=await readFile(join(dist,'index.html'),'utf8')
-for(const required of ['Complex legal files.','196','Request a demo','In development','Fictional','matterdraft-structured-data'])assert(home.includes(required),`Missing server-rendered content: ${required}`)
+for(const required of ['Complex legal files.','196','In development','Fictional','matterdraft-structured-data'])assert(home.includes(required),`Missing server-rendered content: ${required}`)
+assert(!home.includes('Request a demo')&&!home.includes('data-demo')&&!home.includes('demo-dialog'),'Demo request UI must be absent')
 const structured=[...home.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].find(m=>m[1].includes('application/ld+json'))
 assert(structured,'JSON-LD missing')
 const schema=JSON.parse(structured[2]);assert(schema['@graph'].some(n=>n.creativeWorkStatus==='In development'),'Structured data must preserve development status')
@@ -42,7 +43,7 @@ assert(!schema['@graph'].some(n=>n.offers||n.aggregateRating),'No invented prici
 for(const file of ['robots.txt','sitemap.xml','llms.txt','llms-full.txt','index.md','favicon.svg','favicon-32.png','apple-touch-icon.png','site.webmanifest','og/matterdraft-social.jpg','fonts/inter-latin-variable.woff2','_headers','404.html'])assert((await stat(join(dist,file))).size>0,`Missing ${file}`)
 const sitemap=await readFile(join(dist,'sitemap.xml'),'utf8')
 assert(sitemap.includes('<urlset'),'Invalid sitemap')
-if(!settings.legalPublished)for(const route of pages.slice(1))assert(!sitemap.includes(`/${route}<`),'Draft policy must not appear in sitemap')
+for(const route of pages.slice(1))assert(!sitemap.includes(`/${route}<`),'Draft policy must not appear in sitemap')
 const llms=await readFile(join(dist,'llms.txt'),'utf8');assert(llms.startsWith('# MatterDraft'),'llms.txt H1 missing');assert(llms.includes('/index.md'),'Markdown product description not discoverable')
 const assetNames=(await readdir(join(dist,'_nuxt'))).filter(name=>/\.(js|css)$/.test(name))
 let jsBytes=0,jsGzip=0,cssBytes=0,cssGzip=0

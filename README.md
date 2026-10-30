@@ -54,7 +54,7 @@ This serves `dist/` at `http://localhost:3000` with the generated security heade
 | `app/data/legal/` | Generated policy modules. Recreate these with `npm run content`. |
 | `public/` | Fonts, brand and social assets, icons, manifest and generated discovery files. |
 | `scripts/` | Shared settings, content generation, static export, preview server and build verification. |
-| `tests/seo.test.mjs` | URL validation, indexing controls, XML escaping, publication guard and generated-content tests. |
+| `tests/seo.test.mjs` | URL validation, indexing controls, XML escaping and generated-content tests. |
 | `tests/static-response.test.mjs` | Compression quality values, fallback/rejection behavior and static cache rules. |
 | `dist/` | Ready-to-host static output. Generation replaces this directory. |
 | `deploy/headers.json` and `vercel.json` | Generated deployment settings matching the exported HTML. |
@@ -69,17 +69,14 @@ Copy `.env.example` to `.env` to override the defaults, or provide the same vari
 | --- | --- | --- |
 | `NUXT_PUBLIC_SITE_URL` | `https://matterdraft.legal` | The one origin used for canonical URLs, social URLs, sitemap entries and Markdown links. |
 | `NUXT_PUBLIC_INDEXABLE` | `true` | Enables homepage indexing. Set to `false` for a non-indexable preview build. |
-| `NUXT_PUBLIC_LEGAL_PUBLISHED` | `false` | Keeps the policy pages in review-draft mode until their business fields are complete and publication is approved. |
-| `NUXT_PUBLIC_DEMO_ENDPOINT` | Empty | Optional JSON POST endpoint for demo enquiries. Takes precedence over email. |
-| `NUXT_PUBLIC_DEMO_EMAIL` | Empty | Optional recipient for the visitor's email application when no endpoint is configured. |
 
 `scripts/site-config.mjs` validates the site URL as an absolute HTTPS origin. A trailing root slash is accepted and normalized; credentials, a path, query or fragment are rejected. This project is configured for the root of an origin, not a subdirectory deployment.
 
-The content generator and Nuxt configuration use the same settings loader. It reads `.env` through Node's `process.loadEnvFile` when the file exists. The aliases `INDEXABLE` and `LEGAL_PUBLISHED` are also supported; if an alias and its `NUXT_PUBLIC_*` counterpart are both set, their values must agree.
+The content generator and Nuxt configuration use the same settings loader. It reads `.env` through Node's `process.loadEnvFile` when the file exists. The `INDEXABLE` alias is also supported; if it and `NUXT_PUBLIC_INDEXABLE` are both set, their values must agree.
 
-**All `NUXT_PUBLIC_*` values are public.** Use them for the site origin and contact routing, never for passwords or secret API keys.
+**All `NUXT_PUBLIC_*` values are public.** Never put passwords or secret API keys in them.
 
-For a static site, settings are resolved at build time. After changing the domain, indexing flags, contact configuration, content or assets:
+For a static site, settings are resolved at build time. After changing the domain, indexing setting, content or assets:
 
 ```sh
 npm run generate
@@ -91,33 +88,6 @@ Deploy the regenerated `dist/` and its matching header configuration together. C
 ### Preview indexing
 
 With `NUXT_PUBLIC_INDEXABLE=false`, page metadata requests `noindex`, `robots.txt` disallows crawling, and the sitemap contains no page entries. The generated `_headers` file and local preview also add a noindex response header; Vercel uses the page's robots metadata for build-specific indexing settings. Search directives are not access controls; use the hosting provider's access protection when a preview must be private.
-
-## Demo-request behavior
-
-The default form operates locally. Name and email are required; practice/team and workflow are optional. Submission prepares a plain-text request and attempts to copy it to the clipboard. A selectable text field remains available when clipboard access is unavailable. **Nothing is sent in this default mode.**
-
-There are two optional connected modes:
-
-1. **Email:** set `NUXT_PUBLIC_DEMO_EMAIL` and leave the endpoint empty. The form opens a `mailto:` draft. The visitor still sends the message from their email application; the page does not claim delivery.
-2. **Endpoint:** set `NUXT_PUBLIC_DEMO_ENDPOINT` to a service you operate or have explicitly selected. The page sends JSON with `POST`, `Content-Type: application/json` and `Accept: application/json`. Any successful HTTP status is accepted; a response body is not required.
-
-The endpoint payload is:
-
-```json
-{
-  "name": "Example User",
-  "email": "user@example.com",
-  "organisation": "Example Practice",
-  "workflow": "A fictional description of a document workflow",
-  "product": "MatterDraft Studio"
-}
-```
-
-Requests time out after 15 seconds. Failed submissions retain the entered details for retry. Closing the dialog or leaving the route cancels the active request and prevents stale responses from updating a later dialog. If both settings are supplied, the endpoint is used; a failed endpoint request does not automatically send an email.
-
-No submission service is supplied. An endpoint must provide its own input validation, delivery/storage behavior and appropriate protection against misuse. An external endpoint also needs the relevant CORS configuration. A relative `/api/...` URL requires a separately configured backend or proxy; the included static preview server returns HTTP 405 for POST requests.
-
-Before enabling a connected mode, update the form's contact/privacy wording and the relevant source policy to describe the actual recipient and handling. The supplied policy drafts describe the original copy-only preview. Regeneration adds the configured endpoint's origin to the static CSP's `connect-src` allowance.
 
 ## Policy drafts and publication
 
@@ -131,23 +101,13 @@ They are **review drafts**, with unresolved business details. By default they ha
 
 The generator parses trusted, repository-owned Markdown at build time. It removes the first H1 from the HTML because the policy layout supplies the page heading, removes the Publication notes appendix, preserves the draft introductory text, and rewrites the old policy filenames to the correct site routes. The source Markdown is unchanged by generation. The parser is not an untrusted-content sanitization service.
 
-To publish policies:
-
-1. Complete the real operator, address, contacts, dates, commercial model, data practices and other bracketed fields in the source Markdown.
-2. Review the publication notes and confirm the statements against the deployed website and any actual product or service. Replace the draft introductory wording with the adopted publication wording when appropriate.
-3. Keep the source's first H1 and the applicable policy content. Review the terms for the intended business and markets.
-4. Set `NUXT_PUBLIC_LEGAL_PUBLISHED=true` and run `npm run generate`.
-5. Review the resulting pages, metadata and disclosures before deployment.
-
-Generation **fails before replacing output** if publication is enabled while the source policies still contain unresolved bracketed business fields such as `[LEGAL_OPERATOR_NAME]`. This is a content guard, not a determination of legal compliance.
-
-When publication is enabled, legal routes become eligible for indexing if the whole site is also indexable; the sitemap includes them, and Markdown policy copies are linked from `llms.txt` and included in `llms-full.txt`. Switching publication off removes the known generated Markdown copies. The refund draft preserves mandatory remedies alongside the no-voluntary-refunds business position.
+The publication environment flag has been removed. These pages remain visible review drafts with `noindex` metadata until the source policies are completed and a separate publication change is made. The refund draft preserves mandatory remedies alongside the no-voluntary-refunds business position.
 
 ## Rendering, interaction and discovery
 
-Nuxt renders the page content on the server during generation, then Vue hydrates it for interaction. Text and illustrations start visible without JavaScript. The interactive examples and demo form require JavaScript, as the page's noscript notice explains.
+Nuxt renders the page content on the server during generation, then Vue hydrates it for interaction. Text and illustrations start visible without JavaScript. The interactive examples require JavaScript, as the page's noscript notice explains.
 
-The client controller owns event listeners, timers, animation frames, observers and active request cleanup for each landing-page mount. It supports keyboard controls, labeled forms, native dialogs, Escape/backdrop closing and focus restoration. Hero and scroll effects respect reduced-motion preferences. These are implementation features, not a claim of complete accessibility certification.
+The client controller owns event listeners, timers, animation frames, observers and dialog cleanup for each landing-page mount. It supports keyboard controls, native dialogs, Escape/backdrop closing and focus restoration. Hero and scroll effects respect reduced-motion preferences. These are implementation features, not a claim of complete accessibility certification.
 
 All workflow examples use sample data. OCR text, template fields, document ordering, pagination, bookmarks, volume planning, validation and PDF tool appearances are demonstrations. They do not open, upload, process, redact or export actual legal files. In particular, a visual redaction example does not remove underlying file content.
 
@@ -158,7 +118,7 @@ The build generates:
 - `robots.txt` and `sitemap.xml` with the configured indexing rules.
 - `llms.txt` as a concise guide following the [llms.txt proposal](https://llmstxt.org/).
 - `index.md` as a readable product overview.
-- `llms-full.txt` containing the product overview and, only when published, policy text.
+- `llms-full.txt` containing the product overview; draft policy text is excluded.
 
 Markdown alternates and a `rel="describedby"` response link make these resources discoverable. These files do not guarantee search ranking or inclusion in an AI answer. [Google's guidance](https://developers.google.com/search/docs/appearance/ai-features) says its AI search features use the normal SEO fundamentals and do not require a special AI text file.
 
@@ -178,7 +138,7 @@ The export produces three related header artifacts:
 | `deploy/headers.json` | Shared header values consumed by the included preview server; useful when configuring another host. |
 | `vercel.json` | Vercel static build/output settings and stable HTTP header rules. Build-specific script restrictions travel in the HTML. |
 
-The Content Security Policy allows local scripts and hashes of the actual generated inline scripts. It does not enable script `unsafe-inline` or `unsafe-eval`. Inline styles remain allowed because the illustrations and interactions use style attributes. Fonts load from the same origin; network connections are limited to the same origin and any explicitly configured demo endpoint origin.
+The Content Security Policy allows local scripts and hashes of the actual generated inline scripts. It does not enable script `unsafe-inline` or `unsafe-eval`. Inline styles remain allowed because the illustrations and interactions use style attributes. Fonts and network connections are limited to the same origin.
 
 The build-specific policy is embedded in each exported HTML page, so the script hashes travel with the content they protect on every static host. Netlify/Cloudflare `_headers` and the local preview also deliver the full policy as an HTTP header. Vercel's HTTP policy contains only stable `frame-ancestors`, `object-src` and `base-uri` restrictions, while the HTML meta policy supplies the script, style and connection rules. This keeps remote builds independent of previously generated hashes in project configuration. Framing restrictions require the HTTP headers; they are not supplied by the meta tag.
 
@@ -205,7 +165,7 @@ npm run preview
 
 The verifier checks generated page metadata, one H1 per route, duplicate IDs, draft-policy indexing, required assets, structured-data consistency and inline-script hashes against the HTML CSP. It also records asset-size checks in `BUILD-REPORT.json`. See `VALIDATION.md` for the completed browser checks and their scope. These checks are not a Lighthouse score or a real-user loading-time measurement.
 
-Review responsive layouts and interactive flows in a browser after meaningful markup or behavior changes, including keyboard navigation, reduced motion, dialogs, the demo-request modes and navigation back from a policy route. Test the deployed host's routes and headers as well as the local preview.
+Review responsive layouts and interactive flows in a browser after meaningful markup or behavior changes, including keyboard navigation, reduced motion, product-view dialogs and navigation back from a policy route. Test the deployed host's routes and headers as well as the local preview.
 
 Dependencies are pinned with a lockfile: Nuxt `4.6.3`, Vue `3.5.44`, Vue Router `5.4.0`, Tailwind and its Vite plugin `4.3.3`, `vue-tsc` `3.3.14`, TypeScript `6.0.3` and build-time Markdown parser `marked` `18.1.2`.
 

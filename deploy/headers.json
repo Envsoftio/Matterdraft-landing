@@ -1,12 +1,11 @@
 {
   "commonHeaders": {
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-sK0TIosMNdrpLBmlkrY0Cn8MifGo8Z+BvoHtprDd9Y8=' 'sha256-7oI00tAPslS0FK8iOhGRgkICQaFhGuNf1UL9YNYxmU0=' 'sha256-4I0txSw4PO335hVgQL+qv8Hfo360WHYZIpAT8Mb9BNU=' 'sha256-VgjRuzqAd/QbE0KjL4+mvnTJaQXCcw6z92VNJBEMSug=' 'sha256-A5hdP5ezNYSnp291gPM+hHQ3b1YW1r1gCb/aMDxcC60='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self' mailto:",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-iB3y/Q1eWqPEdYrookWf3n7J2mUAUNlgN8JVmLugSZk=' 'sha256-UI4Sp6o1QYb7uNB0MAsaKcibeOCAQ7TD9xBI1OmKdIk=' 'sha256-14Wx1D60sozXg00pZdXTUUhVcz5Dml0GGCAQR4MpDNQ=' 'sha256-rxkdjKSwfAdKvEy99DYhLtUVRnoSsbDWocEgaq3RGro=' 'sha256-A5hdP5ezNYSnp291gPM+hHQ3b1YW1r1gCb/aMDxcC60='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
     "Link": "</llms.txt>; rel=\"describedby\""
   },
-  "indexable": true,
-  "legalPublished": false
+  "indexable": true
 }

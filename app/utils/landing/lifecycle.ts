@@ -1,9 +1,3 @@
-/** Configuration is public: never place credentials or secret API keys here. */
-export interface LandingConfig {
-  demoEndpoint: string
-  demoEmail: string
-}
-
 export interface LandingScope {
   readonly disposed: boolean
   on: (

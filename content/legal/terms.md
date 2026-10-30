@@ -28,9 +28,9 @@ An order, licence confirmation or separately signed agreement may specify additi
 
 MatterDraft is a document-workflow product intended to help users organise matter documents and perform functions such as PDF processing, OCR, collation, pagination, indexing, bookmarking, validation and structured export. The functions you receive are those identified for the version and licence you obtain.
 
-MatterDraft is in development for Windows and macOS. Ask about current availability. A roadmap, demonstration, design image or description of a planned feature is not a promise that the feature is currently available or will be supplied by a particular date unless the accepted order expressly says so.
+MatterDraft is in development for Windows and macOS. Release timing has not been announced. A roadmap, demonstration, design image or description of a planned feature is not a promise that the feature is currently available or will be supplied by a particular date unless the accepted order expressly says so.
 
-The current website uses fictional matters and documents. Its interactive examples do not process your real PDFs, certify a bundle, produce a court filing or complete a purchase. The demo-request form currently prepares text for copying and is not connected to demo bookings.
+The current website uses fictional matters and documents. Its interactive examples do not process your real PDFs, certify a bundle, produce a court filing or complete a purchase. The website does not currently provide a demo-request form.
 
 ## 3. Licence and permitted use
 
@@ -167,7 +167,7 @@ The agreement includes the documents identified in Section 1. Nothing excludes l
 3. Review the proposed business-customer liability cap and suspension provisions with counsel. They are draft commercial terms, not existing user-approved product commitments.
 4. Present the relevant version of these Terms and the Refund Policy before purchase, capture affirmative acceptance and provide the accepted terms to the customer. Do not hide the refund restriction only in a footer.
 5. Configure a functioning grievance process. Check additional obligations before selling through a marketplace or merchant of record, or to customers outside India.
-6. The current design contains no checkout or active demo-submission destination. These Terms do not create either. Replace the preview-specific wording only when the product behavior changes.
+6. The current design contains no checkout or demo-request form. These Terms do not create either. Replace the preview-specific wording only when the product behavior changes.
 
 ### Primary legal sources checked on 29 October 2026
 

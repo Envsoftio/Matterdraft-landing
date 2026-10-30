@@ -23,13 +23,11 @@ This policy explains how we handle personal information in connection with the M
 
 ## 2. Current availability and website demonstrations
 
-MatterDraft is in development for Windows and macOS. Ask about current availability. Website illustrations and interactive examples demonstrate intended workflows; they are not evidence that a production feature has been released.
+MatterDraft is in development for Windows and macOS. Release timing has not been announced. Website illustrations and interactive examples demonstrate intended workflows; they are not evidence that a production feature has been released.
 
-The current website demonstration does not accept payments, create customer accounts or upload legal documents. Its demo-request form prepares text for you to copy. We do not receive that text through the form in its current configuration. If you later send it to us through email or another enabled contact channel, we will receive the information you choose to send.
+The current website demonstration does not accept payments, create customer accounts, upload legal documents or offer a demo-request form. If you contact us through an independently available channel, we will receive the information you choose to send.
 
-Other interactive examples, including editable template fields, sample OCR text and bookmark examples, operate within the page. Use fictional information when exploring them. Closing an on-page dialog does not necessarily clear its contents. Browser autofill, clipboard history, caching and device backups are controlled by your browser, operating system or device settings.
-
-If a contact form is connected to a submission service, we will update the notice presented with that form before it starts sending information. This policy does not authorise undisclosed transmission of information entered into a demonstration.
+Other interactive examples, including editable template fields, sample OCR text and bookmark examples, operate within the page. Use fictional information when exploring them. Browser autofill, clipboard history, caching and device backups are controlled by your browser, operating system or device settings.
 
 ## 3. Local document processing and connected features
 
@@ -47,7 +45,7 @@ The following categories apply only where the corresponding activity or feature 
 
 | Activity | Information involved | Purpose |
 | --- | --- | --- |
-| An enquiry, demo request or support conversation that you send to us | Your name, email, organisation or practice, message and any contact details you provide | Respond to you, arrange an agreed demonstration and handle support or follow-up you request |
+| An enquiry or support conversation that you send to us through an available channel | Your name, email, organisation or practice, message and any contact details you provide | Respond to you and handle support or follow-up you request |
 | Customer or licence administration, if offered | Contact information, organisation details, order or licence identifiers and the minimum activation information disclosed for that release | Provide and administer the licence, manage authorised use and communicate about the product |
 | Purchases, if offered | Billing details, tax information, invoice and transaction references, amount, currency and payment status | Complete the transaction, provide receipts, maintain required records and investigate billing issues |
 | Support material you deliberately provide | Your description of a problem, relevant technical details, and any redacted files, screenshots or logs you choose to supply | Diagnose and resolve the reported issue |
@@ -157,7 +155,7 @@ We may update this policy when the product, our practices or applicable law chan
 1. Confirm the legal operator. The supplied material does not establish that MatterDraft is owned by Envsoft Solutions LLP; do not insert that entity without confirmation.
 2. Complete the identity and contact fields, nominate the appropriate grievance contact and verify that the channels work. Set the effective date to the actual adoption date.
 3. Inspect the deployed website, desktop application, installers, update service, licence service, crash reporting and connected features. The HTML audit cannot verify those systems. Complete the app-data, hosting, cookie, provider and retention disclosures; do not leave them as vague future possibilities.
-4. Remove references to purchases, accounts, organisation administration or providers that are not actually used. Keep the copy-only demo wording only while the current form configuration remains accurate.
+4. Remove references to purchases, accounts, organisation administration or providers that are not actually used. Check that the website contact wording matches the available channels.
 5. Adopt the safeguards, retention process and support-data restrictions promised in the policy. Do not publish aspirational operational claims as established facts.
 6. Have counsel review the final operator, markets, data practices and privacy notices. This is an India-oriented draft; offering the product elsewhere can create additional obligations.
 

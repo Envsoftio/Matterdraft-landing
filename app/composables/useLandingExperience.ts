@@ -1,5 +1,4 @@
 import { nextTick, onBeforeUnmount, onMounted } from 'vue'
-import { useRuntimeConfig } from '#imports'
 import { createLandingScope, type LandingScope } from '../utils/landing/lifecycle'
 import { mountCoreExperience } from '../utils/landing/core.js'
 import { mountWorkflowExamples } from '../utils/landing/workflow.js'
@@ -8,12 +7,6 @@ import { mountHeroExperience } from '../utils/landing/hero.js'
 
 /** Enhances the server-rendered landing content for this page's lifetime. */
 export function useLandingExperience(): void {
-  const runtime = useRuntimeConfig()
-  const text = (value: unknown): string => typeof value === 'string' ? value.trim() : ''
-  const config = {
-    demoEndpoint: text(runtime.public.demoEndpoint),
-    demoEmail: text(runtime.public.demoEmail),
-  }
   let active = true
   let scope: LandingScope | undefined
 
@@ -24,7 +17,7 @@ export function useLandingExperience(): void {
     const mountedScope = createLandingScope()
     scope = mountedScope
     try {
-      mountCoreExperience(mountedScope, config)
+      mountCoreExperience(mountedScope)
       mountWorkflowExamples(mountedScope)
       mountInterfaceTools(mountedScope)
       mountHeroExperience(mountedScope)

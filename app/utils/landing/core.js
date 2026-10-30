@@ -1,17 +1,7 @@
-/**
- * @param {import("./lifecycle").LandingScope} scope
- * @param {import("./lifecycle").LandingConfig} config
- */
-export function mountCoreExperience(scope, config) {
+/** @param {import("./lifecycle").LandingScope} scope */
+export function mountCoreExperience(scope) {
 
-/* MatterDraft Studio — navigation, request form and enlarged product views.
-   Configure a verified endpoint or email before accepting demo requests.
-   Endpoint contract: POST JSON {name, email, organisation, workflow, product}.
-   Return a successful HTTP status only after the request has been accepted.
-   Blank values preserve the honest, copy-only preview behaviour.
-   Values are supplied by Nuxt public runtime configuration. */
-const MATTERDRAFT_CONFIG = Object.freeze({demoEndpoint: config.demoEndpoint || '', demoEmail: config.demoEmail || ''});
-
+/* MatterDraft Studio — navigation and enlarged product views. */
 (() => {
   'use strict';
 
@@ -20,27 +10,14 @@ const MATTERDRAFT_CONFIG = Object.freeze({demoEndpoint: config.demoEndpoint || '
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const menuButton = $('#menu-button');
   const mobileNav = $('#mobile-nav');
-  const demoDialog = $('#demo-dialog');
   const screenDialog = $('#screen-dialog');
-  const form = $('#demo-form');
-  const submit = $('#demo-submit');
-  const status = $('#form-status');
-  const copyOutput = $('#request-copy');
   const dialogFocus = new WeakMap();
-  let sending = false;
-  let activeRequest = null;
-  let submissionEpoch = 0;
   let enlargedViewCount = 0;
 
   const alreadyEnhanced = document.documentElement.classList.contains('js');
   document.documentElement.classList.add('js');
   scope.onCleanup(() => {
-    submissionEpoch += 1;
-    activeRequest?.abort();
-    activeRequest = null;
-    [demoDialog, screenDialog].forEach(dialog => {
-      if (dialog?.open) dialog.close();
-    });
+    if (screenDialog?.open) screenDialog.close();
     document.body.classList.remove('modal-open');
     $('#screen-stage')?.replaceChildren();
     if (!alreadyEnhanced) document.documentElement.classList.remove('js');
@@ -49,18 +26,6 @@ const MATTERDRAFT_CONFIG = Object.freeze({demoEndpoint: config.demoEndpoint || '
   function listenToMedia(query, listener) {
     if (query.addEventListener) scope.on(query, 'change', listener);
     else if (query.addListener) scope.onMedia(query, listener);
-  }
-
-  function setStatus(message, isError = false) {
-    if (!status) return;
-    status.textContent = message;
-    status.classList.toggle('error', isError);
-  }
-
-  function setSending(value) {
-    sending = value;
-    if (submit) submit.disabled = value;
-    if (form) form.setAttribute('aria-busy', String(value));
   }
 
   function closeMenu(restoreFocus = false) {
@@ -102,7 +67,7 @@ const MATTERDRAFT_CONFIG = Object.freeze({demoEndpoint: config.demoEndpoint || '
     document.body.classList.add('modal-open');
   }
 
-  [demoDialog, screenDialog].filter(Boolean).forEach(dialog => {
+  [screenDialog].filter(Boolean).forEach(dialog => {
     // Native modal dialogs provide containment and Escape behavior. Keep an
     // explicit Tab boundary as well for keyboard users across browser versions.
     scope.on(dialog, 'keydown', event => {
@@ -139,13 +104,6 @@ const MATTERDRAFT_CONFIG = Object.freeze({demoEndpoint: config.demoEndpoint || '
       pointerBeganOutside = false;
     });
     scope.on(dialog, 'close', () => {
-      if (dialog === demoDialog) {
-        // A closed/reopened form must never receive an earlier request's UI result.
-        submissionEpoch += 1;
-        if (activeRequest) activeRequest.abort();
-        activeRequest = null;
-        setSending(false);
-      }
       if (!$$('dialog[open]').length) document.body.classList.remove('modal-open');
       const restoreTarget = dialogFocus.get(dialog);
       if (restoreTarget?.isConnected && !restoreTarget.closest('[hidden]')) {
@@ -154,105 +112,6 @@ const MATTERDRAFT_CONFIG = Object.freeze({demoEndpoint: config.demoEndpoint || '
       dialogFocus.delete(dialog);
     });
   });
-
-  const connected = Boolean(MATTERDRAFT_CONFIG.demoEndpoint || MATTERDRAFT_CONFIG.demoEmail);
-  const previewNotice = $('#form-preview-notice');
-  if (previewNotice) previewNotice.hidden = connected;
-  if (submit) {
-    submit.textContent = MATTERDRAFT_CONFIG.demoEndpoint ? 'Send demo request'
-      : MATTERDRAFT_CONFIG.demoEmail ? 'Continue by email' : 'Copy demo request';
-  }
-
-  $$('[data-demo]').forEach(button => scope.on(button, 'click', () => {
-    const restoreTarget = mobileNav?.contains(button) ? menuButton : button;
-    closeMenu();
-    setStatus('');
-    if (copyOutput) copyOutput.hidden = true;
-    openDialog(demoDialog, restoreTarget);
-  }));
-
-  function requestText(data) {
-    return 'MatterDraft Studio — demo request\n\nName: ' + data.name +
-      '\nEmail: ' + data.email +
-      '\nPractice / team: ' + (data.organisation || 'Not specified') +
-      '\n\nDocument workflow:\n' + (data.workflow ||
-        'I would like to explore MatterDraft Studio for document processing, template-driven generation and structured legal bundles.');
-  }
-
-  if (form && submit && copyOutput && demoDialog) {
-    scope.on(form, 'submit', async event => {
-      event.preventDefault();
-      if (sending || !form.reportValidity()) return;
-      const values = new FormData(form);
-      const data = {
-        name: String(values.get('name') || '').trim(),
-        email: String(values.get('email') || '').trim(),
-        organisation: String(values.get('organisation') || '').trim(),
-        workflow: String(values.get('workflow') || '').trim(),
-        product: 'MatterDraft Studio'
-      };
-      if (!data.name) {
-        $('#demo-name')?.focus();
-        setStatus('Please enter your name.', true);
-        return;
-      }
-      setStatus('');
-      copyOutput.hidden = true;
-      const content = requestText(data);
-      const epoch = ++submissionEpoch;
-      const isCurrent = () => !scope.disposed && epoch === submissionEpoch && demoDialog.open;
-
-      if (MATTERDRAFT_CONFIG.demoEndpoint) {
-        setSending(true);
-        setStatus('Sending your request…');
-        const controller = new AbortController();
-        activeRequest = controller;
-        const timeout = scope.timeout(() => controller.abort(), 15000);
-        try {
-          const response = await fetch(MATTERDRAFT_CONFIG.demoEndpoint, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-            body: JSON.stringify(data),
-            signal: controller.signal
-          });
-          if (!response.ok) throw new Error('Request not accepted');
-          if (isCurrent()) {
-            setStatus('Your demo request has been sent.');
-            form.reset();
-          }
-        } catch (_) {
-          if (isCurrent()) {
-            setStatus('Your request could not be sent. Your details are still here; please try again.', true);
-          }
-        } finally {
-          scope.clearTimeout(timeout);
-          if (epoch === submissionEpoch) {
-            activeRequest = null;
-            setSending(false);
-          }
-        }
-      } else if (MATTERDRAFT_CONFIG.demoEmail) {
-        setStatus('Continue in your email app to send the request. This page has not submitted it.');
-        window.location.href = 'mailto:' + encodeURIComponent(MATTERDRAFT_CONFIG.demoEmail) +
-          '?subject=' + encodeURIComponent('MatterDraft Studio demo request') +
-          '&body=' + encodeURIComponent(content);
-      } else {
-        copyOutput.value = content;
-        copyOutput.hidden = false;
-        try {
-          if (!navigator.clipboard || !window.isSecureContext) throw new Error('Clipboard unavailable');
-          await navigator.clipboard.writeText(content);
-          if (isCurrent()) setStatus('Request copied. This preview has not sent your details.');
-        } catch (_) {
-          if (isCurrent()) {
-            copyOutput.focus();
-            copyOutput.select();
-            setStatus('Your request is ready below. Copy the selected text; this preview has not sent your details.');
-          }
-        }
-      }
-    });
-  }
 
   // Enlarge the same editable product illustration used on the page.
   function staticProductClone(source) {

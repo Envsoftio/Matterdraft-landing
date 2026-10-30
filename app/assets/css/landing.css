@@ -1,6 +1,6 @@
 /* Approved MatterDraft landing styles. Imported after Tailwind in main.css.
    Shared primitives use Tailwind @apply; illustration and responsive rules preserve
-   the approved product design. The Inter webfont is provided by main.css. */
+   the approved product design. The Plus Jakarta Sans webfont is provided by main.css. */
 
 /* 01 — Design tokens */
 
@@ -9,8 +9,12 @@
   --ink: #101f37;
   --muted: #526176;
   --subtle: #536681;
-  --blue: #225fdf;
-  --blue-dark: #174bb7;
+  --blue: #217bff;
+  --blue-dark: #6a36ee;
+  --primary: #217bff;
+  --primary-hover: #6a36ee;
+  --brand-gradient: linear-gradient(260.69deg,#248FAF 0.61%,#217BFF 29.85%,#6A36EE 57%,#B12BEB 84.15%,#E052F0 100.52%,#ED5DF1 105.03%);
+  --brand-dark-gradient: linear-gradient(135deg,#123F7A 0%,#0A2A54 28%,#061A39 74%,#031128 100%);
   --cyan: #38c9e6;
   --paper: #f5f7fb;
   --pale: #eaf0fb;
@@ -38,7 +42,7 @@ body {
   margin: 0;
   background: var(--white);
   color: var(--ink);
-  font-family: Inter,Arial,sans-serif;
+  font-family: "Plus Jakarta Sans",sans-serif;
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -154,21 +158,21 @@ h1 {
   font-size: clamp(48px,5.15vw,74px);
   line-height: 1.06;
   letter-spacing: -3.6px;
-  font-weight: 550;
+  font-weight: 700;
 }
 
 h2 {
   font-size: clamp(34px,3.3vw,48px);
   line-height: 1.14;
   letter-spacing: -1.8px;
-  font-weight: 540;
+  font-weight: 700;
 }
 
 h3 {
   font-size: 27px;
   line-height: 1.24;
   letter-spacing: -.8px;
-  font-weight: 550;
+  font-weight: 600;
 }
 
 .lead {
@@ -270,6 +274,8 @@ h3 {
   display: inline-flex;
   gap: 7px;
   align-items: center;
+  justify-content: center;
+  width: 44px;
   min-height: 44px;
   padding: 5px 0;
   background: none;
@@ -305,23 +311,23 @@ h3 {
   min-height: 50px;
   padding: 14px 21px;
   gap: 27px;
-  border: 1px solid transparent;
-  border-radius: 7px;
+  border: none;
+  border-radius: 9999px;
   color: #fff;
-  background: var(--blue);
+  background: var(--brand-gradient);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.4;
   transition: background .18s,box-shadow .18s,transform .18s;
 }
 
 .button:hover {
-  background: var(--blue-dark);
-  box-shadow: 0 5px 17px #225fdf20;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(33,123,255,.22),0 4px 16px rgba(177,43,235,.18);
 }
 
 .button:active {
-  transform: translateY(1px);
+  transform: scale(.98);
 }
 
 .button .icon {
@@ -331,7 +337,7 @@ h3 {
 
 .button-outline {
   background: transparent;
-  border-color: var(--line);
+  border: 1px solid var(--line);
   color: var(--ink);
 }
 
@@ -341,12 +347,12 @@ h3 {
 }
 
 .button-white {
-  background: #fff;
-  color: var(--navy);
+  background: var(--brand-gradient);
+  color: #fff;
 }
 
 .button-white:hover {
-  background: #eaf1ff;
+  background: var(--brand-gradient);
 }
 
 .button-small {
@@ -461,12 +467,15 @@ h3 {
   width: 62%;
 }
 
-.brand {
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
-  white-space: nowrap;
-}
+.brand { display: inline-flex; align-items: center; }
+
+.brand-logo-wrap { display: inline-flex; align-items: center; flex-shrink: 0; }
+.brand-logo { width: 165px; height: auto; flex-shrink: 0; }
+.brand-logo-dark { display: none; }
+.policy-logo .brand-logo { width: 180px; }
+.error-logo .brand-logo { width: 210px; }
+.preview-logo .brand-logo { width: 98px; }
+.desktop-menu-logo .brand-logo { width: 92px; }
 
 .brand-mark {
   width: 38px;
@@ -861,7 +870,7 @@ h3 {
 }
 
 .doc-item.active>.icon {
-  color: #225fdf;
+  color: #217bff;
 }
 
 .doc-inclusion {
@@ -914,7 +923,7 @@ h3 {
 .paper-rule {
   height: 3px;
   width: 23px;
-  background: #1f5dde;
+  background: #217bff;
   margin-bottom: 20px;
 }
 
@@ -991,7 +1000,7 @@ h3 {
 .inspector-title .icon {
   width: 15px;
   height: 15px;
-  color: #225fdf;
+  color: #217bff;
 }
 
 .app-inspector>.badge {
@@ -1189,7 +1198,7 @@ h3 {
 /* 09 — Intelligence layer */
 
 .intelligence {
-  background: var(--navy);
+  background: var(--brand-dark-gradient);
   color: #fff;
   position: relative;
   overflow: hidden;
@@ -2314,7 +2323,7 @@ h3 {
 /* 14 — CTA and footer */
 
 .closing {
-  background: var(--navy);
+  background: var(--brand-dark-gradient);
   color: #fff;
   padding: 70px 0;
   position: relative;
@@ -2427,29 +2436,6 @@ dialog::backdrop {
   backdrop-filter: blur(3px);
 }
 
-.demo-dialog {
-  width: min(550px,calc(100% - 32px));
-}
-
-.dialog-inner {
-  padding: 32px;
-}
-
-.dialog-heading {
-  @apply flex items-start justify-between;
-  gap: 18px;
-}
-
-.dialog-heading .eyebrow {
-  font-size: 9px;
-}
-
-.dialog-heading h2 {
-  font-size: 29px;
-  letter-spacing: -1px;
-  margin-top: 9px;
-}
-
 .close-dialog {
   width: 40px;
   height: 40px;
@@ -2468,104 +2454,6 @@ dialog::backdrop {
 .close-dialog .icon {
   width: 18px;
   height: 18px;
-}
-
-.dialog-intro {
-  font-size: 13px;
-  line-height: 1.8;
-  color: var(--muted);
-  margin-top: 15px;
-}
-
-.form-preview-notice {
-  display: flex;
-  gap: 9px;
-  font-size: 11px;
-  line-height: 1.7;
-  color: #59708f;
-  background: #eff4fc;
-  border: 1px solid #dce6f5;
-  border-radius: 6px;
-  padding: 12px;
-  margin-top: 19px;
-}
-
-.form-preview-notice .icon {
-  width: 16px;
-  height: 16px;
-  margin-top: 2px;
-}
-
-.demo-form {
-  display: grid;
-  gap: 16px;
-  margin-top: 22px;
-}
-
-.form-field label {
-  display: block;
-  font-size: 12px;
-  font-weight: 550;
-  margin-bottom: 6px;
-}
-
-.form-field .optional {
-  font-weight: 400;
-  color: #536681;
-}
-
-.form-field input,.form-field textarea {
-  display: block;
-  width: 100%;
-  border: 1px solid #a9bbd4;
-  background: #fff;
-  border-radius: 6px;
-  color: var(--ink);
-  font-size: 14px;
-  line-height: 1.6;
-  padding: 11px 12px;
-  min-height: 46px;
-}
-
-.form-field textarea {
-  min-height: 90px;
-  resize: vertical;
-}
-
-.form-field input::placeholder,.form-field textarea::placeholder {
-  color: #536681;
-}
-
-.demo-form>.button {
-  width: 100%;
-}
-
-.demo-form>.button:disabled {
-  opacity: .65;
-  cursor: wait;
-}
-
-.form-status {
-  font-size: 12px;
-  line-height: 1.7;
-  color: #286b58;
-  overflow-wrap: anywhere;
-}
-
-.form-status.error {
-  color: #a43c3c;
-}
-
-.request-copy {
-  width: 100%;
-  min-height: 160px;
-  background: #f5f7fb;
-  border: 1px solid #b8c9e1;
-  border-radius: 6px;
-  color: var(--ink);
-  padding: 12px;
-  font-size: 12px;
-  line-height: 1.7;
 }
 
 .screen-dialog {
@@ -3087,16 +2975,7 @@ dialog::backdrop {
   .nav-shell>.button {
     display: none;
   }
-  .brand-mark {
-    width: 34px;
-    height: 34px;
-  }
-  .brand-word {
-    font-size: 20px;
-  }
-  .brand-sub {
-    font-size: 7px;
-  }
+  .nav-shell .brand-logo { width: 155px; }
   .hero {
     padding-top: 36px;
     padding-bottom: 27px;
@@ -3782,21 +3661,6 @@ dialog::backdrop {
     padding-top: 18px;
     font-size: 9px;
   }
-  .dialog-inner {
-    padding: 24px 21px;
-  }
-  .dialog-heading h2 {
-    font-size: 26px;
-  }
-  .dialog-intro {
-    font-size: 12px;
-  }
-  .form-preview-notice {
-    font-size: 10px;
-  }
-  .form-field input,.form-field textarea {
-    font-size: 16px;
-  }
   .screen-stage {
     padding: 16px;
   }
@@ -4032,8 +3896,8 @@ dialog[open] {
 :root {
   --navy: #061a39;
   --ink: #13243e;
-  --blue: #225fdf;
-  --blue-dark: #174bb7;
+  --blue: #217bff;
+  --blue-dark: #6a36ee;
   --cyan: #38c9e6;
   --muted: #52647d;
   --subtle: #536681;
@@ -5053,7 +4917,7 @@ dialog[open] {
   position: absolute;
   top: 175px;
   right: -12px;
-  background: #225fdf;
+  background: #217bff;
   color: white;
   border-radius: 5px;
   font-size: 9px;
@@ -5226,7 +5090,7 @@ dialog[open] {
 }
 
 .ocr-sheet.scanned p {
-  font-family: Georgia,serif;
+  font-family: "Plus Jakarta Sans",sans-serif;
   color: #5a6473;
 }
 
@@ -5491,7 +5355,7 @@ dialog[open] {
   border: 1px solid #b6c9e3;
   border-radius: 5px;
   background: white;
-  font: 11px Inter,Arial,sans-serif;
+  font: 11px "Plus Jakarta Sans",sans-serif;
   padding: 10px;
   color: var(--ink);
 }
@@ -5610,7 +5474,7 @@ dialog[open] {
 
 .collation-section {
   padding-block: 90px;
-  background: var(--navy);
+  background: var(--brand-dark-gradient);
   color: #fff;
 }
 
@@ -6793,7 +6657,7 @@ dialog[open] {
 }
 
 .command-group kbd {
-  font: 8px Inter,Arial,sans-serif;
+  font: 8px "Plus Jakarta Sans",sans-serif;
   color: #61789b;
   background: #f0f4fa;
   border: 1px solid #dce5f2;
@@ -9444,7 +9308,7 @@ dialog[open] {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(ellipse at 78% 30%,#143b6870 0,transparent 47%),linear-gradient(115deg,#031126 0%,#061a36 61%,#071d3b 100%);
+  background: var(--brand-dark-gradient);
 }
 
 .mdh-hero .mdh-grid {
@@ -9564,16 +9428,15 @@ dialog[open] {
 }
 
 .mdh-hero .mdh-primary {
-  background: #edf5ff;
-  color: #102a4d;
-  border: 1px solid #ffffff;
-  box-shadow: 0 5px 25px #00000017,0 1px 0 #fff inset;
+  background: var(--brand-gradient);
+  color: #fff;
+  border: none;
   min-height: 50px;
   padding: 0 8px 0 21px;
   gap: 23px;
   font-size: 12px;
-  font-weight: 600;
-  border-radius: 7px;
+  font-weight: 700;
+  border-radius: 9999px;
   transition: background .2s,transform .2s,box-shadow .2s;
 }
 
@@ -9582,9 +9445,9 @@ dialog[open] {
   height: 32px;
   display: grid;
   place-items: center;
-  border: 1px solid #bacde9;
-  border-radius: 4px;
-  background: #e0edff;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(255,255,255,.18);
 }
 
 .mdh-hero .mdh-primary .icon {
@@ -9593,10 +9456,12 @@ dialog[open] {
 }
 
 .mdh-hero .mdh-primary:hover {
-  background: #fff;
-  box-shadow: 0 6px 28px #77aaff22;
+  background: var(--brand-gradient);
+  box-shadow: 0 8px 24px rgba(33,123,255,.22),0 4px 16px rgba(177,43,235,.18);
   transform: translateY(-1px);
 }
+
+.mdh-hero .mdh-primary:active { transform: scale(.98); }
 
 .mdh-hero .mdh-secondary {
   display: inline-flex;
@@ -10595,19 +10460,21 @@ dialog[open] {
 .mdh-hero .mdh-enlarge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 44px;
   gap: 6px;
   border: 0;
   background: none;
   color: #c1d6f0;
   font-size: 7.5px;
-  min-height: 26px;
+  min-height: 44px;
   padding: 0;
   white-space: nowrap;
 }
 
 .mdh-hero .mdh-enlarge .icon {
-  width: 11px;
-  height: 11px;
+  width: 17px;
+  height: 17px;
 }
 
 .mdh-hero .mdh-rail-wrap {

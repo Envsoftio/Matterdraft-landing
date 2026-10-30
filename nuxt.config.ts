@@ -15,9 +15,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       siteUrl: settings.siteUrl,
-      demoEmail: settings.demoEmail,
-      demoEndpoint: settings.demoEndpoint,
-      legalPublished: settings.legalPublished,
       indexable: settings.indexable,
     },
   },
@@ -28,7 +25,7 @@ export default defineNuxtConfig({
       viewport: 'width=device-width, initial-scale=1',
       meta: [
         { name: 'theme-color', content: '#071b37' },
-        { name: 'color-scheme', content: 'light' },
+        { name: 'color-scheme', content: 'light dark' },
         { name: 'format-detection', content: 'telephone=no' },
       ],
       link: [
@@ -36,8 +33,9 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
         { rel: 'manifest', href: '/site.webmanifest' },
-        { rel: 'preload', href: '/fonts/inter-latin-variable.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
+        { rel: 'preload', href: '/fonts/plus-jakarta-sans-latin-variable.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
       ],
+      script: [{ src: '/theme-init.js' }],
     },
     pageTransition: { name: 'page', mode: 'out-in' },
   },

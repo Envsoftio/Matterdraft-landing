@@ -1,0 +1,238 @@
+/* Shared reading scale, kept separate from the deliberately compact workspace illustrations. */
+.nav-links a { font-size: 13px; }
+.mobile-nav a { font-size: 15px; }
+.button { font-size: 14px; }
+.button-small { font-size: 13px; }
+.section-index,
+.eyebrow { font-size: 11px; letter-spacing: 1.1px; }
+.section-top > .lead,
+.section-head-inline > .lead,
+.split-copy > .lead,
+.export-v2-layout .lead,
+.advanced-section .lead { font-size: clamp(15px,1.15vw,17px); line-height: 1.75; }
+.collation-section .section-top .lead,
+.desktop-command-layout p.lead { font-size: clamp(15px,1.15vw,17px); line-height: 1.75; }
+.automation-panel .lead { font-size: 14px; line-height: 1.7; }
+.advanced-tool,
+.bookmark-regenerate,
+#bookmark-add,
+.collation-actions .button,
+.collation-actions .text-link { font-size: 12px; }
+.collation-live { font-size: 12px; }
+.feature-list li,
+.pillar p,
+.scope-items span { font-size: 13px; line-height: 1.65; }
+.landing-page .figure-meta,
+.zoom-button { font-size: 12px; }
+.closing p { font-size: 16px; line-height: 1.7; }
+.closing .audience,
+.audience-detail { font-size: 12px; }
+
+.mdh-hero .mdh-eyebrow { font-size: 10px; }
+.mdh-hero .mdh-description { font-size: 16px; line-height: 1.72; }
+.mdh-hero .mdh-primary,
+.mdh-hero .mdh-secondary { font-size: 13px; }
+.mdh-hero .mdh-trust { font-size: 11px; }
+.mdh-hero .mdh-development { font-size: 12px; }
+
+.footer-links a,
+.footer-links button { font-size: 13px; }
+.footer-bottom,
+.footer-bottom p.footer-summary { font-size: 13px; line-height: 1.7; }
+.footer-bottom p.footer-summary { max-width: 320px; }
+.footer-signature {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.footer-signature-main { display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.footer-signature-sparkle { width: 18px; height: 18px; color: var(--blue); stroke-width: 1.75; }
+.footer-signature-credit a { color: var(--blue); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.footer-signature-credit a:hover { color: var(--blue-dark); }
+html[data-theme="dark"] .footer-signature-credit a { color: #84bdff; }
+html[data-theme="dark"] .footer-signature-credit a:hover { color: #c39dff; }
+
+@media (max-width: 700px) {
+  .section-index,
+  .eyebrow { font-size: 10.5px; }
+  .mdh-hero .mdh-eyebrow { font-size: 9px; letter-spacing: .75px; }
+  .mdh-hero .mdh-description { font-size: 15px; line-height: 1.7; }
+  .mdh-hero .mdh-actions { flex-wrap: wrap; gap: 12px 18px; }
+  .mdh-hero .mdh-primary,
+  .mdh-hero .mdh-secondary { font-size: 12px; }
+  .mdh-hero .mdh-trust { font-size: 10px; }
+  .mdh-hero .mdh-development { font-size: 11px; }
+  .closing p { font-size: 15px; }
+  .closing .audience,
+  .audience-detail { font-size: 11px; }
+  .footer-links a,
+  .footer-links button { font-size: 13px; min-height: 40px; }
+  .footer-bottom,
+  .footer-bottom p.footer-summary { font-size: 13px; }
+  .landing-page .figure-meta { font-size: 11px; }
+  .footer-signature { align-items: flex-start; gap: 7px; margin-top: 16px; text-align: left; }
+}
+
+@media (max-width: 360px) {
+  .mdh-hero .mdh-eyebrow { font-size: 8.5px; }
+  .mdh-hero .mdh-primary,
+  .mdh-hero .mdh-secondary { font-size: 12px; }
+  .footer-signature-main { font-size: 13px; }
+}
+
+/* Hero and workflow copy are primary reading content, not miniature UI chrome. */
+.mdh-hero .mdh-eyebrow {
+  font-size: 11px;
+  line-height: 1.35;
+}
+.mdh-hero .mdh-description {
+  max-width: 500px;
+  font-size: clamp(17px, 1.2vw, 19px);
+  line-height: 1.65;
+}
+.mdh-hero .mdh-primary,
+.mdh-hero .mdh-secondary {
+  font-size: 14px;
+}
+.mdh-hero .mdh-trust {
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.mdh-hero .mdh-trust .icon {
+  width: 16px;
+  height: 16px;
+}
+.mdh-hero .mdh-development {
+  font-size: 13px;
+  line-height: 1.65;
+}
+.mdh-hero .mdh-current {
+  max-width: 440px;
+}
+.mdh-hero .mdh-current strong {
+  font-size: 16px;
+}
+.mdh-hero .mdh-current p {
+  max-width: 395px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.mdh-hero .mdh-rail-heading,
+.mdh-hero .mdh-replay {
+  font-size: 11px;
+}
+.mdh-hero .mdh-stage {
+  gap: 9px;
+  min-height: 34px;
+  font-size: 12px;
+}
+.mdh-hero .mdh-stage-node {
+  width: 32px;
+  height: 32px;
+}
+.mdh-hero .mdh-stage-node .icon {
+  width: 14px;
+  height: 14px;
+}
+.mdh-hero .mdh-workflow-rail::before {
+  top: 16px;
+}
+
+.journey-step {
+  min-height: 150px;
+  padding: 24px 20px;
+}
+.journey-step .micro {
+  font-size: 11px;
+}
+.journey-step strong {
+  margin-top: 15px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+.journey-step p {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.journey-step > .icon {
+  top: 26px;
+  right: 18px;
+  width: 15px;
+  height: 15px;
+}
+
+@media (min-width: 1201px) {
+  .mdh-hero .mdh-canvas {
+    min-height: 960px;
+    height: auto;
+    max-height: none;
+  }
+  .mdh-hero .mdh-current { margin-top: 27px; }
+  .mdh-hero .mdh-rail-wrap { bottom: 30px; }
+}
+
+@media (max-width: 1200px) {
+  .mdh-hero .mdh-description { font-size: 17px; }
+  .mdh-hero .mdh-development { font-size: 13px; }
+  .mdh-hero .mdh-stage { font-size: 11px; }
+  .mdh-hero .mdh-stage-node { width: 30px; height: 30px; }
+  .mdh-hero .mdh-workflow-rail::before { top: 15px; }
+}
+
+@media (min-width: 761px) and (max-width: 1200px) {
+  .mdh-hero .mdh-canvas { min-height: 1390px; }
+  .mdh-hero .mdh-experience { top: 470px; }
+  .mdh-hero .mdh-orbit-label { display: none; }
+}
+
+@media (max-width: 1020px) {
+  .mdh-hero .mdh-workflow-rail {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px 18px;
+  }
+  .mdh-hero .mdh-workflow-rail::before { display: none; }
+  .mdh-hero .mdh-stage { font-size: 12px; }
+}
+
+@media (max-width: 760px) {
+  .mdh-hero .mdh-experience { top: auto; }
+  .mdh-hero .mdh-orbit-label { font-size: 9px; }
+  .mdh-hero .mdh-eyebrow { font-size: 10px; letter-spacing: .8px; }
+  .mdh-hero .mdh-description { font-size: 16px; line-height: 1.65; }
+  .mdh-hero .mdh-primary,
+  .mdh-hero .mdh-secondary { font-size: 13px; }
+  .mdh-hero .mdh-trust { gap: 9px; font-size: 12px; }
+  .mdh-hero .mdh-development { max-width: 420px; font-size: 12px; line-height: 1.65; }
+  .mdh-hero .mdh-rail-heading,
+  .mdh-hero .mdh-replay { font-size: 10px; }
+  .mdh-hero .mdh-stage { gap: 7px; min-height: 32px; font-size: 11px; }
+  .mdh-hero .mdh-stage-node { width: 28px; height: 28px; }
+  .journey-step { min-height: 100px; padding: 0 0 27px 31px; }
+  .journey-step .micro { width: 32px; height: 32px; left: -16px; font-size: 11px; }
+  .journey-step strong { margin-top: 2px; font-size: 15px; line-height: 1.5; }
+  .journey-step p { max-width: 34ch; font-size: 13px; line-height: 1.65; }
+}
+
+@media (max-width: 430px) {
+  .mdh-hero .mdh-actions { align-items: flex-start; }
+  .mdh-hero .mdh-trust { column-gap: 8px; row-gap: 7px; }
+  .mdh-hero .mdh-trust > i { display: none; }
+  .mdh-hero .mdh-workflow-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mdh-hero .mdh-stage { font-size: 12px; }
+}
+
+@media (max-width: 360px) {
+  .mdh-hero .mdh-eyebrow { font-size: 9px; }
+  .mdh-hero .mdh-description { font-size: 15px; }
+  .mdh-hero .mdh-primary,
+  .mdh-hero .mdh-secondary { font-size: 12px; }
+  .mdh-hero .mdh-trust,
+  .mdh-hero .mdh-development { font-size: 11px; }
+}
