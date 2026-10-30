@@ -194,9 +194,9 @@
             <p class="collation-live" id="collation-status" role="status">Drag documents between parts, use the arrow controls, or change a part with its dropdown. This fictional example contains 196 numbered pages.</p>
           </div>
         </div>
-        <figcaption class="figure-meta">
+        <!-- <figcaption class="figure-meta">
           <span>Interactive collation illustration · Changes rebuild the example shown on this page.</span>
-        </figcaption>
+        </figcaption> -->
       </figure>
       <div class="collation-outcome">
         <strong>Combine the parts</strong>

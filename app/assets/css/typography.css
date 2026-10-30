@@ -236,3 +236,43 @@ html[data-theme="dark"] .footer-signature-credit a:hover { color: #c39dff; }
   .mdh-hero .mdh-trust,
   .mdh-hero .mdh-development { font-size: 11px; }
 }
+
+/* Workflow summaries sit outside the small product illustrations and should read as page content. */
+.collation-outcome,
+.flow-strip,
+.source-flow,
+.ocr-steps {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.collation-outcome {
+  font-size: 15px;
+}
+.collation-outcome .icon,
+.flow-strip .icon,
+.source-flow .icon,
+.ocr-steps .icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+@media (max-width: 700px) {
+  .collation-outcome,
+  .flow-strip,
+  .source-flow,
+  .ocr-steps {
+    font-size: 13px;
+  }
+  .collation-outcome {
+    font-size: 14px;
+  }
+  .collation-outcome .icon,
+  .flow-strip .icon,
+  .source-flow .icon,
+  .ocr-steps .icon {
+    width: 15px;
+    height: 15px;
+    flex-basis: 15px;
+  }
+}

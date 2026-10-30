@@ -1,11 +1,25 @@
 /* Give the hero copy a readable scale and space above the workflow rail. */
+.mdh-hero .mdh-description {
+  margin-top: 32px;
+}
+.mdh-hero .mdh-actions {
+  gap: 16px 28px;
+  margin-top: 34px;
+}
+.mdh-hero .mdh-offer {
+  margin-top: 24px;
+}
 .mdh-hero .mdh-offer,
 .mdh-hero .mdh-survey {
   font-size: 15px;
   line-height: 1.55;
 }
 .mdh-hero .mdh-survey {
-  margin-top: 11px;
+  margin-top: 16px;
+}
+.mdh-hero .mdh-trust {
+  gap: 16px;
+  margin-top: 32px;
 }
 .mdh-hero .mdh-orbit-label {
   font-size: 10px;
@@ -89,14 +103,39 @@
   }
 }
 
+@media (min-width: 761px) and (max-width: 1200px) {
+  .mdh-hero .mdh-canvas {
+    min-height: 1465px;
+  }
+  .mdh-hero .mdh-experience {
+    top: 545px;
+  }
+}
+
 @media (max-width: 760px) {
+  .mdh-hero .mdh-description {
+    margin-top: 28px;
+  }
+  .mdh-hero .mdh-actions {
+    gap: 12px 20px;
+    margin-top: 30px;
+  }
+  .mdh-hero .mdh-offer {
+    margin-top: 22px;
+  }
   .mdh-hero .mdh-offer,
   .mdh-hero .mdh-survey {
     font-size: 14px;
     line-height: 1.55;
   }
+  .mdh-hero .mdh-survey {
+    margin-top: 14px;
+  }
   .mdh-hero .mdh-trust {
     font-size: 12px;
+    column-gap: 12px;
+    row-gap: 10px;
+    margin-top: 28px;
     white-space: normal;
   }
   .mdh-hero .mdh-rail-heading {

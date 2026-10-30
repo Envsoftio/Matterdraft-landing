@@ -127,9 +127,9 @@
             </div>
           </div>
         </div>
-        <figcaption class="figure-meta">
+        <!-- <figcaption class="figure-meta">
           <span>Interactive illustration · This page does not process or redact your own files.</span>
-        </figcaption>
+        </figcaption> -->
       </figure>
       <div class="engine-support">
         <p><strong>Bring different source formats together.</strong>Work with PDFs, Word documents and images. Convert images and documents to PDF within the preparation workflow.</p>

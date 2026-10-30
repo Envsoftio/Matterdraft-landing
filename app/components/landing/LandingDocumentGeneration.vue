@@ -197,9 +197,9 @@
             </div>
           </div>
         </div>
-        <figcaption class="figure-meta">
+        <!-- <figcaption class="figure-meta">
           <span>Fictional form and template · No generative legal drafting.</span>
-        </figcaption>
+        </figcaption> -->
       </figure>
       <div class="flow-strip">
         <span>Matter</span>
