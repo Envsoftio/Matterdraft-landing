@@ -25,7 +25,7 @@ This policy explains how we handle personal information in connection with the M
 
 MatterDraft is in development for Windows and macOS. Release timing has not been announced. Website illustrations and interactive examples demonstrate intended workflows; they are not evidence that a production feature has been released.
 
-The current website demonstration does not accept payments, create customer accounts, upload legal documents or offer a demo-request form. If you contact us through an independently available channel, we will receive the information you choose to send.
+The current website demonstration does not accept payments, create customer accounts, upload legal documents or offer a demo-request form. If an early access form is enabled, the information you submit through it will be sent to the configured form service and used to contact you about early access and launch. If you contact us through another available channel, we will receive the information you choose to send.
 
 Other interactive examples, including editable template fields, sample OCR text and bookmark examples, operate within the page. Use fictional information when exploring them. Browser autofill, clipboard history, caching and device backups are controlled by your browser, operating system or device settings.
 
@@ -46,6 +46,7 @@ The following categories apply only where the corresponding activity or feature 
 | Activity | Information involved | Purpose |
 | --- | --- | --- |
 | An enquiry or support conversation that you send to us through an available channel | Your name, email, organisation or practice, message and any contact details you provide | Respond to you and handle support or follow-up you request |
+| An early access registration, if enabled | Your name, work email, optional role and preferred platform, and contact consent | Manage the early access list and contact you about access and launch |
 | Customer or licence administration, if offered | Contact information, organisation details, order or licence identifiers and the minimum activation information disclosed for that release | Provide and administer the licence, manage authorised use and communicate about the product |
 | Purchases, if offered | Billing details, tax information, invoice and transaction references, amount, currency and payment status | Complete the transaction, provide receipts, maintain required records and investigate billing issues |
 | Support material you deliberately provide | Your description of a problem, relevant technical details, and any redacted files, screenshots or logs you choose to supply | Diagnose and resolve the reported issue |
@@ -108,6 +109,7 @@ We keep information only for as long as it is needed for the disclosed purpose, 
 | Information | Retention approach |
 | --- | --- |
 | Enquiries and communications | Until the enquiry and any requested follow-up are complete, plus the documented period needed to maintain correspondence records |
+| Early access registrations, if enabled | Until the launch and any requested follow-up are complete, subject to the actual retention schedule disclosed before activation |
 | Customer and licence records | During the relevant relationship and thereafter only for legitimate administration, recordkeeping or legal needs |
 | Billing and tax records | For the period required by the applicable accounting and tax laws |
 | Support attachments and diagnostics received by us | Only for the documented support or security purpose and its defined retention period; avoid retaining unnecessary document contents |
@@ -155,7 +157,7 @@ We may update this policy when the product, our practices or applicable law chan
 1. Confirm the legal operator. The supplied material does not establish that MatterDraft is owned by Envsoft Solutions LLP; do not insert that entity without confirmation.
 2. Complete the identity and contact fields, nominate the appropriate grievance contact and verify that the channels work. Set the effective date to the actual adoption date.
 3. Inspect the deployed website, desktop application, installers, update service, licence service, crash reporting and connected features. The HTML audit cannot verify those systems. Complete the app-data, hosting, cookie, provider and retention disclosures; do not leave them as vague future possibilities.
-4. Remove references to purchases, accounts, organisation administration or providers that are not actually used. Check that the website contact wording matches the available channels.
+4. Remove references to purchases, accounts, organisation administration or providers that are not actually used. Before enabling the early access form, identify its provider, location, retention schedule and privacy link, and check that the website contact wording matches the available channels.
 5. Adopt the safeguards, retention process and support-data restrictions promised in the policy. Do not publish aspirational operational claims as established facts.
 6. Have counsel review the final operator, markets, data practices and privacy notices. This is an India-oriented draft; offering the product elsewhere can create additional obligations.
 

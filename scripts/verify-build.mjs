@@ -35,6 +35,7 @@ for(const route of pages){
 }
 const home=await readFile(join(dist,'index.html'),'utf8')
 for(const required of ['Complex legal files.','196','In development','Fictional','matterdraft-structured-data'])assert(home.includes(required),`Missing server-rendered content: ${required}`)
+for(const required of ['https://forms.gle/oZ4ziNTZoQ3QWEoh6','Early access registration','six months free after launch','Registration isn’t open yet'])assert(home.includes(required),`Missing early access content: ${required}`)
 assert(!home.includes('Request a demo')&&!home.includes('data-demo')&&!home.includes('demo-dialog'),'Demo request UI must be absent')
 const structured=[...home.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].find(m=>m[1].includes('application/ld+json'))
 assert(structured,'JSON-LD missing')

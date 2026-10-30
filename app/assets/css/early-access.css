@@ -1,0 +1,80 @@
+/* Early access extends the landing page's existing type, color and control system. */
+.mdh-hero .mdh-canvas { min-height: 915px; max-height: 1060px; }
+.mdh-hero .mdh-offer { margin-top: 13px; color: #dceaff; font-size: 13px; line-height: 1.5; }
+.mdh-hero .mdh-offer strong { color: #fff; font-weight: 700; }
+.mdh-hero .mdh-survey { margin-top: 9px; color: #b9cce5; font-size: 12px; line-height: 1.6; }
+.mdh-hero .mdh-survey a { color: #dcecff; font-weight: 650; text-decoration: underline; text-underline-offset: 3px; }
+.mdh-hero .mdh-survey a:hover { color: #fff; }
+html[data-theme="light"] .mdh-hero .mdh-offer,
+html[data-theme="light"] .mdh-hero .mdh-survey { color: #345574; }
+html[data-theme="light"] .mdh-hero .mdh-offer strong,
+html[data-theme="light"] .mdh-hero .mdh-survey a { color: #174878; }
+
+.early-access { padding: clamp(72px, 8vw, 120px) 0; background: #f4f7fc; color: #10233f; }
+.early-access-layout { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); align-items: start; gap: clamp(40px, 7vw, 110px); }
+.early-access-copy { padding-top: 28px; max-width: 520px; }
+.early-access-copy .eyebrow { color: #256ca8; font-weight: 700; }
+.early-access-copy h2 { margin-top: 18px; font-size: clamp(38px, 3.6vw, 58px); line-height: 1.08; letter-spacing: -.045em; font-weight: 600; }
+.early-access-copy > p:not(.eyebrow) { margin-top: 22px; max-width: 470px; color: #475d79; font-size: 16px; line-height: 1.75; }
+.early-access-copy .early-access-offer { padding-top: 22px; border-top: 1px solid #d3deeb; color: #1c4266; }
+.early-access-offer strong { display: block; color: #145a95; font-size: 22px; line-height: 1.35; }
+.early-access-copy .early-access-timing { font-size: 13px !important; color: #637792 !important; }
+.early-access-panel { padding: clamp(26px, 3.2vw, 44px); border: 1px solid #d5e2ef; border-radius: 20px; background: #fff; box-shadow: 0 22px 55px rgba(12, 42, 80, .09); }
+.early-access-panel-head h3 { color: #102c4d; font-size: 25px; line-height: 1.25; font-weight: 650; letter-spacing: -.025em; }
+.early-access-panel-head p { margin-top: 8px; color: #5a6e88; font-size: 14px; line-height: 1.65; }
+.early-access-form { margin-top: 26px; }
+.early-access-form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.early-access-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 19px 16px; }
+.early-access-fields label { display: flex; flex-direction: column; gap: 8px; color: #233c59; font-size: 13px; line-height: 1.4; font-weight: 650; }
+.early-access-fields .required-mark { color: #a0404c; }
+.early-access-fields input,
+.early-access-fields select { width: 100%; min-height: 48px; padding: 10px 13px; border: 1px solid #c9d7e7; border-radius: 9px; background: #fff; color: #102c4d; font-size: 14px; font-weight: 450; }
+.early-access-fields input::placeholder { color: #71829a; }
+.early-access-fields :disabled { cursor: not-allowed; opacity: .78; }
+.early-access-fields input:hover,
+.early-access-fields select:hover { border-color: #729aca; }
+.early-access-fields input:focus-visible,
+.early-access-fields select:focus-visible { outline: 3px solid #78b7ff; outline-offset: 2px; border-color: #2769a8; }
+.early-access-consent { display: flex; gap: 11px; align-items: flex-start; margin-top: 24px; color: #435b76; font-size: 13px; line-height: 1.6; cursor: pointer; }
+.early-access-consent input { flex: 0 0 auto; width: 18px; height: 18px; margin: 2px 0 0; accent-color: #217bff; }
+.early-access-consent a { color: #165e9c; text-decoration: underline; text-underline-offset: 3px; }
+.early-access-submit { width: 100%; margin-top: 24px; gap: 10px; justify-content: center; }
+.early-access-submit:disabled { cursor: not-allowed; opacity: .6; box-shadow: none; transform: none; }
+.early-access-unavailable { margin-top: 14px; color: #7d4819; font-size: 13px; line-height: 1.5; }
+.early-access-note { margin-top: 14px; color: #657791; font-size: 12px; line-height: 1.5; }
+html[data-theme="dark"] .early-access { background: #0c1d36; color: #edf4ff; }
+html[data-theme="dark"] .early-access-copy .eyebrow { color: #8cc8ff; }
+html[data-theme="dark"] .early-access-copy > p:not(.eyebrow) { color: #bacbe0; }
+html[data-theme="dark"] .early-access-copy .early-access-offer { border-top-color: #3a526f; }
+html[data-theme="dark"] .early-access-offer strong { color: #9ad4ff; }
+html[data-theme="dark"] .early-access-copy .early-access-timing { color: #9eb1cb !important; }
+html[data-theme="dark"] .early-access-panel { border-color: #344c6a; background: #122743; box-shadow: 0 22px 55px rgba(0, 0, 0, .15); }
+html[data-theme="dark"] .early-access-panel-head h3,
+html[data-theme="dark"] .early-access-fields label { color: #e6f0ff; }
+html[data-theme="dark"] .early-access-panel-head p,
+html[data-theme="dark"] .early-access-consent,
+html[data-theme="dark"] .early-access-note { color: #b4c6df; }
+html[data-theme="dark"] .early-access-fields input,
+html[data-theme="dark"] .early-access-fields select { border-color: #526b89; background: #0c1d36; color: #f4f8ff; }
+html[data-theme="dark"] .early-access-fields input::placeholder { color: #a6bad2; }
+html[data-theme="dark"] .early-access-consent a { color: #9ad4ff; }
+html[data-theme="dark"] .early-access-unavailable { color: #ffd096; }
+
+@media (max-width: 1200px) {
+  .mdh-hero .mdh-canvas { min-height: 1210px; max-height: none; }
+}
+@media (max-width: 900px) {
+  .early-access-layout { grid-template-columns: 1fr; gap: 35px; }
+  .early-access-copy { max-width: 680px; padding-top: 0; }
+}
+@media (max-width: 760px) {
+  .mdh-hero .mdh-canvas { min-height: 0; }
+  .mdh-hero .mdh-offer { font-size: 12px; }
+  .mdh-hero .mdh-survey { font-size: 11px; }
+  .early-access { padding: 70px 0; }
+  .early-access-copy h2 { font-size: clamp(35px, 8vw, 48px); }
+  .early-access-panel { padding: 25px 21px; }
+}
+@media (max-width: 520px) {
+  .early-access-fields { grid-template-columns: 1fr; }
+}

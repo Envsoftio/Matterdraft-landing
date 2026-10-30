@@ -27,8 +27,11 @@
         </h1>
         <p class="mdh-description">Process, OCR and collate your documents. Automate pagination, indexes and bookmarks. Review and export a structured legal bundle.</p>
         <div class="mdh-actions">
-          <a class="button mdh-primary" href="#workflow">Explore the workflow<span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></a>
+          <a class="button mdh-primary" href="#early-access">Early access<span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></a>
+          <a class="mdh-secondary" href="#workflow">Explore the workflow<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
         </div>
+        <p class="mdh-offer">Early access signups get <strong>six months free after launch.</strong></p>
+        <p class="mdh-survey">Advocate? <a href="https://forms.gle/oZ4ziNTZoQ3QWEoh6" target="_blank" rel="noopener noreferrer">Share your feedback in our advocate survey <span aria-hidden="true">↗</span></a></p>
         <div class="mdh-trust">
           <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M8 21h8M12 16v5"/></svg>Windows + macOS</span>
           <i aria-hidden="true"></i>

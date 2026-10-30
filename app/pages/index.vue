@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import LandingHeader from '~/components/landing/LandingHeader.vue'
 import LandingHero from '~/components/landing/LandingHero.vue'
+import LandingEarlyAccess from '~/components/landing/LandingEarlyAccess.vue'
 import LandingFeatures from '~/components/landing/LandingFeatures.vue'
 import LandingFooter from '~/components/landing/LandingFooter.vue'
 import LandingOverlays from '~/components/landing/LandingOverlays.vue'
@@ -42,6 +43,7 @@ useHead({ script: [{ key: 'matterdraft-structured-data', type: 'application/ld+j
   <LandingHeader />
   <main id="main">
     <LandingHero />
+    <LandingEarlyAccess />
     <LandingFeatures />
   </main>
   <LandingFooter />

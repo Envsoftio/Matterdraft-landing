@@ -76,6 +76,8 @@ The content generator and Nuxt configuration use the same settings loader. It re
 
 **All `NUXT_PUBLIC_*` values are public.** Never put passwords or secret API keys in them.
 
+The early access section currently previews its fields with submission disabled. Before opening registration, connect a form service, handle success and failure states, test a real submission, and update the privacy draft with the actual provider and retention details.
+
 For a static site, settings are resolved at build time. After changing the domain, indexing setting, content or assets:
 
 ```sh

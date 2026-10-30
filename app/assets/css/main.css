@@ -2,6 +2,7 @@
 @import "./landing.css";
 @import "./dark.css";
 @import "./typography.css";
+@import "./early-access.css";
 
 @theme {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;

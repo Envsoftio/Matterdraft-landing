@@ -10,13 +10,14 @@ existing controls after hydration.
 <LandingHeader />
 <main id="main">
   <LandingHero />
+  <LandingEarlyAccess />
   <LandingFeatures />
 </main>
 <LandingFooter />
 <LandingOverlays />
 ```
 
-Import the five components explicitly from `~/components/landing/` in the page.
+Import the page components explicitly from `~/components/landing/` in the page.
 `LandingFeatures.vue` explicitly imports and orders the fifteen feature and
 closing sections. It introduces no wrapper that would change their layout.
 
