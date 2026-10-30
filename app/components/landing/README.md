@@ -14,7 +14,6 @@ existing controls after hydration.
   <LandingFeatures />
 </main>
 <LandingFooter />
-<LandingOverlays />
 ```
 
 Import the page components explicitly from `~/components/landing/` in the page.
@@ -29,8 +28,6 @@ closing sections. It introduces no wrapper that would change their layout.
   all document controls, the floating reference panels and the workflow rail.
 - Feature sections retain their original element IDs and `data-*` attributes.
   These are stable hooks for `useLandingExperience()`.
-- `LandingOverlays` contains `#screen-dialog`, `#screen-title` and
-  `#screen-stage` for enlarged product views.
 - Policy links are Nuxt routes: `/privacy`, `/terms` and `/refund-policy`.
   Automatic prefetch is disabled for these links. The old policy placeholder
   dialog and its `data-notice` controls are omitted.
@@ -52,14 +49,12 @@ font preload belong to the application asset setup; no base64 webfont is stored
 in the components or this stylesheet.
 
 The landing container explicitly clears Tailwind's generated `container`
-maximum widths, and native dialogs explicitly restore `margin: auto` after
-preflight. Keep these compatibility rules when changing the global reset.
+maximum widths.
 
 All approved brand artwork remains inline SVG with its original gradients and
 distinct definition IDs. No screenshot image replaces the product UI.
 
 ## Content boundaries
 
-The interface examples use fictional matters and documents. The development
-and availability disclosures remain in the approved copy. Changes to
-product claims should be reviewed independently from presentation changes.
+The interface examples use fictional matters and documents. Early access
+registration remains unavailable until a signup destination is connected.

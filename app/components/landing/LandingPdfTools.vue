@@ -129,13 +129,6 @@
         </div>
         <figcaption class="figure-meta">
           <span>Interactive illustration · This page does not process or redact your own files.</span>
-          <button
-            type="button"
-            class="zoom-button"
-            aria-label="Enlarge product view"
-            data-enlarge="engine-visual"
-            data-title="PDF processing and editing workspace"
-          ><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H3v6M15 3h6v6M21 15v6h-6M9 21H3v-6M3 3l6 6M21 3l-6 6M21 21l-6-6M3 21l6-6"/></svg></button>
         </figcaption>
       </figure>
       <div class="engine-support">

@@ -4,7 +4,6 @@ import LandingHero from '~/components/landing/LandingHero.vue'
 import LandingEarlyAccess from '~/components/landing/LandingEarlyAccess.vue'
 import LandingFeatures from '~/components/landing/LandingFeatures.vue'
 import LandingFooter from '~/components/landing/LandingFooter.vue'
-import LandingOverlays from '~/components/landing/LandingOverlays.vue'
 
 const title = 'MatterDraft Studio | Legal Document Workspace'
 const description = 'Organise legal documents, OCR scans and prepare indexed, numbered, bookmarked PDF bundles in one workspace.'
@@ -46,6 +45,5 @@ useHead({ script: [{ key: 'matterdraft-structured-data', type: 'application/ld+j
     <LandingFeatures />
   </main>
   <LandingFooter />
-  <LandingOverlays />
   </div>
 </template>

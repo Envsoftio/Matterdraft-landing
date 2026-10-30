@@ -10,7 +10,7 @@
     "dev": "nuxt dev --host 0.0.0.0",
     "content": "node scripts/generate-content.mjs",
     "build": "npm run content && nuxt build",
-    "generate": "npm run content && nuxt generate && node scripts/export-static.mjs",
+    "generate": "npm run content && NITRO_PRESET=static nuxt generate && node scripts/export-static.mjs",
     "preview": "node scripts/serve-static.mjs",
     "preview:ssr": "node .output/server/index.mjs",
     "typecheck": "nuxt typecheck",

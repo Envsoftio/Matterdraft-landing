@@ -65,21 +65,9 @@ html[data-theme="light"] .mdh-hero .mdh-current p {
 html[data-theme="light"] .mdh-hero .mdh-current {
   color: #173856;
 }
-html[data-theme="light"] .mdh-hero .mdh-current-line {
-  background: linear-gradient(#258ac7, #9dc2dc);
-}
 html[data-theme="light"] .mdh-hero .mdh-orbit-label,
-html[data-theme="light"] .mdh-hero .mdh-figure-caption,
-html[data-theme="light"] .mdh-hero .mdh-enlarge,
-html[data-theme="light"] .mdh-hero .mdh-rail-heading,
-html[data-theme="light"] .mdh-hero .mdh-replay {
+html[data-theme="light"] .mdh-hero .mdh-rail-heading {
   color: #4d6784;
-}
-html[data-theme="light"] .mdh-hero .mdh-rail-wrap {
-  border-top-color: rgba(59, 99, 145, .22);
-}
-html[data-theme="light"] .mdh-hero .mdh-workflow-rail::before {
-  background: linear-gradient(90deg, #8da9c5, rgba(141, 169, 197, .38));
 }
 html[data-theme="light"] .mdh-hero .mdh-stage {
   background: #edf3fa;

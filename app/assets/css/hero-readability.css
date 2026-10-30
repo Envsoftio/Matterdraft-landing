@@ -1,49 +1,219 @@
 /* Give the hero copy a readable scale and space above the workflow rail. */
 .mdh-hero .mdh-offer,
-.mdh-hero .mdh-survey { font-size: 15px; line-height: 1.55; }
-.mdh-hero .mdh-survey { margin-top: 11px; }
-.mdh-hero .mdh-current strong { font-size: 15px; }
-.mdh-hero .mdh-current p { font-size: 13px; line-height: 1.55; }
-.mdh-hero .mdh-orbit-label { font-size: 10px; letter-spacing: .8px; color: #c7d9ef; }
-.mdh-hero .mdh-rail-heading { font-size: 10px; letter-spacing: .8px; color: #b9cce4; }
-.mdh-hero .mdh-stage { font-size: 11px; }
+.mdh-hero .mdh-survey {
+  font-size: 15px;
+  line-height: 1.55;
+}
+.mdh-hero .mdh-survey {
+  margin-top: 11px;
+}
+.mdh-hero .mdh-orbit-label {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: #c7d9ef;
+}
+.mdh-hero .mdh-rail-heading {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: #b9cce4;
+}
+.mdh-hero .mdh-stage {
+  font-size: 11px;
+}
 
 /* The window is an illustration, but its primary labels should survive at normal zoom. */
-.mdh-app .mdh-app-titlebar { font-size: 10px; }
+.mdh-app .mdh-app-titlebar {
+  font-size: 10px;
+}
 .mdh-app .mdh-app-local,
 .mdh-app .mdh-app-matter > small,
-.mdh-app .mdh-app-tag { font-size: 9px; }
-.mdh-app .mdh-app-matter { font-size: 11px; }
+.mdh-app .mdh-app-tag {
+  font-size: 9px;
+}
+.mdh-app .mdh-app-matter {
+  font-size: 11px;
+}
 .mdh-app .mdh-ui-eyebrow,
-.mdh-app .mdh-app-save { font-size: 9px; }
-.mdh-app .mdh-app-nav-item { font-size: 10.5px; }
-.mdh-app .mdh-doc-hint { font-size: 10px; }
-.mdh-app .mdh-doc-copy strong { font-size: 11.5px; }
-.mdh-app .mdh-doc-copy small { font-size: 9.5px; }
-.mdh-app .mdh-document-total { font-size: 10px; }
+.mdh-app .mdh-app-save {
+  font-size: 9px;
+}
+.mdh-app .mdh-app-nav-item {
+  font-size: 10.5px;
+}
+.mdh-app .mdh-doc-hint {
+  font-size: 10px;
+}
+.mdh-app .mdh-doc-copy strong {
+  font-size: 11.5px;
+}
+.mdh-app .mdh-doc-copy small {
+  font-size: 9.5px;
+}
+.mdh-app .mdh-document-total {
+  font-size: 10px;
+}
 .mdh-app .mdh-preview-toolbar small,
 .mdh-app .mdh-paper-text,
-.mdh-app .mdh-paper-highlight { font-size: 9px; }
+.mdh-app .mdh-paper-highlight {
+  font-size: 9px;
+}
 .mdh-app .mdh-paper-kind,
 .mdh-app .mdh-paper-case,
-.mdh-app .mdh-paper-footer { font-size: 8px; }
-.mdh-app .mdh-document-meta > div > span { font-size: 9px; }
-.mdh-app .mdh-document-meta strong { font-size: 10px; white-space: normal; }
-.mdh-app .mdh-app-status { font-size: 9px; flex-wrap: wrap; }
-.mdh-hero .mdh-float-heading p { font-size: 9px; letter-spacing: .45px; }
+.mdh-app .mdh-paper-footer {
+  font-size: 8px;
+}
+.mdh-app .mdh-document-meta > div > span {
+  font-size: 9px;
+}
+.mdh-app .mdh-document-meta strong {
+  font-size: 10px;
+  white-space: normal;
+}
+.mdh-app .mdh-app-status {
+  font-size: 9px;
+  flex-wrap: wrap;
+}
+.mdh-hero .mdh-float-heading p {
+  font-size: 9px;
+  letter-spacing: 0.45px;
+}
 .mdh-hero .mdh-panel-footnote,
-.mdh-hero .mdh-index-summary > span { font-size: 9px; }
+.mdh-hero .mdh-index-summary > span {
+  font-size: 9px;
+}
 
 @media (min-width: 1201px) {
-  .mdh-hero .mdh-canvas { min-height: 1040px; max-height: 1160px; }
+  .mdh-hero .mdh-canvas {
+    min-height: 1040px;
+    max-height: 1160px;
+  }
 }
 
 @media (max-width: 760px) {
   .mdh-hero .mdh-offer,
-  .mdh-hero .mdh-survey { font-size: 14px; line-height: 1.55; }
-  .mdh-hero .mdh-trust { font-size: 12px; white-space: normal; }
-  .mdh-hero .mdh-rail-heading { flex-wrap: wrap; font-size: 10px; }
-  .mdh-hero .mdh-workflow-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .mdh-hero .mdh-stage { font-size: 11px; }
-  .mdh-hero .mdh-stage-node { width: 27px; height: 27px; }
+  .mdh-hero .mdh-survey {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .mdh-hero .mdh-trust {
+    font-size: 12px;
+    white-space: normal;
+  }
+  .mdh-hero .mdh-rail-heading {
+    flex-wrap: wrap;
+    font-size: 10px;
+  }
+  .mdh-hero .mdh-workflow-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .mdh-hero .mdh-stage {
+    font-size: 11px;
+  }
+  .mdh-hero .mdh-stage-node {
+    width: 27px;
+    height: 27px;
+  }
+}
+
+/* Present the workflow as a readable, non-interactive sequence. */
+.mdh-hero .mdh-rail-wrap {
+  padding: 20px;
+  border: 1px solid #83b9ed30;
+  border-radius: 18px;
+  background: #071c38ed;
+  box-shadow: 0 18px 44px #000b2340;
+}
+.mdh-hero .mdh-rail-heading {
+  gap: 12px;
+  margin-bottom: 14px;
+  color: #c4d8ee;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+}
+.mdh-hero .mdh-workflow-rail {
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mdh-hero .mdh-workflow-rail::before {
+  display: none;
+}
+.mdh-hero .mdh-stage {
+  width: 100%;
+  min-height: 52px;
+  justify-self: stretch;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid #91b6db35;
+  border-radius: 10px;
+  background: #102b4a;
+  color: #d2e0f2;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: normal;
+  cursor: default;
+  transition: none;
+}
+.mdh-hero .mdh-stage-node {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border-color: #648bb5;
+  background: #173a5e;
+  box-shadow: none;
+}
+.mdh-hero .mdh-stage-node .icon {
+  width: 14px;
+  height: 14px;
+}
+.mdh-hero .mdh-stage:hover {
+  color: #d2e0f2;
+}
+html[data-theme="light"] .mdh-hero .mdh-rail-wrap {
+  border-color: #a8c6e3;
+  background: #ffffffed;
+  box-shadow: 0 18px 44px #41688d1f;
+}
+html[data-theme="light"] .mdh-hero .mdh-rail-heading {
+  color: #284a6a;
+}
+html[data-theme="light"] .mdh-hero .mdh-stage {
+  border-color: #cbdbea;
+  background: #f0f6fc;
+  color: #294d6d;
+}
+html[data-theme="light"] .mdh-hero .mdh-stage-node {
+  border-color: #adc8df;
+  background: #fff;
+  box-shadow: none;
+}
+html[data-theme="light"] .mdh-hero .mdh-stage:hover {
+  color: #294d6d;
+}
+@media (max-width: 760px) {
+  .mdh-hero .mdh-rail-wrap {
+    margin-top: 32px;
+    padding: 16px;
+  }
+  .mdh-hero .mdh-rail-heading {
+    margin-bottom: 14px;
+    font-size: 10px;
+  }
+  .mdh-hero .mdh-workflow-rail {
+    gap: 8px;
+  }
+  .mdh-hero .mdh-stage {
+    min-height: 50px;
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+  .mdh-hero .mdh-stage-node {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+  }
 }

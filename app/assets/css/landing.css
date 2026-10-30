@@ -9535,15 +9535,6 @@ dialog[open] {
   min-height: 71px;
 }
 
-.mdh-hero .mdh-current-line {
-  width: 2px;
-  flex: 0 0 2px;
-  align-self: stretch;
-  max-height: 54px;
-  background: linear-gradient(#66b4e9,#1d4971);
-  border-radius: 2px;
-}
-
 .mdh-hero .mdh-current strong {
   font-weight: 500;
   font-size: 13px;
@@ -10504,17 +10495,6 @@ dialog[open] {
   isolation: isolate;
 }
 
-.mdh-hero .mdh-workflow-rail:before {
-  content: "";
-  position: absolute;
-  left: 11px;
-  right: 95px;
-  top: 14px;
-  height: 1px;
-  background: linear-gradient(90deg,#446797,#3e628f80);
-  z-index: -1;
-}
-
 .mdh-hero .mdh-stage {
   display: flex;
   align-items: center;
@@ -10783,10 +10763,6 @@ dialog[open] {
     width: 26px;
     height: 26px;
   }
-  .mdh-hero .mdh-workflow-rail:before {
-    top: 13px;
-    right: 70px;
-  }
   .mdh-hero .mdh-fold {
     width: 820px;
     right: -200px;
@@ -10867,10 +10843,6 @@ dialog[open] {
   .mdh-hero .mdh-stage-node .icon {
     width: 10px;
     height: 10px;
-  }
-  .mdh-hero .mdh-workflow-rail:before {
-    top: 14px;
-    right: 65px;
   }
 }
 
@@ -11318,9 +11290,6 @@ dialog[open] {
   .mdh-hero .mdh-workflow-rail {
     grid-template-columns: repeat(4,1fr);
     gap: 18px 8px;
-  }
-  .mdh-hero .mdh-workflow-rail:before {
-    display: none;
   }
   .mdh-hero .mdh-stage {
     font-size: 8px;

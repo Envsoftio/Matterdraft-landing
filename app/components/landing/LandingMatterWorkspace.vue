@@ -286,13 +286,6 @@
         </div>
         <figcaption class="figure-meta">
           <span>Select a tab to inspect the matter structure.</span>
-          <button
-            type="button"
-            class="zoom-button"
-            aria-label="Enlarge product view"
-            data-enlarge="matter-visual"
-            data-title="Matter categories, documents and outputs"
-          ><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H3v6M15 3h6v6M21 15v6h-6M9 21H3v-6M3 3l6 6M21 3l-6 6M21 21l-6-6M3 21l6-6"/></svg></button>
         </figcaption>
       </figure>
     </div>

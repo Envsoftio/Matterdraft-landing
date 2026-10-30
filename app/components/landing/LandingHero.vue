@@ -6,7 +6,6 @@
     data-pen-name="Hero"
     data-mdh-root
     data-stage="validate"
-    data-mdh-sequence="settled"
     data-mdh-document="agreement"
   >
     <div class="mdh-atmosphere" aria-hidden="true">
@@ -38,13 +37,6 @@
           <span>Offline-first</span>
           <i aria-hidden="true"></i>
           <span>Local processing</span>
-        </div>
-        <div class="mdh-current">
-          <span class="mdh-current-line" aria-hidden="true"></span>
-          <div>
-            <strong data-mdh-status-title>Ready for review.</strong>
-            <p data-mdh-status-copy>Illustrative bundle checks bring outstanding findings into view. The prepared material still needs professional review.</p>
-          </div>
         </div>
       </div>
       <figure
@@ -458,7 +450,7 @@
             </span>
             <div>
               <p>BUNDLE CHECKS</p>
-              <strong data-mdh-validation-state>Ready for review</strong>
+              <strong data-mdh-validation-state>3 items to review</strong>
             </div>
           </div>
           <div class="mdh-check-list">
@@ -472,56 +464,56 @@
         <div class="mdh-rail-heading">
           <span>FROM SOURCE FILES TO STRUCTURED OUTPUT</span>
         </div>
-        <div class="mdh-workflow-rail" role="group" aria-label="Explore the legal document workflow">
-          <button type="button" class="mdh-stage " data-mdh-stage="import" aria-pressed="false">
+        <ol class="mdh-workflow-rail" aria-label="Legal document workflow">
+          <li class="mdh-stage">
             <span class="mdh-stage-node">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5" />
               </svg>
             </span>
             <span>Import</span>
-          </button>
-          <button type="button" class="mdh-stage " data-mdh-stage="ocr" aria-pressed="false">
+          </li>
+          <li class="mdh-stage">
             <span class="mdh-stage-node">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5M6 12h12M8 8h8M8 16h5" />
               </svg>
             </span>
             <span>OCR</span>
-          </button>
-          <button type="button" class="mdh-stage " data-mdh-stage="organise" aria-pressed="false">
+          </li>
+          <li class="mdh-stage">
             <span class="mdh-stage-node">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
               </svg>
             </span>
             <span>Organise</span>
-          </button>
-          <button type="button" class="mdh-stage " data-mdh-stage="collate" aria-pressed="false">
+          </li>
+          <li class="mdh-stage">
             <span class="mdh-stage-node">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="m3 7 9-5 9 5-9 5-9-5Zm0 5 9 5 9-5M3 17l9 5 9-5" />
               </svg>
             </span>
             <span>Collate</span>
-          </button>
-          <button type="button" class="mdh-stage " data-mdh-stage="paginate" aria-pressed="false">
+          </li>
+          <li class="mdh-stage">
             <span class="mdh-stage-node">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M7 3h9l4 4v11H7zM16 3v5h4M4 7H2v15h13v-2M10 12h7M10 15h5" />
               </svg>
             </span>
             <span>Paginate</span>
-          </button>
-          <button type="button" class="mdh-stage " data-mdh-stage="index" aria-pressed="false">
+          </li>
+          <li class="mdh-stage">
             <span class="mdh-stage-node">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M9 5h12M9 12h12M9 19h12M3 5h1M3 12h1M3 19h1" />
               </svg>
             </span>
             <span>Index</span>
-          </button>
-          <button type="button" class="mdh-stage is-active" data-mdh-stage="validate" aria-pressed="true">
+          </li>
+          <li class="mdh-stage">
             <span class="mdh-stage-node">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="12" cy="12" r="8.5" />
@@ -529,16 +521,16 @@
               </svg>
             </span>
             <span>Validate</span>
-          </button>
-          <button type="button" class="mdh-stage " data-mdh-stage="export" aria-pressed="false">
+          </li>
+          <li class="mdh-stage">
             <span class="mdh-stage-node">
               <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4" />
               </svg>
             </span>
             <span>Export</span>
-          </button>
-        </div>
+          </li>
+        </ol>
       </div>
     </div>
   </section>
