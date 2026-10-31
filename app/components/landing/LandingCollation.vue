@@ -7,7 +7,7 @@
           <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"><i></i><i></i><i></i></span>The collation engine</p>
           <h2>Many documents.<br>Four parts. One final bundle.</h2>
         </div>
-        <p class="lead">Move documents into the right part, category and order. Rebuild the example to see pagination, index entries and bookmark structure follow.</p>
+        <p class="lead">Arrange petitions, affidavits, evidence and supporting records across four parts of a legal bundle. Reorder a document to see page numbers, index entries and bookmarks follow its place in the matter.</p>
       </div>
       <figure data-reveal>
         <div id="collation-visual">
@@ -215,7 +215,7 @@
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 12h15M13 6l6 6-6 6" />
         </svg>
-        <strong>Final bundle</strong>
+        <strong>Final legal bundle</strong>
       </div>
     </div>
   </section>

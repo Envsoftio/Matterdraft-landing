@@ -5,8 +5,8 @@ import LandingEarlyAccess from '~/components/landing/LandingEarlyAccess.vue'
 import LandingFeatures from '~/components/landing/LandingFeatures.vue'
 import LandingFooter from '~/components/landing/LandingFooter.vue'
 
-const title = 'MatterDraft Studio | Legal Document Workspace'
-const description = 'Organise legal documents, OCR scans and prepare indexed, numbered, bookmarked PDF bundles in one workspace.'
+const title = 'MatterDraft Studio | Legal Document Workspace for Lawyers and Advocates'
+const description = 'A local-first desktop workspace for lawyers, advocates and legal teams. Edit and OCR PDFs, generate documents, collate case files and prepare indexed legal bundles.'
 useSiteSeo({ title, description, path: '/', markdownPath: '/index.md' })
 useLandingExperience()
 

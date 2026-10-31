@@ -7,7 +7,7 @@
           <p class="section-index">01 / More than a PDF editor</p>
           <h2>A PDF is one file.<br>A matter is everything around it.</h2>
         </div>
-        <p class="lead">Editing pages is one part of legal document production. The larger job is keeping the documents, structure, references and final outputs together.</p>
+        <p class="lead">For lawyers, advocates and legal teams, a case file is more than a PDF. Keep source documents, matter details, generated documents, references and final bundles together.</p>
       </div>
       <div class="scope-comparison" data-reveal>
         <div class="file-scope">

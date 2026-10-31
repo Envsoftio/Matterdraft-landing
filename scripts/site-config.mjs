@@ -57,6 +57,7 @@ export function resolveSiteConfig(env = process.env, facts = defaultFacts) {
   return {
     siteUrl: validateSiteOrigin(env.NUXT_PUBLIC_SITE_URL || facts.defaultOrigin),
     indexable: booleanSetting(env, 'INDEXABLE', true),
+    earlyAccessEnabled: Boolean(env.EARLY_ACCESS_GOOGLE_SHEETS_URL?.trim() && env.EARLY_ACCESS_GOOGLE_SHEETS_SECRET?.trim()),
     facts,
   }
 }

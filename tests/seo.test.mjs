@@ -41,6 +41,12 @@ test('indexing defaults to on and preview flags remain explicit', () => {
   }), /must agree/)
 })
 
+test('early access opens only when both private webhook settings are present', () => {
+  assert.equal(resolveSiteConfig({}).earlyAccessEnabled, false)
+  assert.equal(resolveSiteConfig({ EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/id/exec' }).earlyAccessEnabled, false)
+  assert.equal(resolveSiteConfig({ EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/id/exec', EARLY_ACCESS_GOOGLE_SHEETS_SECRET: 'secret' }).earlyAccessEnabled, true)
+})
+
 test('preview builds advertise no sitemap and contain no indexable sitemap URLs', () => {
   const config = resolveSiteConfig({
     NUXT_PUBLIC_SITE_URL: 'https://preview.example.com',

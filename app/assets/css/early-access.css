@@ -22,6 +22,11 @@ html[data-theme="light"] .mdh-hero .mdh-survey a { color: #174878; }
 .early-access-panel-head h3 { color: #102c4d; font-size: 25px; line-height: 1.25; font-weight: 650; letter-spacing: -.025em; }
 .early-access-panel-head p { margin-top: 8px; color: #5a6e88; font-size: 14px; line-height: 1.65; }
 .early-access-form { margin-top: 26px; }
+.early-access-success { margin-top: 26px; padding: 22px; border: 1px solid #b9dcc8; border-radius: 12px; background: #f0faf4; color: #1c6040; }
+.early-access-success h4 { font-size: 20px; font-weight: 650; }
+.early-access-success p { margin-top: 8px; font-size: 14px; line-height: 1.6; }
+.early-access-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.early-access-error { margin-top: 18px; color: #a0404c; font-size: 13px; line-height: 1.5; }
 .early-access-form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
 .early-access-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 19px 16px; }
 .early-access-fields label { display: flex; flex-direction: column; gap: 8px; color: #233c59; font-size: 13px; line-height: 1.4; font-weight: 650; }
@@ -52,6 +57,8 @@ html[data-theme="dark"] .early-access-fields label { color: #e6f0ff; }
 html[data-theme="dark"] .early-access-panel-head p,
 html[data-theme="dark"] .early-access-consent,
 html[data-theme="dark"] .early-access-note { color: #b4c6df; }
+html[data-theme="dark"] .early-access-success { border-color: #3d7455; background: #102e23; color: #b7ebc9; }
+html[data-theme="dark"] .early-access-error { color: #ffb5bd; }
 html[data-theme="dark"] .early-access-fields input,
 html[data-theme="dark"] .early-access-fields select { border-color: #526b89; background: #0c1d36; color: #f4f8ff; }
 html[data-theme="dark"] .early-access-fields input::placeholder { color: #a6bad2; }

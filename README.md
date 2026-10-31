@@ -69,6 +69,8 @@ Copy `.env.example` to `.env` to override the defaults, or provide the same vari
 | --- | --- | --- |
 | `NUXT_PUBLIC_SITE_URL` | `https://matterdraft.legal` | The one origin used for canonical URLs, social URLs, sitemap entries and Markdown links. |
 | `NUXT_PUBLIC_INDEXABLE` | `true` | Enables homepage indexing. Set to `false` for a non-indexable preview build. |
+| `EARLY_ACCESS_GOOGLE_SHEETS_URL` | unset | Private Google Apps Script web app `/exec` URL, available to Netlify Functions and the build. |
+| `EARLY_ACCESS_GOOGLE_SHEETS_SECRET` | unset | Private shared secret, at least 32 characters, available to Netlify Functions and the build. |
 
 `scripts/site-config.mjs` validates the site URL as an absolute HTTPS origin. A trailing root slash is accepted and normalized; credentials, a path, query or fragment are rejected. This project is configured for the root of an origin, not a subdirectory deployment.
 
@@ -76,7 +78,13 @@ The content generator and Nuxt configuration use the same settings loader. It re
 
 **All `NUXT_PUBLIC_*` values are public.** Never put passwords or secret API keys in them.
 
-The early access section currently previews its fields with submission disabled. Before opening registration, connect a form service, handle success and failure states, test a real submission, and update the privacy draft with the actual provider and retention details.
+### Early access with Google Sheets
+
+The on-page form follows the ProctorPlus pattern: browser → Netlify Function → private Google Apps Script webhook → Sheet. The Function validates submissions and checks the script's `{ "success": true }` response before telling the visitor their request was saved. The browser never receives the webhook URL or shared secret. The form stays disabled until both private settings are present **at build time**.
+
+Follow [the Sheet and Apps Script setup guide](docs/early-access-google-sheets.md) to create the Sheet, deploy the receiver, configure Netlify, and test a real submission. Complete the privacy policy's provider, contact and retention details before opening registration.
+
+This requires a Netlify deployment built from the repository so `netlify/functions/early-access.mjs` is deployed alongside `dist/`. Uploading only `dist/` to a static host or using `npm run preview` will not serve the POST endpoint. Use `netlify dev` to test the whole flow locally.
 
 For a static site, settings are resolved at build time. After changing the domain, indexing setting, content or assets:
 

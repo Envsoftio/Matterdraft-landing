@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     public: {
       siteUrl: settings.siteUrl,
       indexable: settings.indexable,
+      earlyAccessEnabled: settings.earlyAccessEnabled,
     },
   },
   app: {

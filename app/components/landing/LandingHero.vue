@@ -18,13 +18,13 @@
     </div>
     <div class="container mdh-canvas">
       <div class="mdh-copy">
-        <p class="mdh-eyebrow"><span class="mdh-status-light" aria-hidden="true"></span>LOCAL-FIRST<span class="mdh-pill-divider"></span>LEGAL DOCUMENT WORKSPACE</p>
+        <p class="mdh-eyebrow"><span class="mdh-status-light" aria-hidden="true"></span>LOCAL-FIRST<span class="mdh-pill-divider"></span>LEGAL DESKTOP APP</p>
         <h1 id="hero-title">
-          <span>Complex legal files.</span>
-          <span>Structured in</span>
-          <span class="mdh-headline-accent">one workspace.</span>
+          <span>Legal documents.</span>
+          <span>Built for lawyers</span>
+          <span class="mdh-headline-accent">and advocates.</span>
         </h1>
-        <p class="mdh-description">Process, OCR and collate your documents. Automate pagination, indexes and bookmarks. Review and export a structured legal bundle.</p>
+        <p class="mdh-description">Prepare case files in one desktop workspace: edit and OCR PDFs, generate documents from templates, collate evidence, and export indexed, paginated and bookmarked legal bundles.</p>
         <div class="mdh-actions">
           <a class="button mdh-primary" href="#early-access">Early access<span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></a>
           <a class="mdh-secondary" href="#workflow">Explore the workflow<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
