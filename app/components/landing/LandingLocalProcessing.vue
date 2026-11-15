@@ -5,7 +5,7 @@
       <div class="split-copy" data-reveal>
         <p class="section-index">10 / Local-first by design</p>
         <h2>Serious document work.<br>On your own computer.</h2>
-        <p class="lead">MatterDraft is designed as an offline-first desktop workspace for Windows and macOS. Its architecture keeps core processing local and separates the interface from the processing engine.</p>
+        <p class="lead">Prepare case files on your Windows or Mac computer, even when you are offline. Keep originals intact while you work with copies and create final documents.</p>
         <div class="source-flow">
           <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 11 3 3 5-5"/></svg>Originals preserved</span>
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -18,14 +18,10 @@
           <span>Generated outputs</span>
         </div>
         <p class="local-qualifier">Connected features, such as sharing links, sit outside the offline document workflow. Offline-first does not mean every feature works without a connection.</p>
-        <details class="technical-details">
-          <summary>Under the desktop workspace</summary>
-          <p>Tauri with Vue and TypeScript provides the desktop interface. A Python FastAPI sidecar supports local processing with PyMuPDF and Tesseract OCR, connected through a secure IPC bridge.</p>
-        </details>
       </div>
       <div class="architecture-board" data-reveal>
         <div class="architecture-heading">
-          <span>Local processing architecture</span>
+          <span>From source files to finished bundles</span>
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
             <rect x="3" y="3" width="18" height="13" rx="2" />
             <path d="M8 21h8M12 16v5" />
@@ -37,10 +33,10 @@
             <path d="M8 21h8M12 16v5" />
           </svg>
           <div>
-            <strong>MatterDraft desktop UI</strong>
-            <span>Your matter, documents and workspace</span>
+            <strong>Organize your matter</strong>
+            <span>Keep case documents together in one workspace</span>
           </div>
-          <span class="micro">DESKTOP</span>
+          <span class="micro">ORGANIZE</span>
         </div>
         <div class="arch-layer">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -50,32 +46,32 @@
             />
           </svg>
           <div>
-            <strong>Secure IPC bridge</strong>
-            <span>A defined path between interface and processing</span>
+            <strong>Prepare your documents</strong>
+            <span>Edit PDFs, make scans searchable and arrange evidence</span>
           </div>
-          <span class="micro">IPC</span>
+          <span class="micro">PREPARE</span>
         </div>
         <div class="arch-layer">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 5h16M4 12h16M4 19h16M8 2v6M16 9v6M10 16v6" />
           </svg>
           <div>
-            <strong>Local processing engine</strong>
-            <span>PDF operations, OCR and structured workflows</span>
+            <strong>Build your bundle</strong>
+            <span>Add page numbers, bookmarks and a clear index</span>
           </div>
-          <span class="micro">LOCAL ENGINE</span>
+          <span class="micro">ASSEMBLE</span>
         </div>
         <div class="arch-layer">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
           </svg>
           <div>
-            <strong>Local files</strong>
-            <span>Originals, working copies and generated outputs</span>
+            <strong>Export final files</strong>
+            <span>Get a finished bundle while preserving your originals</span>
           </div>
-          <span class="micro">FILES</span>
+          <span class="micro">EXPORT</span>
         </div>
-        <p>Core document work is designed to run on the desktop, from imported source files to structured final outputs.</p>
+        <p>Move from scattered source files to a ready-to-share case bundle in one place.</p>
       </div>
     </div>
   </section>

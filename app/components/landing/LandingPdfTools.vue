@@ -4,7 +4,7 @@
     <div class="container">
       <div class="section-top" data-reveal>
         <div>
-          <p class="section-index">03 / A complete PDF processing engine</p>
+          <p class="section-index">03 / Edit and organize PDFs</p>
           <h2>Work on the pages.<br>Keep the matter in view.</h2>
         </div>
         <p class="lead">Merge, split, extract, reorder, replace, insert and delete. Refine the source material before it becomes part of the final legal bundle.</p>

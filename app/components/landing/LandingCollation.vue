@@ -4,7 +4,7 @@
     <div class="container">
       <div class="section-top" data-reveal>
         <div>
-          <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"><i></i><i></i><i></i></span>The collation engine</p>
+          <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"><i></i><i></i><i></i></span>Bring every document together</p>
           <h2>Many documents.<br>Four parts. One final bundle.</h2>
         </div>
         <p class="lead">Arrange petitions, affidavits, evidence and supporting records across four parts of a legal bundle. Reorder a document to see page numbers, index entries and bookmarks follow its place in the matter.</p>
