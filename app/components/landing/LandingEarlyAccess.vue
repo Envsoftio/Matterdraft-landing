@@ -27,7 +27,7 @@ async function submitEarlyAccess() {
         <p class="eyebrow">EARLY ACCESS</p>
         <h2 id="early-access-title">Be among the first to use MatterDraft.</h2>
         <p>{{ enabled ? 'Join the early access list for launch updates and an invitation when access becomes available.' : 'When registration opens, join the early access list for launch updates and an invitation when access becomes available.' }}</p>
-        <p class="early-access-offer"><strong>Six months free after launch</strong> for people who sign up for early access.</p>
+        <p class="early-access-offer"><strong>One month free after launch</strong> for people who sign up for early access.</p>
       </div>
 
       <div class="early-access-panel">

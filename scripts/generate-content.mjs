@@ -91,7 +91,7 @@ export function renderProductMarkdown(config) {
     '',
     'MatterDraft Studio is in development. Release timing has not been announced. ' +
     'The website previews early access registration, but does not currently accept signups or provide a purchase flow. ' +
-    'Early access signups are offered six months free after launch.',
+    'Early access signups are offered one month free after launch.',
     '',
     '## Policies',
     '',
