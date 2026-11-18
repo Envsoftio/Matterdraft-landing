@@ -212,25 +212,25 @@
 .mdh-hero .mdh-stage:hover {
   color: #d2e0f2;
 }
-html[data-theme="light"] .mdh-hero .mdh-rail-wrap {
+html[data-theme='light'] .mdh-hero .mdh-rail-wrap {
   border-color: #a8c6e3;
   background: #ffffffed;
   box-shadow: 0 18px 44px #41688d1f;
 }
-html[data-theme="light"] .mdh-hero .mdh-rail-heading {
+html[data-theme='light'] .mdh-hero .mdh-rail-heading {
   color: #284a6a;
 }
-html[data-theme="light"] .mdh-hero .mdh-stage {
+html[data-theme='light'] .mdh-hero .mdh-stage {
   border-color: #cbdbea;
   background: #f0f6fc;
   color: #294d6d;
 }
-html[data-theme="light"] .mdh-hero .mdh-stage-node {
+html[data-theme='light'] .mdh-hero .mdh-stage-node {
   border-color: #adc8df;
   background: #fff;
   box-shadow: none;
 }
-html[data-theme="light"] .mdh-hero .mdh-stage:hover {
+html[data-theme='light'] .mdh-hero .mdh-stage:hover {
   color: #294d6d;
 }
 @media (max-width: 760px) {

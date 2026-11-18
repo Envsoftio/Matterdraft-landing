@@ -31,11 +31,18 @@ function generate() {
     <div class="frame">
       <SectionHeading v-bind="featureHeadings.templates" />
       <div class="template-grid" data-enter>
-        <form class="panel template-form" autocomplete="off" aria-describedby="template-privacy" @submit.prevent="generate">
+        <form
+          class="panel template-form"
+          autocomplete="off"
+          aria-describedby="template-privacy"
+          @submit.prevent="generate"
+        >
           <header>
             <small>Template example</small>
             <h3>Procedural application</h3>
-            <p id="template-privacy" class="mt-2 text-sm text-studio-muted">Use fictional details in this example.</p>
+            <p id="template-privacy" class="mt-2 text-sm text-studio-muted">
+              Use fictional details in this example.
+            </p>
           </header>
           <div class="template-fields">
             <div
@@ -68,12 +75,8 @@ function generate() {
               <b>{{ preview.respondent }}</b>
             </span>
           </div>
-          <p>
-            1. The applicant requests permission to submit the documents listed in the bundle.
-          </p>
-          <p>
-            2. The bundle index shows which volume and page each document appears on.
-          </p>
+          <p>1. The applicant requests permission to submit the documents listed in the bundle.</p>
+          <p>2. The bundle index shows which volume and page each document appears on.</p>
           <p v-if="generated">{{ preview.date }} · {{ preview.representative }}</p>
           <footer>
             <span>Sample document</span>

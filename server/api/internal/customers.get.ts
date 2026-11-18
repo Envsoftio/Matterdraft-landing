@@ -4,14 +4,18 @@ import { client } from '../../../lib/db'
 import { requireStaff } from '../../utils/customer-account'
 import { listCustomers } from '../../utils/customer-directory'
 
-export default applicationRoute('/api/internal/customers', async event => {
+export default applicationRoute('/api/internal/customers', async (event) => {
   const actor = await requireStaff(event, 'super_admin')
   const query = getQuery(event)
-  if ((query.search !== undefined && typeof query.search !== 'string') ||
-      (query.page !== undefined && typeof query.page !== 'string')) applicationFailure(422)
+  if (
+    (query.search !== undefined && typeof query.search !== 'string') ||
+    (query.page !== undefined && typeof query.page !== 'string')
+  )
+    applicationFailure(422)
   const search = typeof query.search === 'string' ? query.search.trim() : ''
   const page = typeof query.page === 'string' ? Number(query.page) : 1
-  if (search.length > 100 || !Number.isSafeInteger(page) || page < 1 || page > 1000) applicationFailure(422)
+  if (search.length > 100 || !Number.isSafeInteger(page) || page < 1 || page > 1000)
+    applicationFailure(422)
 
   const result = await listCustomers(client, search, page)
   await client.execute({

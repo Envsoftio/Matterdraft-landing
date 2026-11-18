@@ -6,10 +6,10 @@ defineProps<{ policy?: boolean }>()
     <div class="frame">
       <div class="footer-columns">
         <div>
-          <NuxtLink :to="policy ? '/' : '/#top'" aria-label="MatterDraft Studio home"><BrandLogo /></NuxtLink>
-          <p>
-            Prepare case files and indexed court bundles on your own computer.
-          </p>
+          <NuxtLink :to="policy ? '/' : '/#top'" aria-label="MatterDraft Studio home"
+            ><BrandLogo
+          /></NuxtLink>
+          <p>Prepare case files and indexed court bundles on your own computer.</p>
           <div class="footer-badges">
             <span>On-device processing</span>
           </div>
@@ -34,11 +34,7 @@ defineProps<{ policy?: boolean }>()
         <span>Built in India for legal teams</span>
         <span>
           MatterDraft Studio · An
-          <a
-            href="https://envsoft.io/"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
+          <a href="https://envsoft.io/" rel="noopener noreferrer" target="_blank">
             Envsoft Solutions LLP
           </a>
           venture

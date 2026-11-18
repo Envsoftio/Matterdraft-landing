@@ -12,8 +12,10 @@ export async function listOrganisations(db: Client, search: string, page: number
     args: [term, term, pageSize + 1, (page - 1) * pageSize],
   })
   return {
-    organisations: result.rows.slice(0, pageSize).map(row => ({
-      id: String(row.id), name: String(row.name), createdAt: Number(row.created_at),
+    organisations: result.rows.slice(0, pageSize).map((row) => ({
+      id: String(row.id),
+      name: String(row.name),
+      createdAt: Number(row.created_at),
       memberCount: Number(row.member_count),
     })),
     page,
@@ -43,17 +45,25 @@ export async function getOrganisationDetails(db: Client, accountId: string, now 
   ])
   return {
     organisation: {
-      id: String(account.rows[0]!.id), name: String(account.rows[0]!.name),
+      id: String(account.rows[0]!.id),
+      name: String(account.rows[0]!.name),
       createdAt: Number(account.rows[0]!.created_at),
     },
-    members: members.rows.map(row => ({
-      userId: String(row.id), name: String(row.name), email: String(row.email),
-      role: String(row.role), joinedAt: Number(row.created_at),
+    members: members.rows.map((row) => ({
+      userId: String(row.id),
+      name: String(row.name),
+      email: String(row.email),
+      role: String(row.role),
+      joinedAt: Number(row.created_at),
     })),
-    invitations: invitations.rows.map(row => ({
-      id: String(row.id), email: String(row.invitee_email), role: String(row.invited_role),
-      type: String(row.invitation_type), status: Number(row.expires_at) <= now ? 'expired' : 'pending',
-      createdAt: Number(row.created_at), expiresAt: Number(row.expires_at),
+    invitations: invitations.rows.map((row) => ({
+      id: String(row.id),
+      email: String(row.invitee_email),
+      role: String(row.invited_role),
+      type: String(row.invitation_type),
+      status: Number(row.expires_at) <= now ? 'expired' : 'pending',
+      createdAt: Number(row.created_at),
+      expiresAt: Number(row.expires_at),
     })),
   }
 }

@@ -54,12 +54,13 @@ watch(
     const offset = active.getBoundingClientRect().left - list.getBoundingClientRect().left
     if (offset < 0 || offset + active.offsetWidth > list.clientWidth) list.scrollLeft += offset - 4
   },
-  { flush: 'post' }
+  { flush: 'post' },
 )
 const file = computed(() => numberedDocuments.find((doc) => doc.name === selected.value)!)
 let gesture: { x: number; y: number } | undefined
 function startGesture(event: PointerEvent) {
-  if (event.pointerType === 'touch' && event.isPrimary) gesture = { x: event.clientX, y: event.clientY }
+  if (event.pointerType === 'touch' && event.isPrimary)
+    gesture = { x: event.clientX, y: event.clientY }
 }
 function finishGesture(event: PointerEvent) {
   if (!gesture || !event.isPrimary) return
@@ -82,14 +83,16 @@ const steps = [
   ['Export', '#export'],
 ]
 const sampleText: Record<string, string> = {
-  Petition: 'The applicant asks the court to consider the supporting records listed in this matter.',
+  Petition:
+    'The applicant asks the court to consider the supporting records listed in this matter.',
   Affidavit:
     'The deponent confirms that the accompanying documents are true copies of the records described in the schedule.',
   Agreement:
     'This master commercial collaboration agreement is entered into on 14th March 2026 by and between Aster Works Enterprise and Banyan Projects Infrastructure LLP.',
   Correspondence:
     'Letters exchanged between the parties record the dates, requests and responses relevant to this matter.',
-  Evidence: 'The exhibits in this schedule are numbered in the order in which they appear in the bundle.',
+  Evidence:
+    'The exhibits in this schedule are numbered in the order in which they appear in the bundle.',
   'Additional records':
     'Supplementary records accompany the principal exhibits and retain their original sequence.',
 }
@@ -104,8 +107,8 @@ const sampleText: Record<string, string> = {
       </p>
       <h1 id="hero-title">From case documents to organised bundles.</h1>
       <p class="hero-description">
-        Edit PDFs, recognise text in scans, and prepare indexed court bundles. Your case files and finished
-        bundles stay on your device.
+        Edit PDFs, recognise text in scans, and prepare indexed court bundles. Your case files and
+        finished bundles stay on your device.
       </p>
       <div class="hero-actions">
         <a href="#early-access" class="action primary">
@@ -125,7 +128,11 @@ const sampleText: Record<string, string> = {
         </span>
       </p>
     </div>
-    <figure ref="workspace" class="workspace-window" aria-label="Fictional matter workspace preview">
+    <figure
+      ref="workspace"
+      class="workspace-window"
+      aria-label="Fictional matter workspace preview"
+    >
       <figcaption class="window-bar">
         <span class="traffic-lights" aria-hidden="true">
           <i />
@@ -206,8 +213,8 @@ const sampleText: Record<string, string> = {
             <header>
               <div>
                 <small>
-                  {{ file.name === 'Agreement' ? 'ANNEXURE A' : file.name.toUpperCase() }} / BUNDLE PAGES
-                  {{ file.start }}–{{ file.end }}
+                  {{ file.name === 'Agreement' ? 'ANNEXURE A' : file.name.toUpperCase() }} / BUNDLE
+                  PAGES {{ file.start }}–{{ file.end }}
                 </small>
                 <h3>{{ file.name }} (Working Copy)</h3>
               </div>
@@ -298,7 +305,8 @@ const sampleText: Record<string, string> = {
               <DialogContent class="studio-dialog">
                 <DialogTitle>Bundle export preview</DialogTitle>
                 <DialogDescription>
-                  This fictional matter contains six documents across four parts and 196 numbered pages. The preview shows what a bundle includes.
+                  This fictional matter contains six documents across four parts and 196 numbered
+                  pages. The preview shows what a bundle includes.
                 </DialogDescription>
                 <ul class="export-checks">
                   <li

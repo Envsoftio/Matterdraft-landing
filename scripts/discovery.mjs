@@ -3,7 +3,14 @@ export const NO_INDEX_FOLLOW = 'noindex, follow'
 
 export const privateAreas = ['/api', '/.netlify/functions', '/a', '/internal', '/invite', '/portal']
 
-const authPages = ['/sign-in', '/sign-up', '/forgot-password', '/reset-password', '/verify-email', '/consent']
+const authPages = [
+  '/sign-in',
+  '/sign-up',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+  '/consent',
+]
 
 export function discoveryHeaders({ facts, indexable, siteUrl }) {
   const { homepage } = facts
@@ -14,7 +21,13 @@ export function discoveryHeaders({ facts, indexable, siteUrl }) {
     headers[path] = privateHeaders
     headers[`${path}/**`] = privateHeaders
   }
-  for (const path of [...authPages, '/maintenance.html', '/200.html', '/404.html', '/__nuxt_error']) {
+  for (const path of [
+    ...authPages,
+    '/maintenance.html',
+    '/200.html',
+    '/404.html',
+    '/__nuxt_error',
+  ]) {
     headers[path] = { 'X-Robots-Tag': NO_INDEX }
   }
   headers[homepage.markdownPath] = { 'Content-Type': 'text/markdown; charset=utf-8' }

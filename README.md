@@ -33,6 +33,8 @@ This serves `dist/` at `http://localhost:3000` with the generated security heade
 | `npm run dev` | Regenerate content and start development with hot reload. |
 | `npm run content` | Rebuild policy data, robots, sitemap and Markdown/agent content. |
 | `npm run typecheck` | Run Nuxt/Vue type checking. Normal development and build commands do not run this check automatically. |
+| `npm run format` | Format project source with the pinned Prettier version. |
+| `npm run format:check` | Check formatting without writing files. |
 | `npm test` | Run focused configuration, discovery, legal-publication, compression-negotiation and cache tests. |
 | `npm run generate` | Regenerate content, prerender the site and recreate the complete static `dist/` export. |
 | `npm run verify` | Check the current `dist/` and print the size report. Run after generation. |

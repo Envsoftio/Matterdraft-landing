@@ -15,7 +15,11 @@ import { categories } from '~/data/example-matter'
 import SectionHeading from './SectionHeading.vue'
 const findings = [
   { title: 'Missing date: Affidavit.pdf', action: 'Add date', label: 'Document date' },
-  { title: 'Document category not assigned', action: 'Assign category', label: 'Document category' },
+  {
+    title: 'Document category not assigned',
+    action: 'Assign category',
+    label: 'Document category',
+  },
   { title: 'Page numbering requires review', action: 'Review numbering', label: 'Starting page' },
 ] as const
 const editing = ref<number | null>(null)
@@ -45,7 +49,9 @@ function save() {
       <div class="panel inspector" data-enter>
         <header>
           <strong>Pre-export bundle validation</strong>
-          <span aria-live="polite">{{ remaining }} {{ remaining === 1 ? 'item' : 'items' }} to inspect</span>
+          <span aria-live="polite"
+            >{{ remaining }} {{ remaining === 1 ? 'item' : 'items' }} to inspect</span
+          >
         </header>
         <div class="check-row">
           <CircleCheck />

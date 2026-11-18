@@ -21,7 +21,7 @@ onMounted(() => {
     (entries) => {
       for (const entry of entries) if (entry.isIntersecting) current.value = '#' + entry.target.id
     },
-    { rootMargin: '-8% 0px -48% 0px' }
+    { rootMargin: '-8% 0px -48% 0px' },
   )
   for (const [, href] of links) {
     const element = document.querySelector(href)

@@ -14,8 +14,7 @@ export const featureHeadings = {
   pdf: {
     label: 'PDF tools',
     title: 'Work on the pages.\nKeep the matter in view.',
-    description:
-      'Merge and split PDFs, reorder pages, and prepare working copies for the bundle.',
+    description: 'Merge and split PDFs, reorder pages, and prepare working copies for the bundle.',
   },
   ocr: {
     label: 'Scans and OCR',
@@ -31,8 +30,7 @@ export const featureHeadings = {
   templates: {
     label: 'Document templates',
     title: 'The matter supplies the fields.\nThe template gives them form.',
-    description:
-      'Fill in the details a template asks for and preview the formatted document.',
+    description: 'Fill in the details a template asks for and preview the formatted document.',
   },
   collation: {
     label: 'Pagination and indexing',
@@ -49,8 +47,7 @@ export const featureHeadings = {
   validation: {
     label: 'Bundle checks',
     title: 'Find what needs\na second look.',
-    description:
-      'Find missing dates, categories and numbering issues before you export.',
+    description: 'Find missing dates, categories and numbering issues before you export.',
   },
   local: {
     label: 'Document privacy',

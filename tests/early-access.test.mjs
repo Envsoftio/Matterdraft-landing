@@ -4,8 +4,12 @@ import earlyAccess from '../netlify/functions/early-access.mjs'
 
 const endpoint = 'https://matterdraft.legal/.netlify/functions/early-access'
 const validBody = {
-  name: 'Asha Rao', email: 'asha@example.com', role: 'Advocate',
-  platform: 'Windows', contactConsent: true, website: '',
+  name: 'Asha Rao',
+  email: 'asha@example.com',
+  role: 'Advocate',
+  platform: 'Windows',
+  contactConsent: true,
+  website: '',
 }
 
 function request(body = validBody) {
@@ -18,9 +22,14 @@ test('early access rejects invalid input before contacting the Sheet', async () 
   const originalFetch = globalThis.fetch
   process.env.EARLY_ACCESS_GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/test-id/exec'
   process.env.EARLY_ACCESS_GOOGLE_SHEETS_SECRET = 'a'.repeat(32)
-  globalThis.fetch = () => { throw new Error('Unexpected webhook call') }
+  globalThis.fetch = () => {
+    throw new Error('Unexpected webhook call')
+  }
   try {
-    assert.equal((await earlyAccess(request({ ...validBody, name: '=HYPERLINK("x")' }))).status, 400)
+    assert.equal(
+      (await earlyAccess(request({ ...validBody, name: '=HYPERLINK("x")' }))).status,
+      400,
+    )
     assert.equal((await earlyAccess(request({ ...validBody, contactConsent: false }))).status, 400)
     assert.equal((await earlyAccess(request({ ...validBody, platform: 'Linux' }))).status, 400)
     const availability = await earlyAccess(new Request(endpoint))

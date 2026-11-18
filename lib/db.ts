@@ -4,7 +4,9 @@ import { createRequire } from 'node:module'
 import { drizzle } from 'drizzle-orm/libsql/web'
 import * as authSchema from './auth-schema'
 
-const url = process.env.TURSO_DATABASE_URL || (process.env.NODE_ENV === 'production' ? '' : 'file:.data/matterdraft-dev.db')
+const url =
+  process.env.TURSO_DATABASE_URL ||
+  (process.env.NODE_ENV === 'production' ? '' : 'file:.data/matterdraft-dev.db')
 if (!url) throw new Error('TURSO_DATABASE_URL is required in production')
 if (url.startsWith('libsql://') && !process.env.TURSO_AUTH_TOKEN) {
   throw new Error('TURSO_AUTH_TOKEN is required for the hosted database')

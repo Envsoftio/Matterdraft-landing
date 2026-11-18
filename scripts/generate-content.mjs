@@ -6,16 +6,30 @@ import { canonicalUrl, loadSiteConfig, PROJECT_ROOT } from './site-config.mjs'
 
 const LEGAL_SLUGS = ['privacy', 'terms', 'refund-policy']
 export function escapeXml(value) {
-  return String(value).replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
-  })[character])
+  return String(value).replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&apos;',
+      })[character],
+  )
 }
 
 export function prepareLegalMarkdown(markdown) {
-  const normalized = markdown.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').trim()
+  const normalized = markdown
+    .replace(/^\uFEFF/, '')
+    .replace(/\r\n?/g, '\n')
+    .trim()
   const heading = normalized.match(/^#[ \t]+([^\n]+)\n*/)
   if (!heading) throw new Error('Every legal source must start with one level-one title.')
-  if (/\[[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/.test(normalized) || /^#{1,6}\s+Publication notes\b|^>\s+\*{0,2}Review draft\b/im.test(normalized)) {
+  if (
+    /\[[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/.test(normalized) ||
+    /^#{1,6}\s+Publication notes\b|^>\s+\*{0,2}Review draft\b/im.test(normalized)
+  ) {
     throw new Error('Remove placeholders and draft notes before publishing a legal policy.')
   }
   return normalized.slice(heading[0].length).trim() + '\n'
@@ -32,19 +46,28 @@ export function renderRobots(config) {
     ]),
   ]
   return [
-    'User-agent: *', ...rules, '',
-    'User-agent: OAI-SearchBot', ...rules, '',
+    'User-agent: *',
+    ...rules,
+    '',
+    'User-agent: OAI-SearchBot',
+    ...rules,
+    '',
     'Sitemap: ' + canonicalUrl('/sitemap.xml', config.siteUrl),
     '',
   ].join('\n')
 }
 
-export function renderSitemap(config, paths = [
-  config.facts.homepage.path, ...config.facts.legalDocuments.map(({ slug }) => '/' + slug),
-]) {
+export function renderSitemap(
+  config,
+  paths = [
+    config.facts.homepage.path,
+    ...config.facts.legalDocuments.map(({ slug }) => '/' + slug),
+  ],
+) {
   const entries = config.indexable
-    ? [...new Set(paths)].map((path) =>
-      '  <url><loc>' + escapeXml(canonicalUrl(path, config.siteUrl)) + '</loc></url>')
+    ? [...new Set(paths)].map(
+        (path) => '  <url><loc>' + escapeXml(canonicalUrl(path, config.siteUrl)) + '</loc></url>',
+      )
     : []
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -70,8 +93,10 @@ export function renderProductMarkdown(config) {
     '## Document privacy',
     '',
     'Case files, working copies, recognised text and finished bundles stay on your device. ' +
-    'MatterDraft does not upload these files or their contents to its servers. ' +
-    '[Read the Privacy Policy](' + canonicalUrl('/privacy', siteUrl) + ') for how the website handles account and support information.',
+      'MatterDraft does not upload these files or their contents to its servers. ' +
+      '[Read the Privacy Policy](' +
+      canonicalUrl('/privacy', siteUrl) +
+      ') for how the website handles account and support information.',
     '',
     '## Product scope',
     '',
@@ -80,17 +105,25 @@ export function renderProductMarkdown(config) {
     '## Intended workflows',
     '',
     ...facts.capabilities.flatMap(({ title, description, anchor }) => [
-      '### ' + title, '', description, '',
-      '[See this workflow on the website](' + homepage + '#' + anchor + ')', '',
+      '### ' + title,
+      '',
+      description,
+      '',
+      '[See this workflow on the website](' + homepage + '#' + anchor + ')',
+      '',
     ]),
     '## Availability',
     '',
-    'The [early access section](' + homepage + '#early-access) shows whether registration is open. ' +
-    'Early access signups receive launch updates and are offered one month free after launch.',
+    'The [early access section](' +
+      homepage +
+      '#early-access) shows whether registration is open. ' +
+      'Early access signups receive launch updates and are offered one month free after launch.',
     '',
     '## Policies',
     '',
-    ...facts.legalDocuments.map(({ slug, title }) => '- [' + title + '](' + canonicalUrl('/' + slug, siteUrl) + ')'),
+    ...facts.legalDocuments.map(
+      ({ slug, title }) => '- [' + title + '](' + canonicalUrl('/' + slug, siteUrl) + ')',
+    ),
   ]
   return lines.join('\n').trimEnd() + '\n'
 }
@@ -103,30 +136,41 @@ export function renderLlmsIndex(config) {
     '',
     '> ' + facts.summary,
     '',
-    facts.status + ' for ' + facts.platforms.join(' and ') + '. Website examples use fictional data. ' +
-    'The desktop app processes case files on the user’s device and keeps generated bundles there.',
+    facts.status +
+      ' for ' +
+      facts.platforms.join(' and ') +
+      '. Website examples use fictional data. ' +
+      'The desktop app processes case files on the user’s device and keeps generated bundles there.',
     '',
     '## Product',
     '',
-    '- [Product overview in Markdown](' + canonicalUrl(facts.homepage.markdownPath, siteUrl) + '): Scope, intended workflows and limitations.',
+    '- [Product overview in Markdown](' +
+      canonicalUrl(facts.homepage.markdownPath, siteUrl) +
+      '): Scope, intended workflows and limitations.',
     '- [Product website](' + homepage + '): Public feature descriptions and interactive examples.',
-    '- [Early access](' + homepage + '#early-access): Current registration availability and terms of the early access offer.',
+    '- [Early access](' +
+      homepage +
+      '#early-access): Current registration availability and terms of the early access offer.',
     '',
     '## Policies',
     '',
-    ...facts.legalDocuments.map(({ slug, title, description }) =>
-      '- [' + title + '](' + canonicalUrl('/' + slug, siteUrl) + '): ' + description),
+    ...facts.legalDocuments.map(
+      ({ slug, title, description }) =>
+        '- [' + title + '](' + canonicalUrl('/' + slug, siteUrl) + '): ' + description,
+    ),
     '',
     '## Optional',
     '',
-    '- [Complete text export](' + canonicalUrl('/llms-full.txt', siteUrl) + '): A plain-text copy of the product overview.',
+    '- [Complete text export](' +
+      canonicalUrl('/llms-full.txt', siteUrl) +
+      '): A plain-text copy of the product overview.',
   ]
   return lines.join('\n') + '\n'
 }
 
 async function writeIfChanged(path, content) {
   try {
-    if (await readFile(path, 'utf8') === content) return
+    if ((await readFile(path, 'utf8')) === content) return
   } catch (error) {
     if (error.code !== 'ENOENT') throw error
   }
@@ -143,10 +187,12 @@ export async function generateContent({ projectRoot = PROJECT_ROOT, env = proces
   ) {
     throw new Error('content/site.json must define privacy, terms and refund-policy exactly once.')
   }
-  const documents = await Promise.all(definitions.map(async (definition) => ({
-    ...definition,
-    markdown: await readFile(join(projectRoot, 'content/legal', definition.slug + '.md'), 'utf8'),
-  })))
+  const documents = await Promise.all(
+    definitions.map(async (definition) => ({
+      ...definition,
+      markdown: await readFile(join(projectRoot, 'content/legal', definition.slug + '.md'), 'utf8'),
+    })),
+  )
   // Only repository-owned Markdown reaches this build-time parser, never form data.
   const { Marked } = await import('marked')
   const parser = new Marked({ gfm: true, breaks: false })
@@ -161,8 +207,12 @@ export async function generateContent({ projectRoot = PROJECT_ROOT, env = proces
     }
     output.set(
       'app/data/legal/' + document.slug + '.ts',
-      '// Generated from content/legal/' + document.slug + '.md. Run npm run content.\n' +
-      'export default ' + JSON.stringify(data, null, 2) + '\n',
+      '// Generated from content/legal/' +
+        document.slug +
+        '.md. Run npm run content.\n' +
+        'export default ' +
+        JSON.stringify(data, null, 2) +
+        '\n',
     )
   }
 

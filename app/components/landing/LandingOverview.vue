@@ -41,7 +41,10 @@ const darkCapabilities = [
     'Automation',
     'Coordinate pages, indexes and bookmarks. Keep running Bates pagination aligned automatically.',
   ],
-  ['Local-first control', 'Keep core document work on your desktop while preparing and reviewing files.'],
+  [
+    'Local-first control',
+    'Keep core document work on your desktop while preparing and reviewing files.',
+  ],
 ] as const
 </script>
 <template>
@@ -54,7 +57,12 @@ const darkCapabilities = [
         class="dark-design"
       />
       <div class="capability-grid">
-        <article v-for="(card, i) in capabilities" :key="card.label" class="capability-card" data-enter>
+        <article
+          v-for="(card, i) in capabilities"
+          :key="card.label"
+          class="capability-card"
+          data-enter
+        >
           <span class="icon-tile"><component :is="card.icon" /></span>
           <div class="light-design">
             <small>{{ card.label }}</small>

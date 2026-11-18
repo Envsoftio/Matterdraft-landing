@@ -21,9 +21,10 @@ export function negotiateEncoding(header, available = {}) {
 
     let quality = 1
     if (parameters.length) {
-      const weight = parameters.length === 1
-        ? parameters[0].match(/^\s*q\s*=\s*(0(?:\.\d{0,3})?|1(?:\.0{0,3})?)\s*$/i)
-        : null
+      const weight =
+        parameters.length === 1
+          ? parameters[0].match(/^\s*q\s*=\s*(0(?:\.\d{0,3})?|1(?:\.0{0,3})?)\s*$/i)
+          : null
       // Invalid weights must never turn a refused coding into an accepted one.
       quality = weight ? Number(weight[1]) : 0
     }

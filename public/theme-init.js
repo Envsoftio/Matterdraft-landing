@@ -1,11 +1,14 @@
-(function () {
+;(function () {
   var storageKey = 'matterdraft-theme'
   var saved = null
-  try { saved = localStorage.getItem(storageKey) } catch (_) { /* Storage may be disabled. */ }
+  try {
+    saved = localStorage.getItem(storageKey)
+  } catch (_) {
+    /* Storage may be disabled. */
+  }
   var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-  document.documentElement.dataset.theme = saved === 'dark' || saved === 'light'
-    ? saved
-    : prefersDark ? 'dark' : 'light'
+  document.documentElement.dataset.theme =
+    saved === 'dark' || saved === 'light' ? saved : prefersDark ? 'dark' : 'light'
 
   function syncButtons() {
     var dark = document.documentElement.dataset.theme === 'dark'
@@ -23,6 +26,12 @@
   } else {
     syncButtons()
   }
-  new MutationObserver(syncButtons).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-  new MutationObserver(syncButtons).observe(document.documentElement, { childList: true, subtree: true })
+  new MutationObserver(syncButtons).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  })
+  new MutationObserver(syncButtons).observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+  })
 })()

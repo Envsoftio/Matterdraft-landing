@@ -20,7 +20,8 @@ const volumes = computed(() => {
   return result
 })
 function description(index: number, pages: number) {
-  if (pages > target.value) return 'One source document exceeds the target. It stays together in this volume.'
+  if (pages > target.value)
+    return 'One source document exceeds the target. It stays together in this volume.'
   if (target.value === 300 && index === 1)
     return 'The 125-page Correspondence record begins intact here without a mid-document split.'
   if (index === volumes.value.length - 1)
@@ -71,7 +72,9 @@ function description(index: number, pages: number) {
             :aria-label="'Capacity for volume ' + (i + 1)"
             class="capacity"
           >
-            <ProgressIndicator :style="{ width: Math.min(100, (volume.pages / target) * 100) + '%' }" />
+            <ProgressIndicator
+              :style="{ width: Math.min(100, (volume.pages / target) * 100) + '%' }"
+            />
           </ProgressRoot>
           <p>{{ description(i, volume.pages) }}</p>
         </article>

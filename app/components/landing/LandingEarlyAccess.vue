@@ -21,13 +21,22 @@ const endpoint = '/.netlify/functions/early-access'
 const initiallyEnabled = useRuntimeConfig().public.earlyAccessEnabled
 const { data: availability } = useFetch<{ enabled: boolean }>(endpoint, { server: false, retry: 0 })
 const enabled = computed(() => availability.value?.enabled ?? initiallyEnabled)
-const form = reactive({ name: '', email: '', role: '', platform: '', contactConsent: false, website: '' })
+const form = reactive({
+  name: '',
+  email: '',
+  role: '',
+  platform: '',
+  contactConsent: false,
+  website: '',
+})
 const ready = ref(false)
 const pending = ref(false)
 const submitted = ref(false)
 const errorMessage = ref('')
 const submissionStatus = useTemplateRef('submissionStatus')
-onMounted(() => { ready.value = true })
+onMounted(() => {
+  ready.value = true
+})
 
 async function submitEarlyAccess() {
   if (!ready.value || pending.value || !enabled.value) return
@@ -52,7 +61,11 @@ async function submitEarlyAccess() {
 </script>
 
 <template>
-  <section id="early-access" class="studio-section alt signup-section" aria-labelledby="early-access-title">
+  <section
+    id="early-access"
+    class="studio-section alt signup-section"
+    aria-labelledby="early-access-title"
+  >
     <div class="signup-inner">
       <div class="signup-copy" data-enter>
         <h2 id="early-access-title">Get early access to MatterDraft</h2>
@@ -67,7 +80,13 @@ async function submitEarlyAccess() {
       </div>
 
       <div class="signup-card" data-enter>
-        <div v-if="submitted" ref="submissionStatus" class="signup-status" role="status" tabindex="-1">
+        <div
+          v-if="submitted"
+          ref="submissionStatus"
+          class="signup-status"
+          role="status"
+          tabindex="-1"
+        >
           <span class="icon-tile" aria-hidden="true"><Check /></span>
           <h3>You’re on the list.</h3>
           <p>We’ll email you about early access and launch.</p>
@@ -75,20 +94,42 @@ async function submitEarlyAccess() {
         <template v-else>
           <header>
             <h3 id="early-access-form-title">Early access registration</h3>
-            <p>{{ enabled ? 'Share your details to join the list.' : 'Registration isn’t open yet.' }}</p>
+            <p>
+              {{
+                enabled ? 'Share your details to join the list.' : 'Registration isn’t open yet.'
+              }}
+            </p>
           </header>
-          <FormRoot v-if="enabled" method="post" aria-labelledby="early-access-form-title" @submit.prevent="submitEarlyAccess">
+          <FormRoot
+            v-if="enabled"
+            method="post"
+            aria-labelledby="early-access-form-title"
+            @submit.prevent="submitEarlyAccess"
+          >
             <div class="signup-fields">
               <FieldRoot class="signup-field-full" name="name" required :disabled="pending">
                 <FieldLabel for="early-access-name">Full name</FieldLabel>
-                <FieldControl id="early-access-name" v-model="form.name" autocomplete="name" maxlength="120" />
+                <FieldControl
+                  id="early-access-name"
+                  v-model="form.name"
+                  autocomplete="name"
+                  maxlength="120"
+                />
                 <FieldError class="signup-field-error">Enter your full name.</FieldError>
               </FieldRoot>
 
               <FieldRoot class="signup-field-full" name="email" required :disabled="pending">
                 <FieldLabel for="early-access-email">Work email</FieldLabel>
-                <FieldControl id="early-access-email" v-model="form.email" type="email" autocomplete="email" maxlength="254" />
-                <FieldError class="signup-field-error">Enter a valid work email address.</FieldError>
+                <FieldControl
+                  id="early-access-email"
+                  v-model="form.email"
+                  type="email"
+                  autocomplete="email"
+                  maxlength="254"
+                />
+                <FieldError class="signup-field-error"
+                  >Enter a valid work email address.</FieldError
+                >
               </FieldRoot>
 
               <FieldRoot name="role" :disabled="pending">
@@ -103,7 +144,9 @@ async function submitEarlyAccess() {
               </FieldRoot>
 
               <FieldRoot name="platform" :disabled="pending">
-                <FieldLabel for="early-access-platform">Preferred platform <span>(optional)</span></FieldLabel>
+                <FieldLabel for="early-access-platform"
+                  >Preferred platform <span>(optional)</span></FieldLabel
+                >
                 <StudioSelect
                   id="early-access-platform"
                   v-model="form.platform"
@@ -131,7 +174,9 @@ async function submitEarlyAccess() {
                   We store your registration details in Google Sheets.
                   <NuxtLink to="/privacy">Privacy policy</NuxtLink>
                 </FieldDescription>
-                <FieldError class="signup-field-error">Agree to receive emails to join the list.</FieldError>
+                <FieldError class="signup-field-error"
+                  >Agree to receive emails to join the list.</FieldError
+                >
               </div>
             </FieldRoot>
 

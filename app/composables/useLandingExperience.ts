@@ -2,7 +2,11 @@
 export function useLandingExperience() {
   let observer: IntersectionObserver | undefined
   onMounted(() => {
-    if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (
+      !('IntersectionObserver' in window) ||
+      matchMedia('(prefers-reduced-motion: reduce)').matches
+    )
+      return
     observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries)
@@ -11,7 +15,7 @@ export function useLandingExperience() {
             observer?.unobserve(entry.target)
           }
       },
-      { threshold: 0.05 }
+      { threshold: 0.05 },
     )
     document
       .querySelectorAll('.studio-landing .section-heading, .studio-landing [data-enter]')

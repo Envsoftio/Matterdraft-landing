@@ -17,7 +17,10 @@ onMounted(() => {
     <div class="frame two-col local-grid">
       <div>
         <SectionHeading v-bind="featureHeadings.local" layout="stack" />
-        <NuxtLink class="mt-3 inline-block text-sm text-studio-accent underline underline-offset-4" to="/privacy">
+        <NuxtLink
+          class="mt-3 inline-block text-sm text-studio-accent underline underline-offset-4"
+          to="/privacy"
+        >
           Read the Privacy Policy
         </NuxtLink>
       </div>

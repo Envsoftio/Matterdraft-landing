@@ -39,7 +39,13 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
         { rel: 'manifest', href: '/site.webmanifest' },
-        { rel: 'preload', href: '/fonts/plus-jakarta-sans-latin-variable.woff2', as: 'font', type: 'font/woff2', crossorigin: '' },
+        {
+          rel: 'preload',
+          href: '/fonts/plus-jakarta-sans-latin-variable.woff2',
+          as: 'font',
+          type: 'font/woff2',
+          crossorigin: '',
+        },
       ],
       script: [{ src: '/theme-init.js' }],
     },
@@ -49,21 +55,29 @@ export default defineNuxtConfig({
   experimental: { payloadExtraction: true },
   prerender: {
     crawlLinks: false,
-    routes: [settings.facts.homepage.path, ...settings.facts.legalDocuments.map(({ slug }: { slug: string }) => `/${slug}`)],
+    routes: [
+      settings.facts.homepage.path,
+      ...settings.facts.legalDocuments.map(({ slug }: { slug: string }) => `/${slug}`),
+    ],
   },
   nitro: { prerender: { failOnError: true, concurrency: 4 } },
   serverHandlers: [
-    { route: '/.netlify/functions/early-access', handler: fileURLToPath(new URL('./server/handlers/early-access.ts', import.meta.url)) },
+    {
+      route: '/.netlify/functions/early-access',
+      handler: fileURLToPath(new URL('./server/handlers/early-access.ts', import.meta.url)),
+    },
   ],
   routeRules: {
     ...Object.fromEntries(Object.entries(seoHeaders).map(([path, headers]) => [path, { headers }])),
-    '/**': { headers: {
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-      ...seoHeaders['/**'],
-    } },
+    '/**': {
+      headers: {
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
+        'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+        ...seoHeaders['/**'],
+      },
+    },
     '/_nuxt/**': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/_nuxt/builds/latest.json': { headers: { 'Cache-Control': 'no-cache' } },
   },

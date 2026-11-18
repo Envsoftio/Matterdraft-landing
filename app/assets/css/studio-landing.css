@@ -1339,7 +1339,8 @@ html[data-theme='dark'] .export-example {
 }
 .studio-landing .recognized {
   border-color: var(--action);
-  background: radial-gradient(circle at 100% 0, var(--chip) 0 94px, transparent 95px), var(--surface);
+  background:
+    radial-gradient(circle at 100% 0, var(--chip) 0 94px, transparent 95px), var(--surface);
 }
 .recognized header,
 .volume-card small {

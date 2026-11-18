@@ -30,7 +30,10 @@ function apply(tool: string) {
       <div class="pdf-bench panel" data-enter>
         <ToolbarRoot aria-label="Sample PDF tools" class="pdf-toolbar">
           <template
-            v-for="(group, index) in [Object.keys(operations).slice(0, 7), Object.keys(operations).slice(7)]"
+            v-for="(group, index) in [
+              Object.keys(operations).slice(0, 7),
+              Object.keys(operations).slice(7),
+            ]"
             :key="index"
           >
             <strong>{{ index ? 'Page tools' : 'Document tools' }}</strong>
@@ -57,7 +60,8 @@ function apply(tool: string) {
               }}
             </p>
             <footer>
-              Page 1 of {{ selection === 'Delete' ? 38 : selection === 'Insert' ? 40 : 39 }}　 Zoom 100%　
+              Page 1 of {{ selection === 'Delete' ? 38 : selection === 'Insert' ? 40 : 39 }}　 Zoom
+              100%　
               <span class="positive">Sample working copy</span>
             </footer>
           </article>
@@ -65,15 +69,15 @@ function apply(tool: string) {
             <article>
               <h4>Bring different source formats together</h4>
               <p>
-                Work with PDFs, Word documents and images. Convert images and documents to PDF within the
-                preparation workflow.
+                Work with PDFs, Word documents and images. Convert images and documents to PDF
+                within the preparation workflow.
               </p>
             </article>
             <article>
               <h4>Prepare the output you need</h4>
               <p>
-                Compress PDFs and use PDF conversion where supported. Review conversion results before
-                including them in the bundle.
+                Compress PDFs and use PDF conversion where supported. Review conversion results
+                before including them in the bundle.
               </p>
             </article>
           </div>

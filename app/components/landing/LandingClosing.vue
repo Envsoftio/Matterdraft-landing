@@ -10,9 +10,7 @@ import { ArrowRight } from '@lucide/vue'
         <br class="wide-break" />
         structured legal bundle.
       </h2>
-      <p>
-        For advocates, chambers and the legal teams that prepare court bundles.
-      </p>
+      <p>For advocates, chambers and the legal teams that prepare court bundles.</p>
       <a class="action primary" href="#early-access">
         Get Early Access
         <ArrowRight />

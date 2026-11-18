@@ -1,0 +1,9 @@
+{
+  "printWidth": 100,
+  "singleQuote": true,
+  "semi": false,
+  "overrides": [
+    { "files": "*.gs", "options": { "parser": "babel" } },
+    { "files": "*.webmanifest", "options": { "parser": "json" } }
+  ]
+}

@@ -2,12 +2,14 @@ import { applicationRoute, applicationFailure } from '../../utils/application-er
 import { client } from '../../../lib/db'
 import { requireStaff } from '../../utils/customer-account'
 
-export default applicationRoute('/api/internal/overview', async event => {
+export default applicationRoute('/api/internal/overview', async (event) => {
   await requireStaff(event, 'super_admin')
   const [users, accounts, organisations, staff] = await Promise.all([
     client.execute('SELECT COUNT(*) AS count FROM user'),
     client.execute('SELECT COUNT(*) AS count FROM customer_account'),
-    client.execute("SELECT COUNT(*) AS count FROM customer_account WHERE account_type = 'organisation'"),
+    client.execute(
+      "SELECT COUNT(*) AS count FROM customer_account WHERE account_type = 'organisation'",
+    ),
     client.execute('SELECT COUNT(*) AS count FROM staff_access WHERE active = 1'),
   ])
   return {

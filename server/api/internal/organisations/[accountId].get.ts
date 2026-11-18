@@ -4,7 +4,7 @@ import { client } from '../../../../lib/db'
 import { requireStaff } from '../../../utils/customer-account'
 import { getOrganisationDetails } from '../../../utils/organisation-directory'
 
-export default applicationRoute('/api/internal/organisations/[accountId]', async event => {
+export default applicationRoute('/api/internal/organisations/[accountId]', async (event) => {
   const actor = await requireStaff(event, 'super_admin')
   const accountId = getRouterParam(event, 'accountId') || ''
   if (!/^[0-9a-f-]{36}$/.test(accountId)) applicationFailure(404)

@@ -41,9 +41,7 @@ onBeforeUnmount(() => clearTimeout(timer))
           </header>
           <div class="ocr-result" aria-live="polite">
             <h4>Supporting record: Clause 14.1 (Recognised)</h4>
-            <p>
-              “The parties will keep copies of the signed agreement and the delivery schedule.”
-            </p>
+            <p>“The parties will keep copies of the signed agreement and the delivery schedule.”</p>
             <small class="positive">
               <BadgeCheck :size="13" />
               {{
@@ -56,7 +54,13 @@ onBeforeUnmount(() => clearTimeout(timer))
           <footer>
             <button class="mini-action" :disabled="state === 'scanning'" @click="run">
               <Play :size="12" />
-              {{ state === 'scanning' ? 'Recognising…' : state === 'done' ? 'Run again' : 'Run OCR example' }}
+              {{
+                state === 'scanning'
+                  ? 'Recognising…'
+                  : state === 'done'
+                    ? 'Run again'
+                    : 'Run OCR example'
+              }}
             </button>
             Review recognised text before use
           </footer>

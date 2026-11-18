@@ -3,7 +3,7 @@ import { applicationRoute, applicationFailure } from '../../../utils/application
 import { client } from '../../../../lib/db'
 import { requireStaff } from '../../../utils/customer-account'
 
-export default applicationRoute('/api/internal/customers/[userId]', async event => {
+export default applicationRoute('/api/internal/customers/[userId]', async (event) => {
   const actor = await requireStaff(event, 'super_admin')
   const userId = getRouterParam(event, 'userId') || ''
   if (!/^[A-Za-z0-9_-]{16,128}$/.test(userId)) applicationFailure(404)
@@ -29,12 +29,17 @@ export default applicationRoute('/api/internal/customers/[userId]', async event 
   })
   return {
     customer: {
-      id: String(row.id), name: String(row.name), email: String(row.email),
-      emailVerified: Boolean(row.email_verified), createdAt: Number(row.created_at),
+      id: String(row.id),
+      name: String(row.name),
+      email: String(row.email),
+      emailVerified: Boolean(row.email_verified),
+      createdAt: Number(row.created_at),
     },
-    memberships: memberships.rows.map(membership => ({
-      accountId: String(membership.id), accountName: String(membership.name),
-      accountType: String(membership.account_type), role: String(membership.role),
+    memberships: memberships.rows.map((membership) => ({
+      accountId: String(membership.id),
+      accountName: String(membership.name),
+      accountType: String(membership.account_type),
+      role: String(membership.role),
       joinedAt: Number(membership.created_at),
     })),
   }

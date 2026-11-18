@@ -4,8 +4,11 @@
     <div class="container desktop-command-layout">
       <div data-reveal>
         <p class="section-index">The everyday desktop essentials</p>
-        <h2>Familiar controls.<br>A focused workspace.</h2>
-        <p class="lead">Open, save, find and review with the application tools that support the larger production workflow.</p>
+        <h2>Familiar controls.<br />A focused workspace.</h2>
+        <p class="lead">
+          Open, save, find and review with the application tools that support the larger production
+          workflow.
+        </p>
       </div>
       <div class="desktop-chrome" data-reveal>
         <div class="desktop-app-menu">
@@ -84,9 +87,26 @@
           </div>
         </div>
         <div class="desktop-command-footer">
-          <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M8 21h8M12 16v5"/></svg>Windows + macOS</span>
-          <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 1v2M12 21v2M1 12h2M21 12h2M4 4l2 2M18 18l2 2M4 20l2-2M18 6l2-2"/></svg>Display settings</span>
-          <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m9 11 6-4M9 14l6 3"/></svg>Share links require a connection</span>
+          <span
+            ><svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="13" rx="2" />
+              <path d="M8 21h8M12 16v5" /></svg
+            >Windows + macOS</span
+          >
+          <span
+            ><svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 1v2M12 21v2M1 12h2M21 12h2M4 4l2 2M18 18l2 2M4 20l2-2M18 6l2-2" /></svg
+            >Display settings</span
+          >
+          <span
+            ><svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <path d="m9 11 6-4M9 14l6 3" /></svg
+            >Share links require a connection</span
+          >
         </div>
       </div>
     </div>

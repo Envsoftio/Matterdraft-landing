@@ -39,10 +39,16 @@ export function useSiteSeo(page: PageSeo): void {
   useHead({
     link: [
       { key: 'canonical', rel: 'canonical', href: canonical },
-      ...(indexable && page.markdownPath ? [{
-        key: 'markdown-alternate', rel: 'alternate' as const, type: 'text/markdown',
-        href: new URL(page.markdownPath, config.siteUrl).href,
-      }] : []),
+      ...(indexable && page.markdownPath
+        ? [
+            {
+              key: 'markdown-alternate',
+              rel: 'alternate' as const,
+              type: 'text/markdown',
+              href: new URL(page.markdownPath, config.siteUrl).href,
+            },
+          ]
+        : []),
     ],
   })
 }

@@ -13,7 +13,9 @@ const model = defineModel<string>()
       <slot />
     </div>
     <FieldControl :id="id" v-model="model" v-bind="$attrs" class="portal-input" />
-    <FieldDescription v-if="hint" class="mt-2 text-xs text-studio-muted">{{ hint }}</FieldDescription>
+    <FieldDescription v-if="hint" class="mt-2 text-xs text-studio-muted">{{
+      hint
+    }}</FieldDescription>
     <FieldError class="mt-2 text-xs text-studio-danger" />
   </FieldRoot>
 </template>

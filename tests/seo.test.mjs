@@ -5,21 +5,37 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { discoveryHeaders, NO_INDEX_FOLLOW, NO_INDEX, privateAreas } from '../scripts/discovery.mjs'
 import {
-  canonicalUrl, resolveSiteConfig, validateSiteOrigin, PROJECT_ROOT,
+  canonicalUrl,
+  resolveSiteConfig,
+  validateSiteOrigin,
+  PROJECT_ROOT,
 } from '../scripts/site-config.mjs'
 import {
   escapeXml,
-  generateContent, prepareLegalMarkdown, renderLlmsIndex, renderRobots, renderSitemap,
+  generateContent,
+  prepareLegalMarkdown,
+  renderLlmsIndex,
+  renderRobots,
+  renderSitemap,
 } from '../scripts/generate-content.mjs'
 
 test('site origins normalize once and reject deployment mistakes', () => {
   assert.equal(validateSiteOrigin('HTTPS://EXAMPLE.COM:443/'), 'https://example.com')
-  assert.equal(validateSiteOrigin('https://preview.example.com:8443'), 'https://preview.example.com:8443')
+  assert.equal(
+    validateSiteOrigin('https://preview.example.com:8443'),
+    'https://preview.example.com:8443',
+  )
   for (const input of [
-    '', 'example.com', '//example.com', 'http://example.com',
-    'https://user:password@example.com', 'https://example.com/page',
-    'https://example.com/page/..', 'https://example.com/?preview=1',
-    'https://example.com/#section', 'https://example.com\\page',
+    '',
+    'example.com',
+    '//example.com',
+    'http://example.com',
+    'https://user:password@example.com',
+    'https://example.com/page',
+    'https://example.com/page/..',
+    'https://example.com/?preview=1',
+    'https://example.com/#section',
+    'https://example.com\\page',
   ]) {
     assert.throws(() => validateSiteOrigin(input), /HTTPS origin/, input)
   }
@@ -28,7 +44,14 @@ test('site origins normalize once and reject deployment mistakes', () => {
 test('canonical URLs retain the configured origin and reject ambiguous paths', () => {
   assert.equal(canonicalUrl('/', 'https://example.com'), 'https://example.com/')
   assert.equal(canonicalUrl('/privacy', 'https://example.com/'), 'https://example.com/privacy')
-  for (const path of ['privacy', '//other.example/privacy', 'https://other.example/', '/a?b=1', '/a#b', '/\\other']) {
+  for (const path of [
+    'privacy',
+    '//other.example/privacy',
+    'https://other.example/',
+    '/a?b=1',
+    '/a#b',
+    '/\\other',
+  ]) {
     assert.throws(() => canonicalUrl(path, 'https://example.com'), /Canonical paths/)
   }
 })
@@ -36,21 +59,45 @@ test('canonical URLs retain the configured origin and reject ambiguous paths', (
 test('indexing defaults to on and preview flags remain explicit', () => {
   assert.equal(resolveSiteConfig({}).indexable, true)
   assert.equal(resolveSiteConfig({ CONTEXT: 'deploy-preview' }).indexable, false)
-  assert.equal(resolveSiteConfig({ CONTEXT: 'branch-deploy', NUXT_PUBLIC_INDEXABLE: 'true' }).indexable, true)
+  assert.equal(
+    resolveSiteConfig({ CONTEXT: 'branch-deploy', NUXT_PUBLIC_INDEXABLE: 'true' }).indexable,
+    true,
+  )
   assert.equal(resolveSiteConfig({ INDEXABLE: 'false' }).indexable, false)
   assert.throws(() => resolveSiteConfig({ INDEXABLE: 'perhaps' }), /true or false/)
-  assert.throws(() => resolveSiteConfig({
-    INDEXABLE: 'false', NUXT_PUBLIC_INDEXABLE: 'true',
-  }), /must agree/)
+  assert.throws(
+    () =>
+      resolveSiteConfig({
+        INDEXABLE: 'false',
+        NUXT_PUBLIC_INDEXABLE: 'true',
+      }),
+    /must agree/,
+  )
 })
 
 test('early access opens only with a valid webhook destination and shared secret', () => {
   assert.equal(resolveSiteConfig({}).earlyAccessEnabled, false)
-  assert.equal(resolveSiteConfig({ EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/id/exec' }).earlyAccessEnabled, false)
-  const settings = { EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/id/exec', EARLY_ACCESS_GOOGLE_SHEETS_SECRET: 'x'.repeat(32) }
+  assert.equal(
+    resolveSiteConfig({
+      EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/id/exec',
+    }).earlyAccessEnabled,
+    false,
+  )
+  const settings = {
+    EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/id/exec',
+    EARLY_ACCESS_GOOGLE_SHEETS_SECRET: 'x'.repeat(32),
+  }
   assert.equal(resolveSiteConfig(settings).earlyAccessEnabled, true)
-  assert.equal(resolveSiteConfig({ ...settings, EARLY_ACCESS_GOOGLE_SHEETS_SECRET: 'short' }).earlyAccessEnabled, false)
-  assert.equal(resolveSiteConfig({ ...settings, EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://example.test/' }).earlyAccessEnabled, false)
+  assert.equal(
+    resolveSiteConfig({ ...settings, EARLY_ACCESS_GOOGLE_SHEETS_SECRET: 'short' })
+      .earlyAccessEnabled,
+    false,
+  )
+  assert.equal(
+    resolveSiteConfig({ ...settings, EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://example.test/' })
+      .earlyAccessEnabled,
+    false,
+  )
 })
 
 test('preview builds advertise no sitemap and contain no indexable sitemap URLs', () => {
@@ -99,7 +146,14 @@ test('discovery headers scope public links, private pages and preview indexing',
   assert.equal(headers['/llms-full.txt'].Link, headers['/index.md'].Link)
   assert.equal(headers['/llms.txt']['X-Robots-Tag'], NO_INDEX_FOLLOW)
   assert.equal(headers['/privacy'], undefined)
-  for (const path of ['/sign-in', '/reset-password', '/verify-email', '/consent', '/maintenance.html', ...privateAreas]) {
+  for (const path of [
+    '/sign-in',
+    '/reset-password',
+    '/verify-email',
+    '/consent',
+    '/maintenance.html',
+    ...privateAreas,
+  ]) {
     assert.equal(headers[path]['X-Robots-Tag'], NO_INDEX, path)
     assert.equal(headers[path].Link, undefined, path)
   }
@@ -119,7 +173,10 @@ test('sitemap paths use the configured origin and escape XML', () => {
 
 test('legal preparation removes the duplicated title and rejects unpublished material', () => {
   const heading = '# MatterDraft Studio — Privacy Policy\n\n'
-  assert.equal(prepareLegalMarkdown(heading + '## Scope\nPolicy content.'), '## Scope\nPolicy content.\n')
+  assert.equal(
+    prepareLegalMarkdown(heading + '## Scope\nPolicy content.'),
+    '## Scope\nPolicy content.\n',
+  )
   for (const text of ['[UNRESOLVED_FIELD]', '> **Review draft.**', '## Publication notes']) {
     assert.throws(() => prepareLegalMarkdown(heading + text), /before publishing/)
   }
@@ -132,14 +189,17 @@ async function createFixture(t) {
   const facts = await readFile(join(PROJECT_ROOT, 'content/site.json'), 'utf8')
   await writeFile(join(root, 'content/site.json'), facts)
   for (const slug of ['privacy', 'terms', 'refund-policy']) {
-    await writeFile(join(root, 'content/legal', slug + '.md'), [
-      '# MatterDraft Studio — ' + slug,
-      '',
-      'Operator: Example Operator',
-      '',
-      '## 1. Scope',
-      '[Terms and Conditions](/terms).',
-    ].join('\n'))
+    await writeFile(
+      join(root, 'content/legal', slug + '.md'),
+      [
+        '# MatterDraft Studio — ' + slug,
+        '',
+        'Operator: Example Operator',
+        '',
+        '## 1. Scope',
+        '[Terms and Conditions](/terms).',
+      ].join('\n'),
+    )
   }
   return root
 }
@@ -151,7 +211,9 @@ test('generation prepares policy HTML and keeps the Markdown source intact', asy
   const result = await generateContent({ projectRoot, env: {} })
   assert.equal(result.written.length, 8)
   const module = await readFile(join(projectRoot, 'app/data/legal/privacy.ts'), 'utf8')
-  const data = JSON.parse(module.slice(module.indexOf('export default ') + 'export default '.length))
+  const data = JSON.parse(
+    module.slice(module.indexOf('export default ') + 'export default '.length),
+  )
   assert.equal(data.slug, 'privacy')
   assert.doesNotMatch(data.description, /Review draft/)
   assert.match(data.html, /Example Operator/)
@@ -159,7 +221,10 @@ test('generation prepares policy HTML and keeps the Markdown source intact', asy
   assert.doesNotMatch(data.html, /<h1|Publication notes|Internal publication/)
   assert.equal(await readFile(sourcePath, 'utf8'), before)
   await assert.rejects(access(join(projectRoot, 'public/legal/privacy.md')))
-  assert.match(await readFile(join(projectRoot, 'public/llms-full.txt'), 'utf8'), /\(https:\/\/matterdraft\.legal\/privacy\)/)
+  assert.match(
+    await readFile(join(projectRoot, 'public/llms-full.txt'), 'utf8'),
+    /\(https:\/\/matterdraft\.legal\/privacy\)/,
+  )
 })
 
 test('generation removes stale policy Markdown exports', async (t) => {
@@ -169,5 +234,8 @@ test('generation removes stale policy Markdown exports', async (t) => {
   await writeFile(join(projectRoot, 'public/legal/unrelated.md'), 'Keep this file.')
   await generateContent({ projectRoot, env: {} })
   await assert.rejects(access(join(projectRoot, 'public/legal/privacy.md')))
-  assert.equal(await readFile(join(projectRoot, 'public/legal/unrelated.md'), 'utf8'), 'Keep this file.')
+  assert.equal(
+    await readFile(join(projectRoot, 'public/legal/unrelated.md'), 'utf8'),
+    'Keep this file.',
+  )
 })

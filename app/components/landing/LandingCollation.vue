@@ -17,9 +17,9 @@ const rows = computed(() =>
     categories.flatMap((_, i) =>
       files.value
         .filter((d) => d.part === i)
-        .map((d) => ({ ...d, pages: d.pages + (extra.value && d.name === 'Affidavit' ? 2 : 0) }))
-    )
-  )
+        .map((d) => ({ ...d, pages: d.pages + (extra.value && d.name === 'Affidavit' ? 2 : 0) })),
+    ),
+  ),
 )
 function move(name: string, part: number, before?: string) {
   const doc = files.value.find((d) => d.name === name)
@@ -85,7 +85,8 @@ function reset() {
             </DropdownMenuPortal>
           </DropdownMenuRoot>
           <footer>
-            Part total: {{ rows.filter((d) => d.part === i).reduce((total, d) => total + d.pages, 0) }} pages
+            Part total:
+            {{ rows.filter((d) => d.part === i).reduce((total, d) => total + d.pages, 0) }} pages
           </footer>
         </article>
       </div>
@@ -94,7 +95,10 @@ function reset() {
           {{ extra ? 'Remove 2 added pages' : 'Add 2 pages to Affidavit' }}
         </button>
         <button @click="reset">Reset example</button>
-        <span>Combine the parts → Pagination → Index &amp; bookmarks → Volume allocation → Final bundle</span>
+        <span
+          >Combine the parts → Pagination → Index &amp; bookmarks → Volume allocation → Final
+          bundle</span
+        >
       </div>
       <span class="sr-only" role="status">{{ rows.at(-1)?.end }} pages across four parts</span>
     </div>

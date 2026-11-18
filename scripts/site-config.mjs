@@ -29,7 +29,9 @@ export function validateSiteOrigin(value) {
     url.hash ||
     url.pathname !== '/'
   ) {
-    throw new Error('NUXT_PUBLIC_SITE_URL must be an HTTPS origin without a path, query, fragment or credentials.')
+    throw new Error(
+      'NUXT_PUBLIC_SITE_URL must be an HTTPS origin without a path, query, fragment or credentials.',
+    )
   }
   return url.origin
 }

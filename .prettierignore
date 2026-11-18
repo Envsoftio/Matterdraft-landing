@@ -1,0 +1,13 @@
+# Documentation and media assets.
+**/*.md
+**/*.svg
+
+# Generated files and database migration history.
+/app/data/legal/
+/deploy/headers.json
+/drizzle/
+/lib/auth-schema.ts
+/package-lock.json
+/public/llms*.txt
+/public/robots.txt
+/public/sitemap.xml

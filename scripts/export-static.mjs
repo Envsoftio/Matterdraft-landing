@@ -18,7 +18,7 @@ async function filesIn(directory) {
   const result = []
   for (const entry of entries) {
     const full = join(directory, entry.name)
-    if (entry.isDirectory()) result.push(...await filesIn(full))
+    if (entry.isDirectory()) result.push(...(await filesIn(full)))
     else result.push(full)
   }
   return result
@@ -26,7 +26,7 @@ async function filesIn(directory) {
 
 const files = await filesIn(destination)
 const scriptHashes = new Set()
-for (const file of files.filter(file => file.endsWith('.html'))) {
+for (const file of files.filter((file) => file.endsWith('.html'))) {
   const html = await readFile(file, 'utf8')
   for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
     if (!/\bsrc\s*=/.test(match[1]) && match[2]) {
@@ -35,19 +35,25 @@ for (const file of files.filter(file => file.endsWith('.html'))) {
   }
 }
 const csp = [
-  "default-src 'self'", `script-src 'self' ${[...scriptHashes].join(' ')}`,
-  "style-src 'self' 'unsafe-inline'", "img-src 'self' data:", "font-src 'self'",
+  "default-src 'self'",
+  `script-src 'self' ${[...scriptHashes].join(' ')}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data:",
+  "font-src 'self'",
   "connect-src 'self'",
-  "object-src 'none'", "base-uri 'self'", "frame-ancestors 'none'", "form-action 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
 ].join('; ')
 // Keep the hash policy beside the exact HTML it protects. Netlify serves the
 // matching full policy from _headers; frame-ancestors requires that HTTP header.
 const metaCsp = csp.replace(/; frame-ancestors 'none'/, '')
 const escapedMetaCsp = metaCsp.replaceAll('&', '&amp;').replaceAll('"', '&quot;')
-for (const file of files.filter(file => file.endsWith('.html'))) {
+for (const file of files.filter((file) => file.endsWith('.html'))) {
   const html = await readFile(file, 'utf8')
   const meta = `<meta http-equiv="Content-Security-Policy" content="${escapedMetaCsp}">`
-  const updated = html.replace(/(<head>\s*<meta charset="[^"]+">)/i, `$1${meta}`)
+  const updated = html.replace(/(<head>\s*<meta charset="[^"]+"\s*\/?>)/i, `$1${meta}`)
   if (updated === html) throw new Error(`Cannot place the CSP before scripts in ${file}`)
   await writeFile(file, updated)
 }
@@ -59,29 +65,54 @@ const commonHeaders = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   ...seoHeaders['/**'],
 }
-const headerLines = ['/*', ...Object.entries(commonHeaders).map(([name,value]) => `  ${name}: ${value}`),
-  '', '/_nuxt/*', '  Cache-Control: public, max-age=31536000, immutable',
-  '', '/_nuxt/builds/latest.json', '  Cache-Control: no-cache',
-  '', '/fonts/*', '  Cache-Control: public, max-age=86400, stale-while-revalidate=604800',
-  '', '/brand/*', '  Cache-Control: public, max-age=86400',
-  '', '/og/*', '  Cache-Control: public, max-age=86400',
+const headerLines = [
+  '/*',
+  ...Object.entries(commonHeaders).map(([name, value]) => `  ${name}: ${value}`),
+  '',
+  '/_nuxt/*',
+  '  Cache-Control: public, max-age=31536000, immutable',
+  '',
+  '/_nuxt/builds/latest.json',
+  '  Cache-Control: no-cache',
+  '',
+  '/fonts/*',
+  '  Cache-Control: public, max-age=86400, stale-while-revalidate=604800',
+  '',
+  '/brand/*',
+  '  Cache-Control: public, max-age=86400',
+  '',
+  '/og/*',
+  '  Cache-Control: public, max-age=86400',
 ]
 for (const [route, headers] of Object.entries(seoHeaders)) {
   if (route === '/**') continue
-  headerLines.push('', route.replace('/**', '/*'), ...Object.entries(headers).map(([name, value]) => `  ${name}: ${value}`))
+  headerLines.push(
+    '',
+    route.replace('/**', '/*'),
+    ...Object.entries(headers).map(([name, value]) => `  ${name}: ${value}`),
+  )
 }
 await writeFile(join(destination, '_headers'), `${headerLines.join('\n')}\n`)
 await mkdir(join(root, 'deploy'), { recursive: true })
-await writeFile(join(root, 'deploy/headers.json'), `${JSON.stringify({ commonHeaders, discoveryHeaders: seoHeaders }, null, 2)}\n`)
+await writeFile(
+  join(root, 'deploy/headers.json'),
+  `${JSON.stringify({ commonHeaders, discoveryHeaders: seoHeaders }, null, 2)}\n`,
+)
 // Static compression is included for hosts that can negotiate these sidecars.
 // Netlify can also compress the original files itself.
 let compressed = 0
 for (const file of files) {
-  if (!['.html','.css','.js','.json','.svg','.txt','.xml','.md'].includes(extname(file))) continue
+  if (!['.html', '.css', '.js', '.json', '.svg', '.txt', '.xml', '.md'].includes(extname(file)))
+    continue
   const content = await readFile(file)
   if (content.length < 1024) continue
   await writeFile(`${file}.gz`, gzipSync(content, { level: 9 }))
-  await writeFile(`${file}.br`, brotliCompressSync(content, { params: { [constants.BROTLI_PARAM_QUALITY]: 11 } }))
+  await writeFile(
+    `${file}.br`,
+    brotliCompressSync(content, { params: { [constants.BROTLI_PARAM_QUALITY]: 11 } }),
+  )
   compressed++
 }
-console.log(`Static build copied to dist/; security/cache headers and ${compressed} compressed asset pairs created.`)
+console.log(
+  `Static build copied to dist/; security/cache headers and ${compressed} compressed asset pairs created.`,
+)

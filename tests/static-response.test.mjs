@@ -50,7 +50,10 @@ test('malformed and conflicting weights cannot silently enable rejected codings'
 })
 
 test('only successful immutable assets get the long cache lifetime', () => {
-  assert.equal(cacheControlForStaticResponse('/_nuxt/entry.ABC123.js', 200), 'public, max-age=31536000, immutable')
+  assert.equal(
+    cacheControlForStaticResponse('/_nuxt/entry.ABC123.js', 200),
+    'public, max-age=31536000, immutable',
+  )
   assert.equal(cacheControlForStaticResponse('/_nuxt/missing.js', 404), 'no-cache')
   assert.equal(cacheControlForStaticResponse('/fonts/missing.woff2', 404), 'no-cache')
   assert.equal(cacheControlForStaticResponse('/_nuxt/builds/latest.json', 200), 'no-cache')

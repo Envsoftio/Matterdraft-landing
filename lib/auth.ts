@@ -20,12 +20,14 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    sendResetPassword: async ({ user, url }) => sendAccountEmail(user.email, 'Reset your MatterDraft password', url),
+    sendResetPassword: async ({ user, url }) =>
+      sendAccountEmail(user.email, 'Reset your MatterDraft password', url),
   },
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: false,
-    sendVerificationEmail: async ({ user, url }) => sendAccountEmail(user.email, 'Verify your MatterDraft email', url),
+    sendVerificationEmail: async ({ user, url }) =>
+      sendAccountEmail(user.email, 'Verify your MatterDraft email', url),
   },
   disabledPaths: ['/token'],
   plugins: [
@@ -34,9 +36,12 @@ export const auth = betterAuth({
       loginPage: '/sign-in',
       consentPage: '/consent',
       signup: { page: '/sign-up' },
-    clientPrivileges: async ({ user }) => {
+      clientPrivileges: async ({ user }) => {
         if (!user || !user.emailVerified) return false
-        const record = await client.execute({ sql: 'SELECT 1 FROM staff_access WHERE user_id = ? AND role = ? AND active = 1 LIMIT 1', args: [user.id, 'super_admin'] })
+        const record = await client.execute({
+          sql: 'SELECT 1 FROM staff_access WHERE user_id = ? AND role = ? AND active = 1 LIMIT 1',
+          args: [user.id, 'super_admin'],
+        })
         return record.rows.length > 0
       },
     }),

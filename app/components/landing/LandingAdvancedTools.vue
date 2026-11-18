@@ -18,7 +18,12 @@ const tools = [
   [Signature, 'Signature fields', 'Place a signature', 'Place a signature on the working copy.'],
   [PanelsTopLeft, 'Watermark', 'Custom opacity', 'Apply a visible mark across selected pages.'],
   [Clock, 'Timestamp', 'Date and time', 'Add a time reference to the prepared document.'],
-  [ListOrdered, 'Pagination', 'Bates numbering', 'Number pages consistently across the parts of the bundle.'],
+  [
+    ListOrdered,
+    'Pagination',
+    'Bates numbering',
+    'Number pages consistently across the parts of the bundle.',
+  ],
   [
     MessageSquareText,
     'Annotations',

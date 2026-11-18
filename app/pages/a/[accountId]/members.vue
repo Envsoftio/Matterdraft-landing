@@ -1,40 +1,340 @@
 <script setup lang="ts">
-import { DialogRoot, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogDescription } from 'reka-ui'
+import {
+  DialogRoot,
+  DialogPortal,
+  DialogOverlay,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from 'reka-ui'
 import { parseApiError } from '~/utils/api-error'
 definePageMeta({ layout: 'portal' })
 usePrivatePageSeo('Members', 'Manage organisation invitations and member roles.')
 const route = useRoute()
 const accountId = computed(() => String(route.params.accountId))
 type Member = { user_id: string; name: string; email: string; role: string; created_at: number }
-type Invitation = { id: string; invitee_email: string; invited_role: string; invitation_type: string; invitation_status: string; expires_at: number }
-type Data = { account: { name: string; role: string }; members: Member[]; invitations: Invitation[]; allowedInviteRoles: string[] }
-const { data, error: loadError, refresh } = await useFetch<Data>(() => `/api/membership/accounts/${accountId.value}/members`)
-const email = ref(''); const role = ref('member'); const busy = ref(false); const error = ref(''); const success = ref('')
+type Invitation = {
+  id: string
+  invitee_email: string
+  invited_role: string
+  invitation_type: string
+  invitation_status: string
+  expires_at: number
+}
+type Data = {
+  account: { name: string; role: string }
+  members: Member[]
+  invitations: Invitation[]
+  allowedInviteRoles: string[]
+}
+const {
+  data,
+  error: loadError,
+  refresh,
+} = await useFetch<Data>(() => `/api/membership/accounts/${accountId.value}/members`)
+const email = ref('')
+const role = ref('member')
+const busy = ref(false)
+const error = ref('')
+const success = ref('')
 const uncertain = ref(false)
-const selected = ref<Member | null>(null); const nextRole = ref('member')
-async function problem(cause: unknown) { const parsed = parseApiError(cause); if (parsed.ambiguous) { uncertain.value = true; try { await refresh() } catch { /* Keep actions blocked until a fresh read succeeds. */ } return `${parsed.text} Review the current members and invitations before another change.` } return parsed.text }
-async function checkCurrentState() { await refresh(); if (!loadError.value) uncertain.value = false }
-async function invite() { busy.value = true; error.value = ''; success.value = ''; try { const result = await $fetch<{ delivery: string }>(`/api/membership/accounts/${accountId.value}/invitations`, { method: 'POST', body: { email: email.value, role: role.value } }); email.value = ''; success.value = result.delivery === 'sent' ? 'Invitation sent.' : 'Invitation saved, but the email could not be sent. Revoke it and try again later.'; await refresh() } catch (cause) { error.value = await problem(cause) } finally { busy.value = false } }
-async function revoke(id: string) { busy.value = true; error.value = ''; try { await $fetch(`/api/membership/accounts/${accountId.value}/invitations/${id}/revoke`, { method: 'POST' }); await refresh() } catch (cause) { error.value = await problem(cause) } finally { busy.value = false } }
-function review(member: Member) { selected.value = member; nextRole.value = member.role; error.value = ''; success.value = '' }
-async function changeRole() { if (!selected.value) return; busy.value = true; error.value = ''; try { await $fetch(`/api/membership/accounts/${accountId.value}/members/${selected.value.user_id}`, { method: 'PATCH', body: { role: nextRole.value } }); success.value = 'Role updated.'; selected.value = null; await refresh() } catch (cause) { error.value = await problem(cause) } finally { busy.value = false } }
-async function removeMember() { if (!selected.value) return; busy.value = true; error.value = ''; try { await $fetch(`/api/membership/accounts/${accountId.value}/members/${selected.value.user_id}`, { method: 'DELETE' }); success.value = 'Member removed.'; selected.value = null; await refresh() } catch (cause) { error.value = await problem(cause) } finally { busy.value = false } }
-async function transfer() { if (!selected.value) return; busy.value = true; error.value = ''; try { const result = await $fetch<{ delivery: string }>(`/api/membership/accounts/${accountId.value}/transfers`, { method: 'POST', body: { userId: selected.value.user_id } }); success.value = result.delivery === 'sent' ? 'Transfer request sent. You remain owner until they accept.' : 'Transfer request saved, but the email could not be sent. Revoke it and try again later.'; selected.value = null; await refresh() } catch (cause) { error.value = await problem(cause) } finally { busy.value = false } }
-const assignable = computed(() => data.value?.account.role === 'owner' ? ['admin','billing_manager','member'] : ['member'])
+const selected = ref<Member | null>(null)
+const nextRole = ref('member')
+async function problem(cause: unknown) {
+  const parsed = parseApiError(cause)
+  if (parsed.ambiguous) {
+    uncertain.value = true
+    try {
+      await refresh()
+    } catch {
+      /* Keep actions blocked until a fresh read succeeds. */
+    }
+    return `${parsed.text} Review the current members and invitations before another change.`
+  }
+  return parsed.text
+}
+async function checkCurrentState() {
+  await refresh()
+  if (!loadError.value) uncertain.value = false
+}
+async function invite() {
+  busy.value = true
+  error.value = ''
+  success.value = ''
+  try {
+    const result = await $fetch<{ delivery: string }>(
+      `/api/membership/accounts/${accountId.value}/invitations`,
+      { method: 'POST', body: { email: email.value, role: role.value } },
+    )
+    email.value = ''
+    success.value =
+      result.delivery === 'sent'
+        ? 'Invitation sent.'
+        : 'Invitation saved, but the email could not be sent. Revoke it and try again later.'
+    await refresh()
+  } catch (cause) {
+    error.value = await problem(cause)
+  } finally {
+    busy.value = false
+  }
+}
+async function revoke(id: string) {
+  busy.value = true
+  error.value = ''
+  try {
+    await $fetch(`/api/membership/accounts/${accountId.value}/invitations/${id}/revoke`, {
+      method: 'POST',
+    })
+    await refresh()
+  } catch (cause) {
+    error.value = await problem(cause)
+  } finally {
+    busy.value = false
+  }
+}
+function review(member: Member) {
+  selected.value = member
+  nextRole.value = member.role
+  error.value = ''
+  success.value = ''
+}
+async function changeRole() {
+  if (!selected.value) return
+  busy.value = true
+  error.value = ''
+  try {
+    await $fetch(`/api/membership/accounts/${accountId.value}/members/${selected.value.user_id}`, {
+      method: 'PATCH',
+      body: { role: nextRole.value },
+    })
+    success.value = 'Role updated.'
+    selected.value = null
+    await refresh()
+  } catch (cause) {
+    error.value = await problem(cause)
+  } finally {
+    busy.value = false
+  }
+}
+async function removeMember() {
+  if (!selected.value) return
+  busy.value = true
+  error.value = ''
+  try {
+    await $fetch(`/api/membership/accounts/${accountId.value}/members/${selected.value.user_id}`, {
+      method: 'DELETE',
+    })
+    success.value = 'Member removed.'
+    selected.value = null
+    await refresh()
+  } catch (cause) {
+    error.value = await problem(cause)
+  } finally {
+    busy.value = false
+  }
+}
+async function transfer() {
+  if (!selected.value) return
+  busy.value = true
+  error.value = ''
+  try {
+    const result = await $fetch<{ delivery: string }>(
+      `/api/membership/accounts/${accountId.value}/transfers`,
+      { method: 'POST', body: { userId: selected.value.user_id } },
+    )
+    success.value =
+      result.delivery === 'sent'
+        ? 'Transfer request sent. You remain owner until they accept.'
+        : 'Transfer request saved, but the email could not be sent. Revoke it and try again later.'
+    selected.value = null
+    await refresh()
+  } catch (cause) {
+    error.value = await problem(cause)
+  } finally {
+    busy.value = false
+  }
+}
+const assignable = computed(() =>
+  data.value?.account.role === 'owner' ? ['admin', 'billing_manager', 'member'] : ['member'],
+)
 </script>
 <template>
   <div class="portal-content">
     <template v-if="data">
-      <p class="portal-eyebrow">{{ data.account.name }}</p><h1 class="portal-page-title mt-2">Members</h1><p class="mt-3 text-studio-muted">Invite colleagues and manage their roles.</p>
-      <p v-if="error" class="portal-error mt-6" role="alert">{{ error }}</p><button v-if="uncertain" class="portal-link mt-4 block" @click="checkCurrentState">Check current state</button><p v-if="success" class="portal-notice mt-6" role="status">{{ success }}</p>
+      <p class="portal-eyebrow">{{ data.account.name }}</p>
+      <h1 class="portal-page-title mt-2">Members</h1>
+      <p class="mt-3 text-studio-muted">Invite colleagues and manage their roles.</p>
+      <p v-if="error" class="portal-error mt-6" role="alert">{{ error }}</p>
+      <button v-if="uncertain" class="portal-link mt-4 block" @click="checkCurrentState">
+        Check current state
+      </button>
+      <p v-if="success" class="portal-notice mt-6" role="status">{{ success }}</p>
       <div class="mt-10 grid grid-cols-1 gap-10 xl:grid-cols-[minmax(0,1fr)_310px]">
-        <section class="min-w-0"><h2 class="font-heading text-xl font-semibold">Current members</h2><div class="mt-4 overflow-x-auto border-y border-studio-rule"><table class="w-full min-w-[550px] text-left text-sm"><thead class="bg-studio-tint text-studio-muted"><tr><th class="p-3">Member</th><th class="p-3">Role</th><th class="p-3">Joined</th><th class="p-3">Action</th></tr></thead><tbody><tr v-for="member in data.members" :key="member.user_id" class="border-t border-studio-rule"><td class="p-3"><strong class="block">{{ member.name }}</strong><span class="text-studio-muted">{{ member.email }}</span></td><td class="p-3 capitalize">{{ member.role.replace('_', ' ') }}</td><td class="p-3"><NuxtTime :datetime="member.created_at" date-style="short" /></td><td class="p-3"><button class="portal-link" @click="review(member)">Review</button></td></tr></tbody></table></div>
-        <section class="mt-12"><h2 class="font-heading text-xl font-semibold">Pending invitations</h2><div v-if="!data.invitations.length" class="mt-4 text-sm text-studio-muted">No pending invitations.</div><div v-for="invitation in data.invitations" :key="invitation.id" class="flex flex-wrap items-center justify-between gap-3 border-b border-studio-rule py-4 text-sm"><span><strong class="block">{{ invitation.invitee_email }}</strong><span class="text-studio-muted">{{ invitation.invitation_type === 'transfer' ? 'Ownership transfer' : `Invitation to join as ${invitation.invited_role.replace('_', ' ')}` }} · {{ invitation.invitation_status }} · expires <NuxtTime :datetime="invitation.expires_at" date-style="short" /></span></span><button class="portal-link" :disabled="busy || uncertain" @click="revoke(invitation.id)">Revoke</button></div></section>
-        <NuxtLink :to="`/a/${accountId}/activity`" class="portal-link mt-8 inline-block">View activity log</NuxtLink></section>
-        <aside><form class="portal-detail" @submit.prevent="invite"><h2 class="font-heading text-lg font-semibold">Invite member</h2><label for="invite-email" class="portal-label mt-5">Email address</label><input id="invite-email" v-model="email" type="email" class="portal-input" required><label for="invite-role" class="portal-label mt-5">Role</label><StudioSelect id="invite-role" v-model="role" class="portal-input" :options="data.allowedInviteRoles" /><p class="mt-4 text-xs leading-5 text-studio-muted">Invitations expire after seven days.</p><button class="portal-button mt-5 w-full" :disabled="busy || uncertain">{{ busy ? 'Working…' : 'Send invitation' }}</button></form></aside>
+        <section class="min-w-0">
+          <h2 class="font-heading text-xl font-semibold">Current members</h2>
+          <div class="mt-4 overflow-x-auto border-y border-studio-rule">
+            <table class="w-full min-w-[550px] text-left text-sm">
+              <thead class="bg-studio-tint text-studio-muted">
+                <tr>
+                  <th class="p-3">Member</th>
+                  <th class="p-3">Role</th>
+                  <th class="p-3">Joined</th>
+                  <th class="p-3">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="member in data.members"
+                  :key="member.user_id"
+                  class="border-t border-studio-rule"
+                >
+                  <td class="p-3">
+                    <strong class="block">{{ member.name }}</strong><span
+                      class="text-studio-muted"
+                      >{{ member.email }}</span
+                    >
+                  </td>
+                  <td class="p-3 capitalize">{{ member.role.replace('_', ' ') }}</td>
+                  <td class="p-3"><NuxtTime :datetime="member.created_at" date-style="short" /></td>
+                  <td class="p-3">
+                    <button class="portal-link" @click="review(member)">Review</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <section class="mt-12">
+            <h2 class="font-heading text-xl font-semibold">Pending invitations</h2>
+            <div v-if="!data.invitations.length" class="mt-4 text-sm text-studio-muted">
+              No pending invitations.
+            </div>
+            <div
+              v-for="invitation in data.invitations"
+              :key="invitation.id"
+              class="flex flex-wrap items-center justify-between gap-3 border-b border-studio-rule py-4 text-sm"
+            >
+              <span
+                ><strong class="block">{{ invitation.invitee_email }}</strong
+                ><span class="text-studio-muted"
+                  >{{
+                    invitation.invitation_type === 'transfer'
+                      ? 'Ownership transfer'
+                      : `Invitation to join as ${invitation.invited_role.replace('_', ' ')}`
+                  }}
+                  · {{ invitation.invitation_status }} · expires
+                  <NuxtTime :datetime="invitation.expires_at" date-style="short" /></span></span
+              ><button
+                class="portal-link"
+                :disabled="busy || uncertain"
+                @click="revoke(invitation.id)"
+              >
+                Revoke
+              </button>
+            </div>
+          </section>
+          <NuxtLink :to="`/a/${accountId}/activity`" class="portal-link mt-8 inline-block"
+            >View activity log</NuxtLink
+          >
+        </section>
+        <aside>
+          <form class="portal-detail" @submit.prevent="invite">
+            <h2 class="font-heading text-lg font-semibold">Invite member</h2>
+            <label for="invite-email" class="portal-label mt-5">Email address</label
+            ><input
+              id="invite-email"
+              v-model="email"
+              type="email"
+              class="portal-input"
+              required
+            /><label for="invite-role" class="portal-label mt-5">Role</label
+            ><StudioSelect
+              id="invite-role"
+              v-model="role"
+              class="portal-input"
+              :options="data.allowedInviteRoles"
+            />
+            <p class="mt-4 text-xs leading-5 text-studio-muted">
+              Invitations expire after seven days.
+            </p>
+            <button class="portal-button mt-5 w-full" :disabled="busy || uncertain">
+              {{ busy ? 'Working…' : 'Send invitation' }}
+            </button>
+          </form>
+        </aside>
       </div>
-      <DialogRoot :open="Boolean(selected)" @update:open="selected = $event ? selected : null"><DialogPortal><DialogOverlay class="fixed inset-0 z-50 bg-[#06152b]/50" /><DialogContent v-if="selected" class="portal-member-dialog fixed left-1/2 top-1/2 z-50 max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg bg-studio-surface text-studio-heading p-6 shadow-xl"><DialogTitle class="font-heading text-xl font-semibold">Review {{ selected.name }}</DialogTitle><DialogDescription class="mt-2 text-sm text-studio-muted">Current role: {{ selected.role.replace('_', ' ') }}. Changes take effect immediately.</DialogDescription><p v-if="error" role="alert" class="portal-error mt-4">{{ error }}</p><button v-if="uncertain" class="portal-link mt-4" @click="checkCurrentState">Check current state</button><template v-if="selected.role !== 'owner'"><label for="next-role" class="portal-label mt-6">New role</label><StudioSelect id="next-role" v-model="nextRole" class="portal-input" :options="assignable" /><button class="portal-button mt-4" :disabled="busy || uncertain || nextRole === selected.role" @click="changeRole">Save role</button></template><div v-if="data.account.role === 'owner' && selected.role !== 'owner'" class="mt-7 border-t pt-5"><h3 class="font-semibold">Transfer ownership</h3><p class="mt-2 text-sm text-studio-muted">They become owner when they accept. You become an admin. Sign in again if prompted.</p><button class="portal-button-secondary mt-4" :disabled="busy || uncertain" @click="transfer">Request transfer</button></div><div class="mt-7 border-t pt-5"><p class="text-sm text-studio-muted">Removing this member ends their access to the organisation.</p><button class="mt-4 text-sm font-semibold text-studio-danger underline" :disabled="busy || uncertain" @click="removeMember">Remove member</button></div><button class="portal-button-secondary mt-7 ml-3" @click="selected = null">Close</button></DialogContent></DialogPortal></DialogRoot>
+      <DialogRoot :open="Boolean(selected)" @update:open="selected = $event ? selected : null"
+        ><DialogPortal
+          ><DialogOverlay class="fixed inset-0 z-50 bg-[#06152b]/50" /><DialogContent
+            v-if="selected"
+            class="portal-member-dialog fixed left-1/2 top-1/2 z-50 max-h-[calc(100dvh-32px)] w-[calc(100%-32px)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg bg-studio-surface text-studio-heading p-6 shadow-xl"
+            ><DialogTitle class="font-heading text-xl font-semibold"
+              >Review {{ selected.name }}</DialogTitle
+            ><DialogDescription class="mt-2 text-sm text-studio-muted"
+              >Current role: {{ selected.role.replace('_', ' ') }}. Changes take effect
+              immediately.</DialogDescription
+            >
+            <p v-if="error" role="alert" class="portal-error mt-4">{{ error }}</p>
+            <button v-if="uncertain" class="portal-link mt-4" @click="checkCurrentState">
+              Check current state</button
+            ><template v-if="selected.role !== 'owner'"
+              ><label for="next-role" class="portal-label mt-6">New role</label
+              ><StudioSelect
+                id="next-role"
+                v-model="nextRole"
+                class="portal-input"
+                :options="assignable"
+              /><button
+                class="portal-button mt-4"
+                :disabled="busy || uncertain || nextRole === selected.role"
+                @click="changeRole"
+              >
+                Save role
+              </button></template
+            >
+            <div
+              v-if="data.account.role === 'owner' && selected.role !== 'owner'"
+              class="mt-7 border-t pt-5"
+            >
+              <h3 class="font-semibold">Transfer ownership</h3>
+              <p class="mt-2 text-sm text-studio-muted">
+                They become owner when they accept. You become an admin. Sign in again if prompted.
+              </p>
+              <button
+                class="portal-button-secondary mt-4"
+                :disabled="busy || uncertain"
+                @click="transfer"
+              >
+                Request transfer
+              </button>
+            </div>
+            <div class="mt-7 border-t pt-5">
+              <p class="text-sm text-studio-muted">
+                Removing this member ends their access to the organisation.
+              </p>
+              <button
+                class="mt-4 text-sm font-semibold text-studio-danger underline"
+                :disabled="busy || uncertain"
+                @click="removeMember"
+              >
+                Remove member
+              </button>
+            </div>
+            <button class="portal-button-secondary mt-7 ml-3" @click="selected = null">
+              Close
+            </button></DialogContent
+          ></DialogPortal
+        ></DialogRoot
+      >
     </template>
-    <div v-else role="alert"><h1 class="portal-page-title">Members unavailable</h1><p class="mt-3">{{ loadError?.statusCode === 403 ? 'Your role cannot manage membership.' : 'This organisation is unavailable to you.' }}</p></div>
+    <div v-else role="alert">
+      <h1 class="portal-page-title">Members unavailable</h1>
+      <p class="mt-3">
+        {{
+          loadError?.statusCode === 403
+            ? 'Your role cannot manage membership.'
+            : 'This organisation is unavailable to you.'
+        }}
+      </p>
+    </div>
   </div>
 </template>

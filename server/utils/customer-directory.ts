@@ -14,9 +14,12 @@ export async function listCustomers(db: Client, search: string, page: number) {
     args: [term, term, term, customerPageSize + 1, (page - 1) * customerPageSize],
   })
   return {
-    customers: result.rows.slice(0, customerPageSize).map(row => ({
-      id: String(row.id), name: String(row.name), email: String(row.email),
-      emailVerified: Boolean(row.email_verified), createdAt: Number(row.created_at),
+    customers: result.rows.slice(0, customerPageSize).map((row) => ({
+      id: String(row.id),
+      name: String(row.name),
+      email: String(row.email),
+      emailVerified: Boolean(row.email_verified),
+      createdAt: Number(row.created_at),
       accountCount: Number(row.account_count),
     })),
     page,

@@ -61,7 +61,11 @@ const inspected = ref<(typeof numberedDocuments)[number]>()
                 <td>{{ doc.pages }} pp</td>
                 <td><b class="status-tag">Included</b></td>
                 <td>
-                  <button class="text-action" :aria-label="'Inspect ' + doc.name" @click="inspected = doc">
+                  <button
+                    class="text-action"
+                    :aria-label="'Inspect ' + doc.name"
+                    @click="inspected = doc"
+                  >
                     Inspect
                   </button>
                 </td>
@@ -69,7 +73,12 @@ const inspected = ref<(typeof numberedDocuments)[number]>()
             </tbody>
           </table>
         </TabsContent>
-        <TabsContent v-for="tab in ['Categories', 'Parts (4)']" :key="tab" :value="tab" class="table-scroll">
+        <TabsContent
+          v-for="tab in ['Categories', 'Parts (4)']"
+          :key="tab"
+          :value="tab"
+          class="table-scroll"
+        >
           <table>
             <thead>
               <tr>
@@ -80,7 +89,9 @@ const inspected = ref<(typeof numberedDocuments)[number]>()
             </thead>
             <tbody>
               <tr v-for="(name, i) in categories" :key="name">
-                <th scope="row">{{ tab === 'Categories' ? name : 'Part 0' + (i + 1) + ' · ' + name }}</th>
+                <th scope="row">
+                  {{ tab === 'Categories' ? name : 'Part 0' + (i + 1) + ' · ' + name }}
+                </th>
                 <td>
                   {{
                     numberedDocuments
@@ -90,7 +101,11 @@ const inspected = ref<(typeof numberedDocuments)[number]>()
                   }}
                 </td>
                 <td>
-                  {{ numberedDocuments.filter((d) => d.part === i).reduce((sum, d) => sum + d.pages, 0) }}
+                  {{
+                    numberedDocuments
+                      .filter((d) => d.part === i)
+                      .reduce((sum, d) => sum + d.pages, 0)
+                  }}
                 </td>
               </tr>
             </tbody>

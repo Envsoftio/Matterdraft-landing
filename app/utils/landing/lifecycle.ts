@@ -28,7 +28,9 @@ export function createLandingScope(): LandingScope {
   const observers = new Set<IntersectionObserver>()
 
   const scope: LandingScope = {
-    get disposed() { return disposed },
+    get disposed() {
+      return disposed
+    },
 
     on(target, type, listener, options) {
       if (!target || disposed) return
@@ -91,14 +93,20 @@ export function createLandingScope(): LandingScope {
       disposed = true
       // Stop events first: closing dialogs during teardown must not restore focus
       // to a route that is about to disappear.
-      listeners.splice(0).reverse().forEach(remove => remove())
-      timers.forEach(id => window.clearTimeout(id))
-      frames.forEach(id => window.cancelAnimationFrame(id))
-      observers.forEach(observer => observer.disconnect())
+      listeners
+        .splice(0)
+        .reverse()
+        .forEach((remove) => remove())
+      timers.forEach((id) => window.clearTimeout(id))
+      frames.forEach((id) => window.cancelAnimationFrame(id))
+      observers.forEach((observer) => observer.disconnect())
       timers.clear()
       frames.clear()
       observers.clear()
-      cleanups.splice(0).reverse().forEach(cleanup => cleanup())
+      cleanups
+        .splice(0)
+        .reverse()
+        .forEach((cleanup) => cleanup())
     },
   }
 
