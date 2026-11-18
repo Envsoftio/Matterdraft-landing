@@ -40,21 +40,6 @@ function filterActivity(next = 1) {
   })
 }
 
-const registering = ref(false)
-const registerError = ref('')
-async function registerDesktop() {
-  registering.value = true
-  registerError.value = ''
-  try {
-    await $fetch('/api/internal/desktop-client', { method: 'POST' })
-    await refreshDesktop()
-  } catch (cause) {
-    registerError.value = parseApiError(cause).text
-  } finally {
-    registering.value = false
-  }
-}
-
 async function refreshDashboard() {
   await Promise.all([refresh(), refreshActivity(), refreshDesktop()])
 }
@@ -171,9 +156,7 @@ async function refreshDashboard() {
               <dd class="text-right font-semibold">
                 <span v-if="desktopError">Check unavailable</span>
                 <span v-else-if="desktop?.clientId">Registered</span>
-                <a v-else-if="desktop" class="portal-link" href="#desktop-connection"
-                  >Setup needed</a
-                >
+                <span v-else-if="desktop">Unregistered</span>
                 <span v-else>Checking…</span>
               </dd>
             </div>
@@ -280,34 +263,6 @@ async function refreshDashboard() {
           </button>
         </nav>
       </section>
-
-      <details
-        v-if="desktop"
-        id="desktop-connection"
-        class="portal-detail mt-10 max-w-2xl scroll-mt-24"
-        :open="!desktop.clientId"
-      >
-        <summary class="cursor-pointer font-heading font-semibold">Desktop app connection</summary>
-        <dl class="mt-4 space-y-3 break-all text-sm">
-          <div>
-            <dt class="text-studio-muted">Return address</dt>
-            <dd class="mt-1 font-medium">{{ desktop.redirectUri }}</dd>
-          </div>
-          <div v-if="desktop.clientId">
-            <dt class="text-studio-muted">Client ID</dt>
-            <dd class="mt-1 font-medium">{{ desktop.clientId }}</dd>
-          </div>
-        </dl>
-        <button
-          v-if="!desktop.clientId"
-          class="portal-button mt-4"
-          :disabled="registering"
-          @click="registerDesktop"
-        >
-          {{ registering ? 'Registering…' : 'Register desktop app' }}
-        </button>
-        <p v-if="registerError" role="alert" class="portal-error mt-4">{{ registerError }}</p>
-      </details>
     </template>
     <p v-else-if="pending" role="status" class="mt-8 text-sm text-studio-muted">
       Loading dashboard…

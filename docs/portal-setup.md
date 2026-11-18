@@ -2,7 +2,7 @@
 
 The product scope is user login, subscription management, device licensing and support tickets. Organisation membership and staff administration support those workflows. Product usage reporting, analytics dashboards, notification inboxes, campaigns and incident management are outside scope; see `PRD_CUSTOMER_AND_ADMIN_BACKEND.md`. Subscription and licensing integrations are not implemented by the current foundation.
 
-The customer account area supports verified sign-in, personal and organisation accounts, member invitations, role changes, ownership transfers, and an activity log. Staff access requires a verified account with an active staff role. The internal administration area lists organisations and can register the desktop app for sign-in.
+The customer account area supports verified sign-in, personal and organisation accounts, member invitations, role changes, ownership transfers, and an activity log. Staff access requires a verified account with an active staff role.
 
 ## Local setup
 
@@ -11,13 +11,14 @@ The customer account area supports verified sign-in, personal and organisation a
 3. Run `npm run dev` and open `http://localhost:3000/sign-up`.
 4. Local account emails are saved as JSON in `.data/mail-preview/`. Open the verification URL from the latest preview. Configure `SMTP_HOST`, `SMTP_FROM`, and any needed SMTP credentials before production use; local preview files are not a delivery mechanism.
 5. Sign in and verify the account email. Grant the initial super-admin capability with `npm run staff:grant-access -- user@example.com "Initial administrator bootstrap"`. This command changes the configured database and records an audit event; check its target before running it. Staff API routes check the active staff role on every request.
-6. A super admin can register the first-party desktop OAuth client from the internal overview. Copy its public client ID and exact redirect URI into the desktop application configuration.
 
 ## Super Admin Dashboard
 
 The dashboard at `/internal/overview` shows solo and firm account activity, tickets needing a response, and the service checks. Apply `0005_service_failure_counts.sql` before deploying it. Failure counts include API responses observed by Nitro when Turso is reachable. Use production monitoring for hosting outages and database downtime.
 
 ## Desktop authorization contract
+
+During deployment setup, register the first-party desktop client with `POST /api/internal/desktop-client` from a verified super-admin session on the portal origin. The endpoint returns the public client ID and exact callback URI for the desktop configuration. Repeat the call to retrieve an existing registration for that callback.
 
 The desktop app must register and handle `legal.matterdraft.studio:/oauth/callback` as a private-use URL scheme. It opens the system browser to the server's OAuth authorization endpoint and uses Authorization Code with PKCE `S256`. Generate a fresh verifier, challenge, and unpredictable `state` for each attempt. Use the registered public client ID; do not ship a client secret. On callback, verify `state`, exchange the code with the original verifier, and store tokens in the operating system's secure credential store. The portal does not receive local matter or document content.
 
