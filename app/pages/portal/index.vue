@@ -2,12 +2,16 @@
 import { parseApiError } from '~/utils/api-error'
 definePageMeta({ layout: 'portal' })
 usePrivatePageSeo('Accounts', 'View and switch between your personal and organisation accounts.')
-type Context = { accounts: { id: string; name: string; accountType: string; role: string }[] }
+type Context = {
+  isStaff: boolean
+  accounts: { id: string; name: string; accountType: string; role: string }[]
+}
 const {
   data,
   refresh,
   error: loadError,
 } = await useFetch<Context>('/api/portal/context', { key: 'portal-context' })
+if (data.value?.isStaff) await navigateTo('/internal/overview', { replace: true })
 const name = ref('')
 const busy = ref(false)
 const error = ref('')
@@ -56,11 +60,17 @@ async function createOrganisation() {
 }
 </script>
 <template>
-  <div class="portal-content">
+  <div v-if="data && !data.isStaff" class="portal-content">
     <p class="portal-eyebrow">Accounts</p>
     <h1 class="portal-page-title mt-2">Your accounts</h1>
-    <p class="mt-3 text-studio-muted">Choose an account to manage.</p>
-    <div class="mt-9 divide-y divide-studio-rule border-y border-studio-rule">
+    <p v-if="data.accounts.length" class="mt-3 text-studio-muted">Choose an account to manage.</p>
+    <p v-else class="mt-3 text-studio-muted">
+      Open the invitation sent to your email to join your organisation.
+    </p>
+    <div
+      v-if="data.accounts.length"
+      class="mt-9 divide-y divide-studio-rule border-y border-studio-rule"
+    >
       <NuxtLink
         v-for="account in data?.accounts"
         :key="account.id"

@@ -1,6 +1,6 @@
 // Opt-in route/browser verification. Never points at a hosted database or sends SMTP.
 import assert from 'node:assert/strict'
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { readFile, readdir, mkdir } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -13,7 +13,9 @@ assert.match(database, /^file:\/private\/tmp\/.+\.db$/, 'Use a disposable /priva
 const db = createClient({ url: database })
 // Also verify that the server has been started against THIS database, below.
 const modulePath = process.env.PLAYWRIGHT_MODULE_PATH
-const { chromium } = await import(modulePath ? pathToFileURL(modulePath).href : 'playwright')
+const { chromium, request } = await import(
+  modulePath ? pathToFileURL(modulePath).href : 'playwright'
+)
 const browser = await chromium.launch({
   headless: true,
   ...(process.env.CHROME_EXECUTABLE ? { executablePath: process.env.CHROME_EXECUTABLE } : {}),
@@ -95,25 +97,23 @@ async function hydrated(page) {
     () => document.querySelector('#__nuxt')?.__vue_app__?.$nuxt?.isHydrating === false,
   )
 }
-async function signIn(person) {
-  await person.page.goto(`${origin}/sign-in`)
+async function signIn(person, destination = '/portal', signInPath = '/sign-in') {
+  await person.page.goto(new URL(signInPath, origin).href)
   await hydrated(person.page)
   await person.page.getByLabel('Email address').fill(person.email)
   await person.page.getByLabel('Password', { exact: true }).fill(password)
   await person.page.getByLabel('Password', { exact: true }).press('Enter')
   try {
-    await person.page.waitForURL('**/portal', { timeout: 15000 })
+    const expected =
+      typeof destination === 'string' ? new URL(destination, origin).href : destination
+    await person.page.waitForURL(expected, { timeout: 15000 })
   } catch (error) {
     await person.page.screenshot({ path: `${directory}/signin-failure.png`, fullPage: true })
-    console.log(
-      'Signin failure',
-      person.page.url(),
-      await person.page.getByRole('alert').allTextContents(),
-    )
+    console.log('Signin failure', await person.page.getByRole('alert').allTextContents())
     throw error
   }
 }
-async function person(name, ui = false) {
+async function person(name, { ui = false, invitationToken, browserSignIn = true } = {}) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 } })
   const page = await context.newPage()
   page.on('pageerror', (error) => browserErrors.push(error.name))
@@ -121,8 +121,13 @@ async function person(name, ui = false) {
     if (/hydration.*mismatch/i.test(message.text())) browserErrors.push('HydrationMismatch')
   })
   const result = { context, page, name, email: `${name.toLowerCase()}-${run}@example.test` }
+  const invitationPath = invitationToken ? `/invite/${invitationToken}` : undefined
   if (ui) {
-    await screen(result, '/sign-up', 'sign-up')
+    if (invitationPath) {
+      await page.goto(origin + invitationPath)
+      await hydrated(page)
+      await page.getByRole('link', { name: 'Create an account', exact: true }).click()
+    } else await screen(result, '/sign-up', 'sign-up')
     await page.getByLabel('Full name').fill(name)
     await page.getByLabel('Email address').fill(result.email)
     await page.getByLabel('Password', { exact: true }).fill(password)
@@ -142,8 +147,10 @@ async function person(name, ui = false) {
   await api(result, '/api/auth/sign-in/email', 'POST', { email: result.email, password }, 403)
   await page.goto(await mail(result.email, 'Verify'))
   await hydrated(page)
-  await signIn(result)
-  result.accounts = (await api(result, '/api/portal/context')).accounts
+  if (browserSignIn) {
+    await signIn(result, invitationPath, invitationPath ? page.url() : undefined)
+    result.accounts = (await api(result, '/api/portal/context')).accounts
+  }
   return result
 }
 async function invite(owner, recipient, accountId, role = 'member') {
@@ -151,8 +158,71 @@ async function invite(owner, recipient, accountId, role = 'member') {
   await api(owner, path, 'POST', { email: recipient.email, role })
   return new URL(await mail(recipient.email, 'Invitation')).pathname.split('/').pop()
 }
+
+async function desktopSignIn(person, { clientId, redirectUri }, staffOnly = false) {
+  const verifier = randomUUID() + randomUUID()
+  const state = randomUUID()
+  const query = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    response_type: 'code',
+    scope: 'openid profile email offline_access',
+    code_challenge: createHash('sha256').update(verifier).digest('base64url'),
+    code_challenge_method: 'S256',
+    state,
+  })
+  const response = await person.context.request.get(
+    `${origin}/api/auth/oauth2/authorize?${query}`,
+    {
+      headers: { Accept: 'text/html' },
+      maxRedirects: 0,
+    },
+  )
+  if (staffOnly) {
+    assert.equal(response.status(), 403)
+    return
+  }
+  assert.equal(response.status(), 302, 'Desktop authorization opens consent')
+  let consent = new URL(response.headers().location, origin)
+  if (consent.pathname === '/sign-in') {
+    await signIn(person, (url) => url.pathname === '/consent', consent.href)
+    consent = new URL(person.page.url())
+  }
+  assert.equal(consent.pathname, '/consent')
+  await api(person, '/api/portal/oauth-request' + consent.search)
+  const approval = await api(person, '/api/auth/oauth2/consent', 'POST', {
+    accept: true,
+    oauth_query: consent.search.slice(1),
+  })
+  const callback = new URL(approval.url)
+  assert.equal(callback.protocol + callback.pathname, redirectUri)
+  assert.equal(callback.searchParams.get('state'), state)
+  const desktop = await request.newContext({ baseURL: origin })
+  try {
+    const tokens = await desktop.post('/api/auth/oauth2/token', {
+      form: {
+        grant_type: 'authorization_code',
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        code: callback.searchParams.get('code'),
+        code_verifier: verifier,
+      },
+    })
+    const body = await tokens.json()
+    assert.equal(tokens.status(), 200, `Desktop PKCE exchange ${body.error || body.code || ''}`)
+    sensitiveTokens.push(body.access_token)
+    const response = await desktop.get('/api/auth/oauth2/userinfo', {
+      headers: { Authorization: 'Bearer ' + body.access_token },
+    })
+    assert.equal(response.status(), 200)
+    assert.equal((await response.json()).email, person.email)
+  } finally {
+    await desktop.dispose()
+  }
+}
+
 try {
-  const owner = await person('Owner', true)
+  const owner = await person('Owner', { ui: true })
   const peer = await person('Peer')
   const admin = await person('Admin')
   const outsider = await person('Outsider')
@@ -174,6 +244,21 @@ try {
   const accountId = owner.page.url().split('/')[4]
   const memberPath = `/api/membership/accounts/${accountId}`
   const tickets = `/api/accounts/${accountId}/tickets`
+  const associateToken = await invite(owner, { email: `associate-${run}@example.test` }, accountId)
+  const associate = await person('Associate', { ui: true, invitationToken: associateToken })
+  assert.deepEqual(associate.accounts, [])
+  await associate.page.getByRole('button', { name: 'Accept invitation' }).click()
+  await associate.page.getByRole('link', { name: 'Open organisation' }).click()
+  await associate.page.waitForURL(`**/a/${accountId}/overview`)
+  const { accounts: associateAccounts } = await api(associate, '/api/portal/context')
+  assert.deepEqual(
+    associateAccounts.map(({ id, accountType, role }) => [id, accountType, role]),
+    [[accountId, 'organisation', 'member']],
+  )
+  await api(associate, `${memberPath}/members`, 'GET', undefined, 403)
+  note(
+    'New firm member returns to the invitation after verification and joins without a personal account',
+  )
   await owner.page.getByLabel('Email address').fill(peer.email)
   await owner.page.getByRole('button', { name: 'Send invitation' }).click()
   await owner.page.getByRole('status').waitFor()
@@ -378,6 +463,41 @@ try {
     sql: "INSERT INTO staff_access (user_id, role, active, created_at) VALUES (?, 'super_admin', 1, ?)",
     args: [staff.id, Date.now()],
   })
+  await signIn(staff, '/internal/overview')
+  const staffContext = await api(staff, '/api/portal/context')
+  assert.equal(staffContext.staffRole, 'super_admin')
+  assert.deepEqual(staffContext.accounts, [])
+  await api(staff, `/api/accounts/${staff.accounts[0].id}/overview`, 'GET', undefined, 403)
+  await api(staff, '/api/membership/organisations', 'POST', { name: 'Staff firm' }, 403)
+  await api(staff, `/api/membership/invitations/${associateToken}`, 'GET', undefined, 403)
+  await api(staff, `/api/internal/customers/${staff.id}`, 'GET', undefined, 404)
+
+  const newStaff = await person('NewStaff', { browserSignIn: false })
+  await db.execute({
+    sql: "INSERT INTO staff_access (user_id, role, active, created_at) VALUES (?, 'super_admin', 1, ?)",
+    args: [newStaff.id, Date.now()],
+  })
+  await signIn(newStaff, '/internal/overview')
+  assert.deepEqual((await api(newStaff, '/api/portal/context')).accounts, [])
+  const personalAccounts = await db.execute({
+    sql: 'SELECT id FROM customer_account WHERE personal_owner_user_id = ?',
+    args: [newStaff.id],
+  })
+  assert.equal(personalAccounts.rows.length, 0, 'Staff sign-in creates no personal account')
+
+  const desktop = await api(staff, '/api/internal/desktop-client', 'POST')
+  await desktopSignIn(staff, desktop, true)
+  await desktopSignIn(associate, desktop)
+  const solo = await person('Solo', { browserSignIn: false })
+  await desktopSignIn(solo, desktop)
+  const soloAccount = await db.execute({
+    sql: 'SELECT account_type FROM customer_account WHERE personal_owner_user_id = ?',
+    args: [solo.id],
+  })
+  assert.equal(soloAccount.rows[0]?.account_type, 'personal')
+  note(
+    'Staff go straight to internal administration and are denied customer and desktop access; solo and firm customers complete OAuth with PKCE',
+  )
   await db.execute({ sql: 'UPDATE user SET email_verified = 0 WHERE id = ?', args: [staff.id] })
   await api(staff, '/api/internal/tickets', 'GET', undefined, 403)
   await db.execute({ sql: 'UPDATE user SET email_verified = 1 WHERE id = ?', args: [staff.id] })

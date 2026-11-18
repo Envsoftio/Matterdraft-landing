@@ -5,7 +5,7 @@ usePrivatePageSeo('Administration', 'View the MatterDraft staff administration o
 const { data, error, refresh } = await useFetch('/api/internal/overview')
 const { data: desktop, refresh: refreshDesktop } = await useFetch('/api/internal/desktop-client')
 const countLabels: Record<string, string> = {
-  users: 'Registered users',
+  users: 'Customer users',
   accounts: 'Customer accounts',
   organisations: 'Organisations',
   staff: 'Staff members',

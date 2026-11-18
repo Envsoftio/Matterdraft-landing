@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FormRoot } from 'reka-ui'
 import { authClient } from '~~/lib/auth-client'
+import { authReturnTo } from '~/utils/auth-return-to'
 
 definePageMeta({ layout: false })
 usePrivatePageSeo('Sign in', 'Sign in to your MatterDraft Studio account.')
@@ -9,10 +10,8 @@ const email = ref('')
 const password = ref('')
 const busy = ref(false)
 const error = ref('')
-const destination = computed(() => {
-  const value = String(route.query.returnTo || '/portal')
-  return value.startsWith('/') && !value.startsWith('//') ? value : '/portal'
-})
+const returnTo = computed(() => authReturnTo(route.query.returnTo))
+const signUpQuery = computed(() => (route.query.sig ? route.query : { returnTo: returnTo.value }))
 
 async function submit() {
   busy.value = true
@@ -27,7 +26,7 @@ async function submit() {
         result.error.message || 'We could not sign you in. Check your details and try again.'
       return
     }
-    if (!route.query.oauth_query) await navigateTo(destination.value)
+    if (!result.data?.redirect && !route.query.sig) await navigateTo(returnTo.value || '/portal')
   } catch {
     error.value = 'Sign-in is temporarily unavailable. Please try again.'
   } finally {
@@ -66,7 +65,10 @@ async function submit() {
       </button>
     </FormRoot>
     <p class="mt-7 text-center text-sm text-studio-muted">
-      New to MatterDraft? <NuxtLink class="portal-link" to="/sign-up">Create an account</NuxtLink>
+      New to MatterDraft?
+      <NuxtLink class="portal-link" :to="{ path: '/sign-up', query: signUpQuery }">
+        Create an account
+      </NuxtLink>
     </p>
   </PortalAuthShell>
 </template>

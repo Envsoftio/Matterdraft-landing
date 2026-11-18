@@ -1,10 +1,10 @@
 import { applicationRoute, applicationFailure } from '../../utils/application-error'
 import { verifyOAuthQueryParams } from '@better-auth/oauth-provider'
 import { auth } from '../../../lib/auth'
-import { requireUser } from '../../utils/customer-account'
+import { requireCustomer } from '../../utils/customer-account'
 
 export default applicationRoute('/api/portal/oauth-request', async (event) => {
-  await requireUser(event)
+  await requireCustomer(event)
   const params = new URL(getRequestURL(event)).searchParams
   const signed = new Set(['sig', 'ba_param', ...params.getAll('ba_param')])
   const query = new URLSearchParams([...params].filter(([key]) => signed.has(key))).toString()

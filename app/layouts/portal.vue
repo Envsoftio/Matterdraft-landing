@@ -15,7 +15,6 @@ import {
   LogOut,
   Menu,
   X,
-  ArrowUpRight,
   Users,
   ScrollText,
   ContactRound,
@@ -26,14 +25,19 @@ import { authClient } from '~~/lib/auth-client'
 type Context = {
   user: { id: string; name: string; email: string }
   accounts: { id: string; name: string; accountType: string; role: string }[]
+  isStaff: boolean
   staffRole: string | null
 }
 const route = useRoute()
+const isInternal = computed(() => route.path.startsWith('/internal/'))
 const { data: context, error } = await useFetch<Context>('/api/portal/context', {
   key: 'portal-context',
 })
 if (error.value && (error.value as { statusCode?: number }).statusCode === 401) {
   await navigateTo({ path: '/sign-in', query: { returnTo: route.fullPath } })
+}
+if (context.value?.isStaff && !isInternal.value && route.path !== '/portal') {
+  await navigateTo('/internal/overview', { replace: true })
 }
 const mobileOpen = ref(false)
 const desktopNavigation = ref(false)
@@ -55,7 +59,6 @@ async function closeNavigation() {
   await nextTick()
   navigationTrigger.value?.focus()
 }
-const isInternal = computed(() => route.path.startsWith('/internal'))
 const currentAccount = computed(
   () =>
     context.value?.accounts.find((account) => route.path.startsWith(`/a/${account.id}/`)) ||
@@ -132,7 +135,7 @@ async function signOut() {
         >
           <div class="flex h-[72px] items-center justify-between border-b border-studio-rule px-5">
             <NuxtLink
-              to="/portal"
+              :to="isInternal ? '/internal/overview' : '/portal'"
               class="flex items-center gap-2.5 font-heading text-[17px] font-bold tracking-tight text-studio-heading"
               ><BrandLogo class="portal-wordmark"
             /></NuxtLink>
@@ -149,11 +152,13 @@ async function signOut() {
               v-if="isInternal"
               class="mx-2 mb-7 rounded-md bg-studio-chip px-3 py-3 text-xs leading-5 text-studio-heading"
             >
-              <strong class="block text-sm">Internal administration</strong>Staff access ·
-              {{ context?.staffRole?.replace('_', ' ') }}
+              <strong class="block text-sm">Internal administration</strong>
+              <span v-if="context?.staffRole"
+                >Staff access · {{ context.staffRole.replace('_', ' ') }}</span
+              >
             </div>
             <div
-              v-else
+              v-else-if="currentAccount"
               class="mx-2 mb-6 rounded-md bg-studio-chip px-3 py-3 text-xs leading-5 text-studio-heading"
             >
               <strong class="block truncate text-sm text-studio-heading">{{
@@ -164,8 +169,9 @@ async function signOut() {
               ·
               {{ currentAccount?.role }}
             </div>
-            <p class="portal-nav-label">Workspace</p>
+            <p v-if="isInternal || currentAccount" class="portal-nav-label">Workspace</p>
             <NuxtLink
+              v-if="isInternal || currentAccount"
               :to="isInternal ? '/internal/overview' : `/a/${currentAccount?.id}/overview`"
               class="portal-nav-link"
               :class="
@@ -240,16 +246,6 @@ async function signOut() {
                 ><span class="truncate">{{ account.name }}</span></NuxtLink
               >
             </div>
-            <div class="mt-auto border-t border-studio-rule pt-5">
-              <NuxtLink
-                v-if="context?.staffRole && !isInternal"
-                to="/internal/overview"
-                class="portal-nav-link"
-                ><ArrowUpRight :size="18" />Internal portal</NuxtLink
-              ><NuxtLink v-if="isInternal" to="/portal" class="portal-nav-link"
-                ><ArrowUpRight :size="18" />Customer portal</NuxtLink
-              >
-            </div>
           </div>
         </aside>
       </FocusScope>
@@ -276,11 +272,13 @@ async function signOut() {
                     ? 'Internal administration'
                     : currentAccount?.accountType === 'personal'
                       ? 'Personal account'
-                      : 'Organisation account'
+                      : currentAccount
+                        ? 'Organisation account'
+                        : 'Account access'
                 }}
               </p>
               <p class="truncate font-heading text-base font-semibold text-studio-heading">
-                {{ isInternal ? 'Administration' : currentAccount?.name }}
+                {{ isInternal ? 'Administration' : currentAccount?.name || 'Your accounts' }}
               </p>
             </div>
           </div>

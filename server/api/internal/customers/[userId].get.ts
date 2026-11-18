@@ -9,7 +9,9 @@ export default applicationRoute('/api/internal/customers/[userId]', async (event
   if (!/^[A-Za-z0-9_-]{16,128}$/.test(userId)) applicationFailure(404)
 
   const customer = await client.execute({
-    sql: 'SELECT id, name, email, email_verified, created_at FROM user WHERE id = ? LIMIT 1',
+    sql: `SELECT id, name, email, email_verified, created_at FROM user
+      WHERE id = ? AND NOT EXISTS (SELECT 1 FROM staff_access WHERE user_id = user.id)
+      LIMIT 1`,
     args: [userId],
   })
   const row = customer.rows[0]

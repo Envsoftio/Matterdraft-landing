@@ -8,7 +8,8 @@ export async function listCustomers(db: Client, search: string, page: number) {
     sql: `SELECT u.id, u.name, u.email, u.email_verified, u.created_at,
       COUNT(m.account_id) AS account_count
       FROM user u LEFT JOIN account_membership m ON m.user_id = u.id
-      WHERE (? = '' OR instr(lower(u.name), ?) > 0 OR instr(lower(u.email), ?) > 0)
+      WHERE NOT EXISTS (SELECT 1 FROM staff_access WHERE user_id = u.id)
+        AND (? = '' OR instr(lower(u.name), ?) > 0 OR instr(lower(u.email), ?) > 0)
       GROUP BY u.id
       ORDER BY u.created_at DESC, u.id DESC LIMIT ? OFFSET ?`,
     args: [term, term, term, customerPageSize + 1, (page - 1) * customerPageSize],

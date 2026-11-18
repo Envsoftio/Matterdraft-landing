@@ -10,6 +10,7 @@ test('customer directory filters safely, counts memberships, and pages without r
       'CREATE TABLE user (id TEXT PRIMARY KEY, name TEXT, email TEXT, email_verified INTEGER, created_at INTEGER)',
     )
     await db.execute('CREATE TABLE account_membership (account_id TEXT, user_id TEXT)')
+    await db.execute('CREATE TABLE staff_access (user_id TEXT PRIMARY KEY, active INTEGER)')
     for (let index = 0; index < 27; index++) {
       const id = `user_${String(index).padStart(2, '0')}`
       await db.execute({
@@ -18,6 +19,8 @@ test('customer directory filters safely, counts memberships, and pages without r
       })
     }
     await db.execute("INSERT INTO account_membership VALUES ('a', 'user_26'), ('b', 'user_26')")
+    await db.execute("INSERT INTO user VALUES ('staff', 'Staff', 'staff@example.test', 1, 28)")
+    await db.execute("INSERT INTO staff_access VALUES ('staff', 1)")
 
     const first = await listCustomers(db, '', 1)
     const second = await listCustomers(db, '', 2)

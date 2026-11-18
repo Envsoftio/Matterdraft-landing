@@ -2,7 +2,12 @@ import { applicationRoute, applicationFailure } from '../../utils/application-er
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { client } from '../../../lib/db'
 import { sendAccountEmail } from '../../../lib/mail'
-import { requireAccount, requireUser, type AccountRole } from '../../utils/customer-account'
+import {
+  requireAccount,
+  requireCustomer,
+  requireUser,
+  type AccountRole,
+} from '../../utils/customer-account'
 
 const inviteMs = 7 * 24 * 60 * 60 * 1000
 const recentMs = 10 * 60 * 1000
@@ -82,7 +87,7 @@ export default applicationRoute('/api/membership/[...path]', async (event) => {
   const now = Date.now()
 
   if (resource === 'organisations' && parts.length === 1 && method === 'POST') {
-    const session = await requireUser(event)
+    const session = await requireCustomer(event)
     const name = nameOf(body.name)
     if (name.length < 2 || name.length > 100)
       fail(422, 'Organisation name must be 2 to 100 characters')
@@ -127,7 +132,7 @@ export default applicationRoute('/api/membership/[...path]', async (event) => {
     (method === 'GET' || method === 'POST')
   ) {
     if (!/^[A-Za-z0-9_-]{43}$/.test(id)) fail(404, 'Invitation not found')
-    const session = await requireUser(event)
+    const session = await requireCustomer(event)
     const tx = method === 'POST' ? await client.transaction('write') : null
     try {
       const db = tx || client

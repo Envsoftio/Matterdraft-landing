@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { FormRoot } from 'reka-ui'
 import { authClient } from '~~/lib/auth-client'
+import { authReturnTo } from '~/utils/auth-return-to'
 
 definePageMeta({ layout: false })
 usePrivatePageSeo('Verify email', 'Verify the email address on your MatterDraft Studio account.')
-const email = ref(String(useRoute().query.email || ''))
+const route = useRoute()
+const router = useRouter()
+const email = ref(String(route.query.email || ''))
+const signIn = computed(() => {
+  const { email: _email, ...query } = route.query
+  return {
+    path: '/sign-in',
+    query: query.sig ? query : { returnTo: authReturnTo(query.returnTo) },
+  }
+})
 const busy = ref(false)
 const message = ref('')
 const error = ref('')
@@ -16,7 +26,7 @@ async function resend() {
   try {
     const result = await authClient.sendVerificationEmail({
       email: email.value.trim(),
-      callbackURL: '/sign-in',
+      callbackURL: router.resolve(signIn.value).href,
     })
     if (result.error)
       error.value = 'We could not request a verification link. Please try again later.'
@@ -50,6 +60,6 @@ async function resend() {
         Resend verification link
       </button>
     </FormRoot>
-    <NuxtLink class="portal-link mt-6 inline-block" to="/sign-in">Return to sign in</NuxtLink>
+    <NuxtLink class="portal-link mt-6 inline-block" :to="signIn">Return to sign in</NuxtLink>
   </PortalAuthShell>
 </template>
