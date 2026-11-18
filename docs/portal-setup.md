@@ -22,7 +22,7 @@ The authorization server's public metadata and a full native round trip must be 
 ## Deployment prerequisites
 
 - Netlify must receive `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `BETTER_AUTH_URL` (the exact HTTPS portal origin), `BETTER_AUTH_SECRET`, and production SMTP settings as server environment variables. Use separate database and secrets for deploy previews. Never use the local development `.env` in Netlify.
-- Netlify uses `npm run build` with the Nitro `netlify` preset and publishes `.output/public`. The prior static `npm run generate` flow cannot serve portal API routes.
+- Netlify uses `npm run build` with the Nitro `netlify` preset. The preset writes public files to `dist` and generates the server function for the portal and its API routes.
 - Run migrations against each target database before its release. Arrange database backups and restore verification before accepting production accounts.
 - The callback scheme in `DESKTOP_REDIRECT_URI` must match the desktop handler exactly. Changing it requires a new client registration and desktop release.
 - Review dependency advisories and the remaining manual checks before production launch. Local query, error-contract and opt-in route/browser checks exist; the release still needs the deployment, SMTP and native desktop checks listed below.
