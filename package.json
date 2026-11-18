@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "description": "MatterDraft Studio — fast, accessible Nuxt and Tailwind landing page",
-  "engines": { "node": "^22.22.3 || ^24.15.0 || >=26.0.0" },
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+  },
   "scripts": {
     "predev": "npm run content",
     "dev": "nuxt dev --host 0.0.0.0",
@@ -16,18 +18,38 @@
     "typecheck": "nuxt typecheck",
     "test": "node --test tests/*.test.mjs",
     "verify": "node scripts/verify-build.mjs",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "portal:auth-schema": "auth generate --config ./lib/auth.ts --adapter drizzle --dialect sqlite --output ./lib/auth-schema.ts -y",
+    "db:generate-migration": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "staff:grant-access": "node scripts/grant-staff-access.mjs"
   },
   "dependencies": {
-    "nuxt": "4.6.3",
-    "vue": "3.5.44",
-    "vue-router": "5.4.0"
+    "@better-auth/oauth-provider": "1.7.25",
+    "@libsql/client": "0.18.0",
+    "@lucide/vue": "1.75.0",
+    "better-auth": "1.7.25",
+    "drizzle-orm": "0.45.4",
+    "nodemailer": "10.6.0",
+    "nuxt": "4.6.4",
+    "reka-ui": "2.11.0",
+    "vue": "3.5.45",
+    "vue-router": "5.5.1"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "4.3.3",
-    "marked": "18.1.2",
-    "tailwindcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.5",
+    "@types/nodemailer": "8.0.2",
+    "auth": "1.7.25",
+    "drizzle-kit": "0.31.11",
+    "marked": "18.2.1",
+    "tailwindcss": "4.3.5",
     "typescript": "6.0.3",
     "vue-tsc": "3.3.14"
+  },
+  "overrides": {
+    "minimatch": "11.0.9",
+    "@esbuild-kit/core-utils": {
+      "esbuild": "0.25.12"
+    }
   }
 }

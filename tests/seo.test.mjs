@@ -41,10 +41,13 @@ test('indexing defaults to on and preview flags remain explicit', () => {
   }), /must agree/)
 })
 
-test('early access opens only when both private webhook settings are present', () => {
+test('early access opens only with a valid webhook destination and shared secret', () => {
   assert.equal(resolveSiteConfig({}).earlyAccessEnabled, false)
   assert.equal(resolveSiteConfig({ EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/id/exec' }).earlyAccessEnabled, false)
-  assert.equal(resolveSiteConfig({ EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/id/exec', EARLY_ACCESS_GOOGLE_SHEETS_SECRET: 'secret' }).earlyAccessEnabled, true)
+  const settings = { EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/id/exec', EARLY_ACCESS_GOOGLE_SHEETS_SECRET: 'x'.repeat(32) }
+  assert.equal(resolveSiteConfig(settings).earlyAccessEnabled, true)
+  assert.equal(resolveSiteConfig({ ...settings, EARLY_ACCESS_GOOGLE_SHEETS_SECRET: 'short' }).earlyAccessEnabled, false)
+  assert.equal(resolveSiteConfig({ ...settings, EARLY_ACCESS_GOOGLE_SHEETS_URL: 'https://example.test/' }).earlyAccessEnabled, false)
 })
 
 test('preview builds advertise no sitemap and contain no indexable sitemap URLs', () => {

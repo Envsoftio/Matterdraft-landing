@@ -23,7 +23,13 @@ test('early access rejects invalid input before contacting the Sheet', async () 
     assert.equal((await earlyAccess(request({ ...validBody, name: '=HYPERLINK("x")' }))).status, 400)
     assert.equal((await earlyAccess(request({ ...validBody, contactConsent: false }))).status, 400)
     assert.equal((await earlyAccess(request({ ...validBody, platform: 'Linux' }))).status, 400)
-    assert.equal((await earlyAccess(new Request(endpoint))).status, 405)
+    const availability = await earlyAccess(new Request(endpoint))
+    assert.equal(availability.headers.get('cache-control'), 'no-store')
+    assert.deepEqual(await availability.json(), { enabled: true })
+    assert.equal((await earlyAccess(new Request(endpoint, { method: 'PUT' }))).status, 405)
+    delete process.env.EARLY_ACCESS_GOOGLE_SHEETS_URL
+    assert.deepEqual(await (await earlyAccess(new Request(endpoint))).json(), { enabled: false })
+    assert.equal((await earlyAccess(request())).status, 503)
   } finally {
     globalThis.fetch = originalFetch
     if (originalUrl === undefined) delete process.env.EARLY_ACCESS_GOOGLE_SHEETS_URL

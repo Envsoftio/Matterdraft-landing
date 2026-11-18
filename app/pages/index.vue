@@ -37,7 +37,7 @@ useHead({ script: [{ key: 'matterdraft-structured-data', type: 'application/ld+j
 </script>
 
 <template>
-  <div class="landing-page">
+  <div id="top" class="studio-landing">
   <LandingHeader />
   <main id="main">
     <LandingHero />

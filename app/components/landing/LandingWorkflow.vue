@@ -1,110 +1,32 @@
-<!-- Approved section: End-to-End Workflow. -->
+<script setup lang="ts">
+import { featureHeadings } from '~/data/feature-headings'
+import SectionHeading from './SectionHeading.vue'
+const steps = [
+  ['Create / open matter', 'Start with the case context.', '#matter-workspace'],
+  ['Import documents', 'Bring PDFs, Word files and images.', '#matter-workspace'],
+  ['Process & OCR', 'Prepare pages and recognise text.', '#ocr'],
+  ['Organise & categorise', 'Set groups, relationships and order.', '#matter-workspace'],
+  ['Generate documents', 'Fill the selected templates.', '#document-generation'],
+  ['Collate', 'Arrange the parts of the bundle.', '#collation'],
+  ['Paginate', 'Calculate the numbered ranges.', '#automation'],
+  ['Index & bookmark', 'Build references and navigation.', '#automation'],
+  ['Validate', 'Inspect rule-based findings.', '#validation'],
+  ['Split into volumes', 'Preserve document boundaries.', '#volumes'],
+  ['Review', 'Check the generated result.', '#validation'],
+  ['Export', 'Create structured final files.', '#export'],
+]
+</script>
 <template>
-  <section class="full-workflow-section" id="workflow" data-pen-name="End-to-End Workflow">
-    <div class="container">
-      <div class="section-top" data-reveal>
-        <div>
-          <p class="section-index">12 / The whole production workflow</p>
-          <h2>From the first file<br>to the final output.</h2>
-        </div>
-        <p class="lead">Document processing, legal workflow and automation are connected around the matter. Return to a stage whenever the documents need to change.</p>
-      </div>
-      <ol class="full-workflow">
-        <li class="journey-step">
-          <span class="micro">01</span>
-          <strong>Create / open matter</strong>
-          <p>Start with the case context.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">02</span>
-          <strong>Import documents</strong>
-          <p>Bring PDFs, Word files and images.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">03</span>
-          <strong>Process & OCR</strong>
-          <p>Prepare pages and recognise text.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">04</span>
-          <strong>Organise & categorise</strong>
-          <p>Set groups, relationships and order.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">05</span>
-          <strong>Generate documents</strong>
-          <p>Fill the selected templates.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">06</span>
-          <strong>Collate</strong>
-          <p>Arrange the parts of the bundle.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">07</span>
-          <strong>Paginate</strong>
-          <p>Calculate the numbered ranges.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">08</span>
-          <strong>Index & bookmark</strong>
-          <p>Build references and navigation.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">09</span>
-          <strong>Validate</strong>
-          <p>Inspect rule-based findings.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">10</span>
-          <strong>Split into volumes</strong>
-          <p>Preserve document boundaries.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">11</span>
-          <strong>Review</strong>
-          <p>Check the generated result.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
-        </li>
-        <li class="journey-step">
-          <span class="micro">12</span>
-          <strong>Export</strong>
-          <p>Create structured final files.</p>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
-          </svg>
+  <section id="workflow" class="studio-section alt">
+    <div class="frame">
+      <SectionHeading v-bind="featureHeadings.workflow" layout="stack" />
+      <ol class="workflow-grid" data-enter>
+        <li v-for="([name, caption, href], i) in steps" :key="name">
+          <a :href="href" class="panel">
+            <small>{{ String(i + 1).padStart(2, '0') }}</small>
+            <h4>{{ name }}</h4>
+            <p>{{ caption }}</p>
+          </a>
         </li>
       </ol>
     </div>

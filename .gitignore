@@ -1,6 +1,7 @@
 node_modules/
 .nuxt/
 .output/
+.netlify/
 .data/
 .env
 .env.*
@@ -9,3 +10,4 @@ dist/
 coverage/
 *.log
 .DS_Store
+admindesign/

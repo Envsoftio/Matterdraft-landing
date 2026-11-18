@@ -34,14 +34,14 @@ for(const route of pages){
   pageReports.push({route:`/${route}`,htmlBytes:Buffer.byteLength(html),gzipBytes:gzipSync(html).length})
 }
 const home=await readFile(join(dist,'index.html'),'utf8')
-for(const required of ['Built for lawyers','and advocates.','196','Fictional','matterdraft-structured-data'])assert(home.includes(required),`Missing server-rendered content: ${required}`)
-for(const required of ['https://forms.gle/oZ4ziNTZoQ3QWEoh6','Early access registration','one month free after launch','Registration isn’t open yet'])assert(home.includes(required),`Missing early access content: ${required}`)
+for(const required of ['From case documents','to organised bundles.','196','Fictional','matterdraft-structured-data'])assert(home.includes(required),`Missing server-rendered content: ${required}`)
+for(const required of ['https://forms.gle/oZ4ziNTZoQ3QWEoh6','Early access registration','one month free after launch',settings.earlyAccessEnabled ? 'Share your details' : 'Registration isn’t open yet'])assert(home.includes(required),`Missing early access content: ${required}`)
 assert(!home.includes('Request a demo')&&!home.includes('data-demo')&&!home.includes('demo-dialog'),'Demo request UI must be absent')
 const structured=[...home.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].find(m=>m[1].includes('application/ld+json'))
 assert(structured,'JSON-LD missing')
 const schema=JSON.parse(structured[2]);assert(schema['@graph'].some(n=>n['@type']==='SoftwareApplication'),'Software structured data missing')
 assert(!schema['@graph'].some(n=>n.offers||n.aggregateRating),'No invented pricing or ratings')
-for(const file of ['robots.txt','sitemap.xml','llms.txt','llms-full.txt','index.md','favicon.svg','favicon-32.png','apple-touch-icon.png','site.webmanifest','og/matterdraft-social.jpg','fonts/inter-latin-variable.woff2','_headers','404.html'])assert((await stat(join(dist,file))).size>0,`Missing ${file}`)
+for(const file of ['robots.txt','sitemap.xml','llms.txt','llms-full.txt','index.md','favicon.svg','favicon-32.png','apple-touch-icon.png','site.webmanifest','og/matterdraft-social.jpg','fonts/plus-jakarta-sans-latin-variable.woff2','fonts/jetbrains-mono-medium.woff2','brand/studio-wordmark-light.png','brand/studio-wordmark-dark.png','_headers','404.html'])assert((await stat(join(dist,file))).size>0,`Missing ${file}`)
 const sitemap=await readFile(join(dist,'sitemap.xml'),'utf8')
 assert(sitemap.includes('<urlset'),'Invalid sitemap')
 for(const route of pages.slice(1))assert(!sitemap.includes(`/${route}<`),'Draft policy must not appear in sitemap')
@@ -49,7 +49,8 @@ const llms=await readFile(join(dist,'llms.txt'),'utf8');assert(llms.startsWith('
 const assetNames=(await readdir(join(dist,'_nuxt'))).filter(name=>/\.(js|css)$/.test(name))
 let jsBytes=0,jsGzip=0,cssBytes=0,cssGzip=0
 for(const name of assetNames){const data=await readFile(join(dist,'_nuxt',name));if(name.endsWith('.js')){jsBytes+=data.length;jsGzip+=gzipSync(data).length}else{cssBytes+=data.length;cssGzip+=gzipSync(data).length}}
-const fontBytes=(await stat(join(dist,'fonts/inter-latin-variable.woff2'))).size
+const landingFonts = ['plus-jakarta-sans-latin-variable.woff2', 'jetbrains-mono-medium.woff2']
+const fontBytes = (await Promise.all(landingFonts.map(file => stat(join(dist, 'fonts', file))))).reduce((sum, file) => sum + file.size, 0)
 assert(jsGzip<250*1024,`All-route JS gzip budget exceeded: ${jsGzip}`)
 assert(cssGzip<48*1024,`CSS gzip budget exceeded: ${cssGzip}`)
 assert(fontBytes<180*1024,`Font budget exceeded: ${fontBytes}`)

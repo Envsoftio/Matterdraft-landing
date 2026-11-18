@@ -1,11 +1,15 @@
 import { createServer } from 'node:http'
+import { existsSync } from 'node:fs'
 import { readFile, stat } from 'node:fs/promises'
 import { dirname, extname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { cacheControlForStaticResponse, negotiateEncoding } from './static-response.mjs'
+import earlyAccess from '../lib/early-access-sheets.mjs'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
+const envFile = join(root, '.env')
+if (existsSync(envFile)) process.loadEnvFile(envFile)
 const directory = join(root, 'dist')
 const { values } = parseArgs({ options: { port: { type: 'string' }, host: { type: 'string' }, strictPort: { type: 'boolean' } } })
 const port = Number(values.port || process.env.PORT || 3000)
@@ -17,12 +21,23 @@ const exists = async path => { try { return (await stat(path)).isFile() } catch 
 
 createServer(async (request, response) => {
   try {
+    const url = new URL(request.url || '/', 'http://localhost')
+    if (url.pathname === '/.netlify/functions/early-access') {
+      const signupRequest = new Request(url, {
+        method: request.method, headers: request.headers,
+        ...(request.method === 'POST' && { body: request, duplex: 'half' }),
+      })
+      const result = await earlyAccess(signupRequest)
+      response.writeHead(result.status, Object.fromEntries(result.headers))
+      response.end(await result.text())
+      return
+    }
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       response.writeHead(405, { Allow: 'GET, HEAD', 'Content-Type':'text/plain; charset=utf-8' })
       response.end('Method not allowed. This static site does not accept submissions.')
       return
     }
-    const pathname = decodeURIComponent(new URL(request.url || '/', 'http://localhost').pathname)
+    const pathname = decodeURIComponent(url.pathname)
     if (pathname.includes('\0')) throw new Error('Invalid path')
     const candidate = resolve(directory, `.${pathname}`)
     if (candidate !== directory && !candidate.startsWith(`${directory}${sep}`)) {

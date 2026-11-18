@@ -1,537 +1,344 @@
-<!-- Approved premium hero. Interaction hooks are owned by useLandingExperience(). -->
+<script setup lang="ts">
+import {
+  ToggleGroupRoot,
+  ToggleGroupItem,
+  DialogRoot,
+  DialogTrigger,
+  DialogPortal,
+  DialogOverlay,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from 'reka-ui'
+import {
+  ArrowDown,
+  BadgeCheck,
+  Check,
+  Crop,
+  Download,
+  Eraser,
+  FileText,
+  FolderOpen,
+  GripVertical,
+  ListChecks,
+  Monitor,
+  PencilLine,
+  RefreshCw,
+  ScanSearch,
+  SlidersHorizontal,
+  X,
+  Zap,
+} from '@lucide/vue'
+import { matterName, numberedDocuments } from '~/data/example-matter'
+const selected = ref('Agreement')
+const compact = ref(false)
+const workspace = useTemplateRef('workspace')
+let mobileQuery: MediaQueryList | undefined
+function updateLayout() {
+  compact.value = Boolean(mobileQuery?.matches)
+}
+onMounted(() => {
+  mobileQuery = window.matchMedia('(max-width: 640px)')
+  updateLayout()
+  mobileQuery.addEventListener('change', updateLayout)
+})
+onBeforeUnmount(() => mobileQuery?.removeEventListener('change', updateLayout))
+watch(
+  [compact, selected],
+  () => {
+    if (!compact.value) return
+    const list = workspace.value?.querySelector<HTMLElement>('.document-list')
+    const active = list?.querySelector<HTMLElement>('[data-state="on"]')
+    if (!list || !active) return
+    const offset = active.getBoundingClientRect().left - list.getBoundingClientRect().left
+    if (offset < 0 || offset + active.offsetWidth > list.clientWidth) list.scrollLeft += offset - 4
+  },
+  { flush: 'post' }
+)
+const file = computed(() => numberedDocuments.find((doc) => doc.name === selected.value)!)
+let gesture: { x: number; y: number } | undefined
+function startGesture(event: PointerEvent) {
+  if (event.pointerType === 'touch' && event.isPrimary) gesture = { x: event.clientX, y: event.clientY }
+}
+function finishGesture(event: PointerEvent) {
+  if (!gesture || !event.isPrimary) return
+  const dx = event.clientX - gesture.x
+  const dy = event.clientY - gesture.y
+  gesture = undefined
+  if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy) * 1.5) return
+  const index = numberedDocuments.findIndex((doc) => doc.name === selected.value)
+  const next = numberedDocuments[index + (dx < 0 ? 1 : -1)]
+  if (next) selected.value = next.name
+}
+const steps = [
+  ['Import', '#matter-workspace'],
+  ['OCR', '#ocr'],
+  ['Organise', '#matter-workspace'],
+  ['Collate', '#collation'],
+  ['Paginate', '#automation'],
+  ['Index', '#automation'],
+  ['Validate', '#validation'],
+  ['Export', '#export'],
+]
+const sampleText: Record<string, string> = {
+  Petition: 'The applicant asks the court to consider the supporting records listed in this matter.',
+  Affidavit:
+    'The deponent confirms that the accompanying documents are true copies of the records described in the schedule.',
+  Agreement:
+    'This master commercial collaboration agreement is entered into on 14th March 2026 by and between Aster Works Enterprise and Banyan Projects Infrastructure LLP.',
+  Correspondence:
+    'Letters exchanged between the parties record the dates, requests and responses relevant to this matter.',
+  Evidence: 'The exhibits in this schedule are numbered in the order in which they appear in the bundle.',
+  'Additional records':
+    'Supplementary records accompany the principal exhibits and retain their original sequence.',
+}
+</script>
+
 <template>
-  <section
-    class="v2-hero mdh-hero"
-    aria-labelledby="hero-title"
-    data-pen-name="Hero"
-    data-mdh-root
-    data-stage="validate"
-    data-mdh-document="agreement"
-  >
-    <div class="mdh-atmosphere" aria-hidden="true">
-      <div class="mdh-grid"></div>
-      <svg class="mdh-fold" viewBox="0 0 1000 1000" fill="none">
-        <path d="M1040 65 500 350v400l540-285M500 350 230 205v400l270 145M500 350 770 205v290" />
-        <path d="M1080 120 540 405v400l540-285M540 405 270 260v400l270 145" />
-      </svg>
-      <span class="mdh-horizon"></span>
-    </div>
-    <div class="container mdh-canvas">
-      <div class="mdh-copy">
-        <p class="mdh-eyebrow"><span class="mdh-status-light" aria-hidden="true"></span>LOCAL-FIRST<span class="mdh-pill-divider"></span>LEGAL DESKTOP APP</p>
-        <h1 id="hero-title">
-          <span>Legal documents.</span>
-          <span>Built for lawyers</span>
-          <span class="mdh-headline-accent">and advocates.</span>
-        </h1>
-        <p class="mdh-description">Prepare case files in one desktop workspace: edit and OCR PDFs, generate documents from templates, collate evidence, and export indexed, paginated and bookmarked legal bundles.</p>
-        <div class="mdh-actions">
-          <a class="button mdh-primary" href="#early-access">Early access<span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></a>
-          <a class="mdh-secondary" href="#workflow">Explore the workflow<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
-        </div>
-        <p class="mdh-offer">Early access signups get <strong>one month free after launch.</strong></p>
-        <p class="mdh-survey">Advocate? <a href="https://forms.gle/oZ4ziNTZoQ3QWEoh6" target="_blank" rel="noopener noreferrer">Share your feedback in our advocate survey <span aria-hidden="true">↗</span></a></p>
-        <div class="mdh-trust">
-          <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M8 21h8M12 16v5"/></svg>Windows + macOS</span>
-          <i aria-hidden="true"></i>
-          <span>Offline-first</span>
-          <i aria-hidden="true"></i>
-          <span>Local processing</span>
-        </div>
+  <section class="studio-hero" aria-labelledby="hero-title">
+    <div class="hero-intro">
+      <p class="hero-eyebrow">
+        <i />
+        Desktop document preparation · For advocates &amp; chambers
+      </p>
+      <h1 id="hero-title">
+        From case documents
+        <br />
+        to organised bundles.
+      </h1>
+      <p class="hero-description">
+        Prepare case files in one desktop workspace: edit and OCR PDFs, generate documents from templates,
+        collate evidence, and export indexed, paginated and bookmarked legal bundles.
+      </p>
+      <div class="hero-actions">
+        <a href="#early-access" class="action primary">
+          <Zap />
+          Early access
+        </a>
+        <a href="#workflow" class="action secondary">
+          Explore the workflow
+          <ArrowDown />
+        </a>
       </div>
-      <figure
-        class="mdh-experience"
-        aria-label="One MatterDraft workspace coordinating documents, references and review"
-      >
-        <div class="mdh-orbit-label"><span class="mdh-orbit-dot"></span>ONE MATTER. EVERY REFERENCE CONNECTED.</div>
-        <div class="mdh-stage-light" aria-hidden="true"></div>
-        <svg class="mdh-connectors" viewBox="0 0 840 760" fill="none" aria-hidden="true">
-          <path class="mdh-connector-index" d="M641 244V280H558V311" />
-          <path class="mdh-connector-bookmark" d="M289 533H246V649H215" />
-          <path class="mdh-connector-validation" d="M718 527V577H711V618" />
-          <circle cx="558" cy="311" r="3" />
-          <circle cx="289" cy="533" r="3" />
-          <circle cx="718" cy="527" r="3" />
-        </svg>
-        <div id="hero-workspace" class="mdh-workspace">
-          <div
-            class="product-shell mdh-app"
-            data-document-demo
-            data-pen-name="Product window / Coordinated matter workspace"
+      <p class="offer-pill">
+        <BadgeCheck :size="15" />
+        <span>
+          Early access signups get
+          <strong>one month free after launch.</strong>
+        </span>
+      </p>
+    </div>
+    <figure ref="workspace" class="workspace-window" aria-label="Fictional matter workspace preview">
+      <figcaption class="window-bar">
+        <span class="traffic-lights" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span class="window-caption">
+          <Monitor :size="14" />
+          MatterDraft Studio —
+          <b>{{ matterName }}</b>
+          (MD-DEMO-026)
+        </span>
+        <span class="local-state">● Offline / Saved Locally</span>
+        <span class="window-version">Preview</span>
+      </figcaption>
+      <div class="workspace-columns">
+        <aside class="workspace-side">
+          <div class="workspace-label">
+            Matter documents (06)
+            <span class="code-tag">196 Pages</span>
+          </div>
+          <ToggleGroupRoot
+            type="single"
+            :model-value="selected"
+            :orientation="compact ? 'horizontal' : 'vertical'"
+            class="document-list"
+            aria-label="Select a sample document"
+            @update:model-value="
+              (value) => {
+                if (value) selected = String(value)
+              }
+            "
           >
-            <div class="mdh-app-titlebar">
-              <span class="mdh-window-dots" aria-hidden="true">
-                <i></i>
-                <i></i>
-                <i></i>
-              </span>
-              <span>MatterDraft Studio</span>
-              <span class="mdh-app-local"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M8 21h8M12 16v5"/></svg>Local workspace</span>
-            </div>
-            <div class="mdh-app-matter">
-              <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>Aster Works v. Banyan Projects</span>
-              <small>MD-DEMO-026</small>
-              <span class="mdh-app-tag">Fictional matter</span>
-            </div>
-            <div class="mdh-app-body">
-              <aside class="mdh-app-sidebar" aria-label="Illustrative matter navigation">
-                <div class="mdh-app-brand">
-                  <BrandLogo class="preview-logo" />
-                </div>
-                <span class="mdh-ui-eyebrow">THIS MATTER</span>
-                <div class="mdh-app-nav">
-                  <div class="mdh-app-nav-item " data-mdh-area="matter">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
-                    </svg>
-                    <span>Matter</span>
-                  </div>
-                  <div class="mdh-app-nav-item is-current" data-mdh-area="documents">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M7 3h9l4 4v11H7zM16 3v5h4M4 7H2v15h13v-2M10 12h7M10 15h5" />
-                    </svg>
-                    <span>Documents</span>
-                    <b>6</b>
-                  </div>
-                  <div class="mdh-app-nav-item " data-mdh-area="parts">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="m3 7 9-5 9 5-9 5-9-5Zm0 5 9 5 9-5M3 17l9 5 9-5" />
-                    </svg>
-                    <span>Parts</span>
-                  </div>
-                  <div class="mdh-app-nav-item " data-mdh-area="index">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M9 5h12M9 12h12M9 19h12M3 5h1M3 12h1M3 19h1" />
-                    </svg>
-                    <span>Index</span>
-                  </div>
-                  <div class="mdh-app-nav-item " data-mdh-area="bookmarks">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M6 3h12v18l-6-4-6 4V3Z" />
-                    </svg>
-                    <span>Bookmarks</span>
-                  </div>
-                  <div class="mdh-app-nav-item " data-mdh-area="validation">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <circle cx="12" cy="12" r="8.5" />
-                      <path d="m8 12 3 3 5-6" />
-                    </svg>
-                    <span>Validation</span>
-                  </div>
-                  <div class="mdh-app-nav-item " data-mdh-area="volumes">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="m3 7 9-5 9 5-9 5-9-5Zm0 5 9 5 9-5M3 17l9 5 9-5" />
-                    </svg>
-                    <span>Volumes</span>
-                  </div>
-                  <div class="mdh-app-nav-item " data-mdh-area="export">
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4" />
-                    </svg>
-                    <span>Export</span>
-                  </div>
-                </div>
-                <div class="mdh-app-save"><i></i>Saved locally</div>
-              </aside>
-              <div class="mdh-document-panel" data-mdh-area="documents">
-                <div class="mdh-document-head">
-                  <strong>Documents <span>06</span></strong>
-                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M7 3v18m-4-4 4 4 4-4M14 5h7M14 10h5M14 15h3" />
-                  </svg>
-                </div>
-                <p class="mdh-doc-hint">Select a document to explore</p>
-                <div class="mdh-doc-list">
-                  <button
-                    class="mdh-doc "
-                    type="button"
-                    data-document
-                    data-doc-title="Petition"
-                    data-doc-pages="1–18"
-                    data-doc-index="PETITION"
-                    aria-pressed="false"
-                  >
-                    <span class="mdh-doc-grip" aria-hidden="true">⠿</span>
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z" />
-                      <path d="M14 3v6h6M8 13h8M8 17h5" />
-                    </svg>
-                    <span class="mdh-doc-copy">
-                      <strong>Petition.pdf</strong>
-                      <small>18 pages<span class="mdh-doc-category"> · Core documents</span></small>
-                    </span>
-                    <span class="mdh-doc-included" aria-hidden="true">
-                      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="m5 12 4 4L19 6" />
-                      </svg>
-                    </span>
-                  </button>
-                  <button
-                    class="mdh-doc "
-                    type="button"
-                    data-document
-                    data-doc-title="Affidavit"
-                    data-doc-pages="19–42"
-                    data-doc-index="AFFIDAVIT"
-                    aria-pressed="false"
-                  >
-                    <span class="mdh-doc-grip" aria-hidden="true">⠿</span>
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z" />
-                      <path d="M14 3v6h6M8 13h8M8 17h5" />
-                    </svg>
-                    <span class="mdh-doc-copy">
-                      <strong>Affidavit.pdf</strong>
-                      <small>24 pages<span class="mdh-doc-category"> · Core documents</span></small>
-                    </span>
-                    <span class="mdh-doc-included" aria-hidden="true">
-                      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="m5 12 4 4L19 6" />
-                      </svg>
-                    </span>
-                  </button>
-                  <button
-                    class="mdh-doc active"
-                    type="button"
-                    data-document
-                    data-doc-title="Agreement"
-                    data-doc-pages="43–81"
-                    data-doc-index="ANNEXURE A"
-                    aria-pressed="true"
-                  >
-                    <span class="mdh-doc-grip" aria-hidden="true">⠿</span>
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z" />
-                      <path d="M14 3v6h6M8 13h8M8 17h5" />
-                    </svg>
-                    <span class="mdh-doc-copy">
-                      <strong>Agreement.pdf</strong>
-                      <small>39 pages<span class="mdh-doc-category"> · Supporting documents</span></small>
-                    </span>
-                    <span class="mdh-doc-included" aria-hidden="true">
-                      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="m5 12 4 4L19 6" />
-                      </svg>
-                    </span>
-                  </button>
-                  <button
-                    class="mdh-doc "
-                    type="button"
-                    data-document
-                    data-doc-title="Correspondence"
-                    data-doc-pages="82–108"
-                    data-doc-index="CORRESPONDENCE"
-                    aria-pressed="false"
-                  >
-                    <span class="mdh-doc-grip" aria-hidden="true">⠿</span>
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z" />
-                      <path d="M14 3v6h6M8 13h8M8 17h5" />
-                    </svg>
-                    <span class="mdh-doc-copy">
-                      <strong>Correspondence.pdf</strong>
-                      <small>27 pages<span class="mdh-doc-category"> · Supporting documents</span></small>
-                    </span>
-                    <span class="mdh-doc-included" aria-hidden="true">
-                      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="m5 12 4 4L19 6" />
-                      </svg>
-                    </span>
-                  </button>
-                  <button
-                    class="mdh-doc "
-                    type="button"
-                    data-document
-                    data-doc-title="Evidence"
-                    data-doc-pages="109–160"
-                    data-doc-index="EVIDENCE"
-                    aria-pressed="false"
-                  >
-                    <span class="mdh-doc-grip" aria-hidden="true">⠿</span>
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z" />
-                      <path d="M14 3v6h6M8 13h8M8 17h5" />
-                    </svg>
-                    <span class="mdh-doc-copy">
-                      <strong>Evidence.pdf</strong>
-                      <small>52 pages<span class="mdh-doc-category"> · Evidence</span></small>
-                    </span>
-                    <span class="mdh-doc-included" aria-hidden="true">
-                      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="m5 12 4 4L19 6" />
-                      </svg>
-                    </span>
-                  </button>
-                  <button
-                    class="mdh-doc "
-                    type="button"
-                    data-document
-                    data-doc-title="Additional records"
-                    data-doc-pages="161–196"
-                    data-doc-index="RECORDS"
-                    aria-pressed="false"
-                  >
-                    <span class="mdh-doc-grip" aria-hidden="true">⠿</span>
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z" />
-                      <path d="M14 3v6h6M8 13h8M8 17h5" />
-                    </svg>
-                    <span class="mdh-doc-copy">
-                      <strong>Additional records.pdf</strong>
-                      <small>36 pages<span class="mdh-doc-category"> · Additional material</span></small>
-                    </span>
-                    <span class="mdh-doc-included" aria-hidden="true">
-                      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="m5 12 4 4L19 6" />
-                      </svg>
-                    </span>
-                  </button>
-                </div>
-                <div class="mdh-document-total">
-                  <span>6 included</span>
-                  <strong>196 pages</strong>
-                </div>
+            <ToggleGroupItem
+              v-for="doc in numberedDocuments"
+              :key="doc.name"
+              :value="doc.name"
+              class="document-item"
+            >
+              <GripVertical :size="13" />
+              <FileText :size="16" />
+              <strong>{{ doc.name }}.pdf</strong>
+              <small>{{ doc.pages }} pp</small>
+            </ToggleGroupItem>
+          </ToggleGroupRoot>
+          <a class="preflight" href="#validation">
+            <span>
+              <ListChecks :size="15" />
+              Pre-flight checks
+              <b>3 items to review</b>
+            </span>
+            <i />
+          </a>
+        </aside>
+        <div
+          class="document-desk"
+          @pointerdown="startGesture"
+          @pointerup="finishGesture"
+          @pointercancel="gesture = undefined"
+        >
+          <div class="reading-tools">
+            <span>Page 1 of {{ file.pages }}</span>
+            <i />
+            <span>Zoom 100%</span>
+            <i />
+            <span class="positive">
+              <ScanSearch :size="12" />
+              OCR Searchable
+            </span>
+            <span class="reading-icons" aria-hidden="true">
+              <RefreshCw />
+              <Crop />
+              <PencilLine />
+              <Eraser />
+            </span>
+          </div>
+          <article class="sample-paper" aria-live="polite" :key="file.name">
+            <header>
+              <div>
+                <small>
+                  {{ file.name === 'Agreement' ? 'ANNEXURE A' : file.name.toUpperCase() }} / BUNDLE PAGES
+                  {{ file.start }}–{{ file.end }}
+                </small>
+                <h3>{{ file.name }} (Working Copy)</h3>
               </div>
-              <div class="mdh-document-preview">
-                <div class="mdh-preview-toolbar">
-                  <span data-hero-page-count>Page 1 of 39</span>
-                  <span>
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M3 10a9 9 0 1 1 2 9M3 4v6h6" />
-                    </svg>
-                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M6 2v15a1 1 0 0 0 1 1h15M2 6h15a1 1 0 0 1 1 1v15" />
-                    </svg>
-                    <small>100%</small>
-                  </span>
-                </div>
-                <div class="mdh-page-stage">
-                  <div class="mdh-thumbnails" aria-label="Illustrative page thumbnails">
-                    <span class="is-current">1</span>
-                    <span>2</span>
-                    <span>3</span>
-                  </div>
-                  <div class="mdh-paper" data-mdh-area="paper">
-                    <div class="mdh-paper-rule"></div>
-                    <p class="mdh-paper-kind" data-doc-index>ANNEXURE A</p>
-                    <p class="mdh-paper-title" data-doc-title>Agreement</p>
-                    <p class="mdh-paper-case">Aster Works v. Banyan Projects</p>
-                    <p class="mdh-paper-text">Document record</p>
-                    <div class="page-lines" aria-hidden="true">
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                    </div>
-                    <div class="mdh-paper-highlight"><span class="mdh-text-cursor" aria-hidden="true"></span>Searchable text in the<br>working copy.</div>
-                    <div class="page-lines" aria-hidden="true">
-                      <i></i>
-                      <i></i>
-                      <i></i>
-                    </div>
-                    <div class="mdh-paper-footer">
-                      <span>BUNDLE PAGES</span>
-                      <strong data-doc-pages>43–81</strong>
-                    </div>
-                  </div>
-                </div>
-                <div class="mdh-document-meta">
-                  <div>
-                    <span>Category</span>
-                    <strong data-hero-category>Supporting documents</strong>
-                  </div>
-                  <div>
-                    <span>Part / volume</span>
-                    <strong><span data-hero-part>Part 2</span> · Volume 1</strong>
-                  </div>
-                  <div class="mdh-meta-bookmark">
-                    <span>Bookmark</span>
-                    <strong data-hero-bookmark>2a · Agreement</strong>
-                  </div>
-                </div>
+              <div class="paper-ref">
+                REF: MD-DEMO-026
+                <b>Original Preserved</b>
               </div>
-            </div>
-            <div class="mdh-app-status">
-              <span>
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5M6 12h12M8 8h8M8 16h5" />
-                </svg>
-                <span data-mdh-ocr-state>OCR complete</span>
-              </span>
-              <span>4 parts<span class="mdh-status-dot">·</span>196 numbered pages<span class="mdh-status-dot">·</span>Originals preserved</span>
-            </div>
-          </div>
+            </header>
+            <h4>
+              {{
+                file.name === 'Agreement'
+                  ? '1. DEFINITIONS AND OPERATIVE PROVISIONS'
+                  : '1. ' + file.name.toUpperCase()
+              }}
+            </h4>
+            <p>{{ sampleText[file.name] }}</p>
+            <blockquote>
+              <strong>
+                <PencilLine :size="13" />
+                Working-copy clause annotation: Review this section
+              </strong>
+              {{
+                file.name === 'Agreement'
+                  ? '“The parties unconditionally stipulate to an air-gapped forensic audit mechanism governed exclusively by deterministic local verification protocols.”'
+                  : 'Check this record against the original before including it in the final bundle.'
+              }}
+            </blockquote>
+            <p class="paper-note">
+              {{
+                file.name === 'Agreement'
+                  ? 'Section 2.4 - Confidentiality. Neither party shall transmit raw unencrypted evidentiary records across public multitenant server architectures without prior cryptographic sign-off.'
+                  : 'This sample working copy preserves the original document.'
+              }}
+            </p>
+            <footer>
+              <span>{{ matterName }}</span>
+              <span class="code-tag">BATES NO. MD-{{ String(file.start).padStart(4, '0') }}</span>
+            </footer>
+          </article>
         </div>
-        <aside class="mdh-float mdh-index-panel" aria-label="Illustrative matter index">
-          <div class="mdh-float-heading">
-            <span class="mdh-float-icon">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M9 5h12M9 12h12M9 19h12M3 5h1M3 12h1M3 19h1" />
-              </svg>
-            </span>
-            <div>
-              <p>LIVE REFERENCES</p>
-              <strong data-mdh-index-state>Index updated</strong>
-            </div>
-            <span class="mdh-panel-check">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m5 12 4 4L19 6" />
-              </svg>
-            </span>
+        <aside class="workspace-side references">
+          <div class="workspace-label">
+            Live reference index
+            <small class="positive">↻ Auto-synced</small>
           </div>
-          <div class="mdh-index-summary">
-            <strong>196</strong>
-            <span>pages mapped<br>6 document entries</span>
+          <div class="index-list">
+            <button
+              v-for="(doc, i) in numberedDocuments"
+              :key="doc.name"
+              :class="{ chosen: doc.name === selected }"
+              :aria-pressed="doc.name === selected"
+              @click="selected = doc.name"
+            >
+              <span>{{ i + 1 }}. {{ doc.name }}</span>
+              <span>p. {{ doc.start }}</span>
+            </button>
           </div>
-          <div class="mdh-index-rows">
-            <div class="mdh-index-row" data-index-document="petition">
-              <span>Petition</span>
-              <i></i>
-              <b>1</b>
-            </div>
-            <div class="mdh-index-row" data-index-document="affidavit">
-              <span>Affidavit</span>
-              <i></i>
-              <b>19</b>
-            </div>
-            <div class="mdh-index-row" data-index-document="agreement">
-              <span>Agreement</span>
-              <i></i>
-              <b>43</b>
-            </div>
-            <div class="mdh-index-row" data-index-document="correspondence">
-              <span>Correspondence</span>
-              <i></i>
-              <b>82</b>
-            </div>
-            <div class="mdh-index-row" data-index-document="evidence">
-              <span>Evidence</span>
-              <i></i>
-              <b>109</b>
-            </div>
-            <div class="mdh-index-row" data-index-document="additional-records">
-              <span>Additional records</span>
-              <i></i>
-              <b>161</b>
-            </div>
+          <div class="workspace-label">
+            Bookmarks hierarchy
+            <small>1 → 1a → 1b</small>
           </div>
+          <div
+            v-for="(part, i) in ['Core documents', 'Supporting documents']"
+            :key="part"
+            class="bookmark-group"
+          >
+            <strong>
+              <FolderOpen :size="13" />
+              {{ i + 1 }}. {{ part }}
+            </strong>
+            <button
+              v-for="(doc, j) in numberedDocuments.filter((doc) => doc.part === i)"
+              :key="doc.name"
+              :class="{ chosen: doc.name === selected }"
+              @click="selected = doc.name"
+            >
+              <span>{{ i + 1 }}{{ j === 0 ? 'a' : 'b' }}. {{ doc.name }}</span>
+              p. {{ doc.start }}
+            </button>
+          </div>
+          <DialogRoot>
+            <DialogTrigger class="export-example">
+              <Download :size="15" />
+              Export Court Bundle (PDF/A)
+            </DialogTrigger>
+            <DialogPortal>
+              <DialogOverlay class="studio-overlay" />
+              <DialogContent class="studio-dialog">
+                <DialogTitle>Bundle export preview</DialogTitle>
+                <DialogDescription>
+                  This fictional matter contains six documents across four parts and 196 numbered pages.
+                </DialogDescription>
+                <ul class="export-checks">
+                  <li
+                    v-for="item in [
+                      'Index and page ranges generated',
+                      'Document bookmarks included',
+                      'Three pre-flight findings to review',
+                    ]"
+                    :key="item"
+                  >
+                    <Check :size="16" />
+                    {{ item }}
+                  </li>
+                </ul>
+                <DialogClose class="action secondary">
+                  Close preview
+                  <X :size="14" />
+                </DialogClose>
+              </DialogContent>
+            </DialogPortal>
+          </DialogRoot>
         </aside>
-        <aside class="mdh-float mdh-bookmark-panel" aria-label="Illustrative bookmark hierarchy">
-          <div class="mdh-float-heading">
-            <span class="mdh-float-icon">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 3h12v18l-6-4-6 4V3Z" />
-              </svg>
-            </span>
-            <div>
-              <p>DOCUMENT HIERARCHY</p>
-              <strong data-mdh-bookmark-state>Bookmarks ready</strong>
-            </div>
-          </div>
-          <div class="mdh-bookmark-rows">
-            <span><b>1</b>Core documents</span>
-            <span class="mdh-bookmark-child"><b>1a</b>Petition</span>
-            <span class="mdh-bookmark-child"><b>1b</b>Affidavit</span>
-            <span class="mdh-bookmark-selected">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6 3h12v18l-6-4-6 4V3Z" />
-              </svg>
-              <span data-mdh-selected-bookmark>2a · Agreement</span>
-            </span>
-          </div>
-          <p class="mdh-panel-footnote">6 document entries across 4 groups</p>
-        </aside>
-        <aside class="mdh-float mdh-validation-panel" aria-label="Illustrative bundle checks">
-          <div class="mdh-float-heading">
-            <span class="mdh-float-icon">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="8.5" />
-                <path d="m8 12 3 3 5-6" />
-              </svg>
-            </span>
-            <div>
-              <p>BUNDLE CHECKS</p>
-              <strong data-mdh-validation-state>3 items to review</strong>
-            </div>
-          </div>
-          <div class="mdh-check-list">
-            <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>Index generated</span>
-            <span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>Page ranges generated</span>
-            <span class="mdh-check-warning"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 10 18H2L12 3ZM12 9v5M12 17v1"/></svg>3 items need review</span>
-          </div>
-        </aside>
-      </figure>
-      <div class="mdh-rail-wrap">
-        <div class="mdh-rail-heading">
-          <span>FROM SOURCE FILES TO STRUCTURED OUTPUT</span>
-        </div>
-        <ol class="mdh-workflow-rail" aria-label="Legal document workflow">
-          <li class="mdh-stage">
-            <span class="mdh-stage-node">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5" />
-              </svg>
-            </span>
-            <span>Import</span>
-          </li>
-          <li class="mdh-stage">
-            <span class="mdh-stage-node">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5M6 12h12M8 8h8M8 16h5" />
-              </svg>
-            </span>
-            <span>OCR</span>
-          </li>
-          <li class="mdh-stage">
-            <span class="mdh-stage-node">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
-              </svg>
-            </span>
-            <span>Organise</span>
-          </li>
-          <li class="mdh-stage">
-            <span class="mdh-stage-node">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m3 7 9-5 9 5-9 5-9-5Zm0 5 9 5 9-5M3 17l9 5 9-5" />
-              </svg>
-            </span>
-            <span>Collate</span>
-          </li>
-          <li class="mdh-stage">
-            <span class="mdh-stage-node">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M7 3h9l4 4v11H7zM16 3v5h4M4 7H2v15h13v-2M10 12h7M10 15h5" />
-              </svg>
-            </span>
-            <span>Paginate</span>
-          </li>
-          <li class="mdh-stage">
-            <span class="mdh-stage-node">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M9 5h12M9 12h12M9 19h12M3 5h1M3 12h1M3 19h1" />
-              </svg>
-            </span>
-            <span>Index</span>
-          </li>
-          <li class="mdh-stage">
-            <span class="mdh-stage-node">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="8.5" />
-                <path d="m8 12 3 3 5-6" />
-              </svg>
-            </span>
-            <span>Validate</span>
-          </li>
-          <li class="mdh-stage">
-            <span class="mdh-stage-node">
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4" />
-              </svg>
-            </span>
-            <span>Export</span>
-          </li>
-        </ol>
       </div>
-    </div>
+    </figure>
   </section>
+  <nav class="production-ribbon" aria-labelledby="workflow-ribbon-title">
+    <div class="frame">
+      <strong id="workflow-ribbon-title">
+        <SlidersHorizontal :size="18" aria-hidden="true" />
+        From source files to structured output
+      </strong>
+      <ol>
+        <li v-for="([name, href], index) in steps" :key="name">
+          <a :href="href">{{ index + 1 }} {{ name }}</a>
+        </li>
+      </ol>
+    </div>
+  </nav>
 </template>

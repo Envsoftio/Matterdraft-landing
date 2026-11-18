@@ -1,102 +1,112 @@
-<!-- Approved section: Validation. -->
+<script setup lang="ts">
+import {
+  DialogRoot,
+  DialogPortal,
+  DialogOverlay,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+  Label,
+} from 'reka-ui'
+import { CircleCheck, CircleAlert } from '@lucide/vue'
+import { featureHeadings } from '~/data/feature-headings'
+import { categories } from '~/data/example-matter'
+import SectionHeading from './SectionHeading.vue'
+const findings = [
+  { title: 'Missing date: Affidavit.pdf', action: 'Add date', label: 'Document date' },
+  { title: 'Document category not assigned', action: 'Assign category', label: 'Document category' },
+  { title: 'Page numbering requires review', action: 'Review numbering', label: 'Starting page' },
+] as const
+const editing = ref<number | null>(null)
+const values = ref(['', '', ''])
+const input = ref('')
+const remaining = computed(() => values.value.filter((v) => !v).length)
+function edit(index: number) {
+  editing.value = index
+  input.value = values.value[index] || (index === 2 ? '1' : '')
+}
+function save() {
+  if (editing.value === null || !input.value) return
+  values.value[editing.value] = input.value
+  editing.value = null
+}
+</script>
 <template>
-  <section class="validation-section" data-pen-name="Validation">
-    <div class="container split">
-      <div class="split-copy" data-reveal>
-        <p class="section-index">09 / Rule-based pre-export checks</p>
-        <h2>Find what needs<br>a second look.</h2>
-        <p class="lead">Check the structure across document categories. Bring missing dates, unassigned categories and numbering issues into view before export.</p>
-        <p class="validation-note"><strong>Production checks, with a human review.</strong><br>Validation helps inspect fields and document structure. It does not certify legal correctness or court compliance.</p>
+  <section id="validation" class="studio-section alt">
+    <div class="frame validation-grid">
+      <div>
+        <SectionHeading v-bind="featureHeadings.validation" layout="stack" />
+        <p class="review-note">
+          <strong>Production checks, with a human review.</strong>
+          Validation helps inspect fields and document structure. It does not certify legal correctness or
+          court compliance.
+        </p>
       </div>
-      <figure data-reveal>
-        <div id="validation-visual">
-          <div class="product-shell" id="validation-demo">
-            <div class="validation-summary">
-              <h3><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8 12 3 3 5-6"/></svg>Bundle validation</h3>
-              <span class="badge badge-amber"><span data-validation-count>3</span> items to inspect</span>
-            </div>
-            <ul class="validation-list" id="validation-list">
-              <li class="validation-row is-pass">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="8.5" />
-                  <path d="m8 12 3 3 5-6" />
-                </svg>
-                <span class="validation-copy">
-                  <strong>Index generated</strong>
-                  <small>Page references are present.</small>
-                </span>
-              </li>
-              <li class="validation-row is-pass">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="8.5" />
-                  <path d="m8 12 3 3 5-6" />
-                </svg>
-                <span class="validation-copy">
-                  <strong>Bookmarks generated</strong>
-                  <small>Document hierarchy is available.</small>
-                </span>
-              </li>
-              <li class="validation-row is-pass">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="8.5" />
-                  <path d="m8 12 3 3 5-6" />
-                </svg>
-                <span class="validation-copy">
-                  <strong>Required category groups present</strong>
-                  <small>The four-part structure is in place.</small>
-                </span>
-              </li>
-              <li class="validation-row is-pass">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="8.5" />
-                  <path d="m8 12 3 3 5-6" />
-                </svg>
-                <span class="validation-copy">
-                  <strong>Volume boundaries checked</strong>
-                  <small>Documents remain intact.</small>
-                </span>
-              </li>
-              <li class="validation-row is-warning">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="m12 3 10 18H2L12 3ZM12 9v5M12 17v1" />
-                </svg>
-                <span class="validation-copy">
-                  <strong>Missing date: Affidavit</strong>
-                  <small>Provide the document date.</small>
-                </span>
-              </li>
-              <li class="validation-row is-warning">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="m12 3 10 18H2L12 3ZM12 9v5M12 17v1" />
-                </svg>
-                <span class="validation-copy">
-                  <strong>Document category not assigned</strong>
-                  <small>Assign the supporting evidence.</small>
-                </span>
-              </li>
-              <li class="validation-row is-warning">
-                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="m12 3 10 18H2L12 3ZM12 9v5M12 17v1" />
-                </svg>
-                <span class="validation-copy">
-                  <strong>Page numbering requires review</strong>
-                  <small>Review ranges after a document change.</small>
-                </span>
-              </li>
-            </ul>
-            <div class="validation-actions">
-              <button type="button" id="validation-date-fix">Add missing date</button>
-              <button type="button" id="validation-category-fix">Assign category</button>
-              <button type="button" id="validation-pagination-fix">Review numbering</button>
-              <button type="button" id="validation-reset">Reset</button>
-            </div>
-            <p class="validation-status" id="validation-status" role="status">Resolve the three findings to see this illustrative review update.</p>
-          </div>
+      <div class="panel inspector" data-enter>
+        <header>
+          <strong>Pre-export bundle validation</strong>
+          <span aria-live="polite">{{ remaining }} {{ remaining === 1 ? 'item' : 'items' }} to inspect</span>
+        </header>
+        <div class="check-row">
+          <CircleCheck />
+          Index generated
+          <small>Page references present</small>
         </div>
-        <figcaption class="figure-meta">
-          <span>Interactive rule-based check illustration.</span>
-        </figcaption>
-      </figure>
+        <div class="check-row">
+          <CircleCheck />
+          Bookmarks hierarchy generated
+          <small>4-tier nested order</small>
+        </div>
+        <div
+          v-for="(finding, i) in findings"
+          :key="finding.title"
+          class="check-row"
+          :class="{ attention: !values[i] }"
+        >
+          <component :is="values[i] ? CircleCheck : CircleAlert" />
+          <span>{{ values[i] ? finding.label + ': ' + values[i] : finding.title }}</span>
+          <button @click="edit(i)">{{ values[i] ? 'Edit' : finding.action }}</button>
+        </div>
+      </div>
+      <DialogRoot
+        :open="editing !== null"
+        @update:open="
+          (open) => {
+            if (!open) editing = null
+          }
+        "
+      >
+        <DialogPortal>
+          <DialogOverlay class="studio-overlay" />
+          <DialogContent v-if="editing !== null" class="studio-dialog">
+            <DialogTitle>{{ findings[editing]?.action }}</DialogTitle>
+            <DialogDescription>Update this finding in the sample bundle.</DialogDescription>
+            <form @submit.prevent="save">
+              <Label for="finding-value">{{ findings[editing]?.label }}</Label>
+              <StudioSelect
+                v-if="editing === 1"
+                id="finding-value"
+                v-model="input"
+                :options="categories"
+                placeholder="Choose a category"
+              />
+              <input
+                v-else
+                id="finding-value"
+                v-model="input"
+                :type="editing === 0 ? 'date' : 'number'"
+                :min="editing === 2 ? 1 : undefined"
+                required
+              />
+              <div class="dialog-actions">
+                <DialogClose class="action secondary" type="button">Cancel</DialogClose>
+                <button class="action primary" :disabled="!input">Save change</button>
+              </div>
+            </form>
+          </DialogContent>
+        </DialogPortal>
+      </DialogRoot>
     </div>
   </section>
 </template>

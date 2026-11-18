@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1794939413240,
+      "tag": "0000_bouncy_juggernaut",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1794940596959,
+      "tag": "0001_eager_luke_cage",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794943683733,
+      "tag": "0002_known_eternity",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1795010198516,
+      "tag": "0003_loose_mastermind",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1795010658075,
+      "tag": "0004_elite_preak",
+      "breakpoints": true
+    }
+  ]
+}

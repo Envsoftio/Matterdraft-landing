@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { getEarlyAccessDestination } from '../lib/early-access-sheets.mjs'
 
 export const PROJECT_ROOT = fileURLToPath(new URL('../', import.meta.url))
 
@@ -57,7 +58,7 @@ export function resolveSiteConfig(env = process.env, facts = defaultFacts) {
   return {
     siteUrl: validateSiteOrigin(env.NUXT_PUBLIC_SITE_URL || facts.defaultOrigin),
     indexable: booleanSetting(env, 'INDEXABLE', true),
-    earlyAccessEnabled: Boolean(env.EARLY_ACCESS_GOOGLE_SHEETS_URL?.trim() && env.EARLY_ACCESS_GOOGLE_SHEETS_SECRET?.trim()),
+    earlyAccessEnabled: Boolean(getEarlyAccessDestination(env)),
     facts,
   }
 }

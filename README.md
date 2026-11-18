@@ -80,11 +80,11 @@ The content generator and Nuxt configuration use the same settings loader. It re
 
 ### Early access with Google Sheets
 
-The on-page form follows the ProctorPlus pattern: browser → Netlify Function → private Google Apps Script webhook → Sheet. The Function validates submissions and checks the script's `{ "success": true }` response before telling the visitor their request was saved. The browser never receives the webhook URL or shared secret. The form stays disabled until both private settings are present **at build time**.
+The on-page form submits to the existing Google Apps Script receiver through `/.netlify/functions/early-access`. A GET checks whether the running server has the webhook URL and shared secret. A POST validates the fields and waits for the receiver to confirm the Sheet write. Only the availability flag and submission result reach the browser.
 
 Follow [the Sheet and Apps Script setup guide](docs/early-access-google-sheets.md) to create the Sheet, deploy the receiver, configure Netlify, and test a real submission. Complete the privacy policy's provider, contact and retention details before opening registration.
 
-This requires a Netlify deployment built from the repository so `netlify/functions/early-access.mjs` is deployed alongside `dist/`. Uploading only `dist/` to a static host or using `npm run preview` will not serve the POST endpoint. Use `netlify dev` to test the whole flow locally.
+`npm run dev`, `npm run preview` (after generation), and Netlify serve the same handler. For local use, put both private settings in `.env`. For deployment, build from the repository so Netlify includes the function.
 
 For a static site, settings are resolved at build time. After changing the domain, indexing setting, content or assets:
 

@@ -18,7 +18,7 @@ MatterDraft uses the same path as ProctorPlus: the on-page form posts to a Netli
 ## Configure Netlify
 
 1. Set `EARLY_ACCESS_GOOGLE_SHEETS_URL` to the `/exec` URL and `EARLY_ACCESS_GOOGLE_SHEETS_SECRET` to the same secret in Netlify environment variables. Give both **Builds** and **Functions** access. Do not prefix either with `NUXT_PUBLIC_`.
-2. Build and deploy from the repository using `npm run generate` and `dist` as the publish directory. Netlify will deploy `netlify/functions/early-access.mjs` as a function too. A manual upload of only `dist/` does not include it.
+2. Deploy from the repository using its `netlify.toml` build settings. Netlify includes `netlify/functions/early-access.mjs` as a function. For local verification, set the same variables in `.env`, run `npm run dev`, and open the landing page. A GET to `/.netlify/functions/early-access` reports whether the server is configured without creating a registration.
 3. Complete and publish the MatterDraft privacy policy with the actual Google provider, processing and retention details.
 4. Submit a test entry on the deployed site. Confirm the success message appears and a matching row is added to **Early Access**. If submission fails, check Netlify Function logs and **Apps Script → Executions**. Remove the test row if appropriate.
 

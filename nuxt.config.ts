@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 import { loadSiteConfig } from './scripts/site-config.mjs'
 
@@ -8,7 +9,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   telemetry: false,
   ssr: true,
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/portal.css'],
   vite: { plugins: [tailwindcss()] },
   typescript: { strict: true, typeCheck: false },
   sourcemap: { server: false, client: false },
@@ -43,11 +44,18 @@ export default defineNuxtConfig({
   features: { inlineStyles: false },
   experimental: { payloadExtraction: true },
   prerender: {
-    crawlLinks: true,
+    crawlLinks: false,
     routes: ['/', '/privacy', '/terms', '/refund-policy'],
   },
   nitro: { prerender: { failOnError: true, concurrency: 4 } },
+  serverHandlers: [
+    { route: '/.netlify/functions/early-access', handler: fileURLToPath(new URL('./server/handlers/early-access.ts', import.meta.url)) },
+  ],
   routeRules: {
+    '/api/**': { headers: { 'Cache-Control': 'private, no-store' } },
+    '/a/**': { headers: { 'Cache-Control': 'private, no-store' } },
+    '/internal/**': { headers: { 'Cache-Control': 'private, no-store' } },
+    '/portal/**': { headers: { 'Cache-Control': 'private, no-store' } },
     '/**': { headers: {
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',

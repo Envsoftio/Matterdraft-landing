@@ -14,23 +14,15 @@
     document.querySelectorAll('.theme-toggle').forEach(function (button) {
       var label = dark ? 'Switch to light mode' : 'Switch to dark mode'
       if (button.getAttribute('aria-label') !== label) button.setAttribute('aria-label', label)
-      if (button.getAttribute('aria-pressed') !== String(dark)) button.setAttribute('aria-pressed', String(dark))
+      if (button.getAttribute('title') !== label) button.setAttribute('title', label)
     })
   }
-
-  document.addEventListener('click', function (event) {
-    var button = event.target.closest && event.target.closest('.theme-toggle')
-    if (!button) return
-    var theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
-    document.documentElement.dataset.theme = theme
-    try { localStorage.setItem(storageKey, theme) } catch (_) { /* Storage may be disabled. */ }
-    syncButtons()
-  })
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', syncButtons, { once: true })
   } else {
     syncButtons()
   }
+  new MutationObserver(syncButtons).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
   new MutationObserver(syncButtons).observe(document.documentElement, { childList: true, subtree: true })
 })()
