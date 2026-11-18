@@ -102,11 +102,7 @@ const sampleText: Record<string, string> = {
         <i />
         Desktop document preparation · For advocates &amp; chambers
       </p>
-      <h1 id="hero-title">
-        From case documents
-        <br />
-        to organised bundles.
-      </h1>
+      <h1 id="hero-title">From case documents to organised bundles.</h1>
       <p class="hero-description">
         Prepare case files in one desktop workspace: edit and OCR PDFs, generate documents from templates,
         collate evidence, and export indexed, paginated and bookmarked legal bundles.
