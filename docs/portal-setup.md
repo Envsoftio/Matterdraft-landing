@@ -7,11 +7,15 @@ The customer account area supports verified sign-in, personal and organisation a
 ## Local setup
 
 1. Use Node from `package.json`, install with `npm ci`, and set the variables in `.env.example` in local `.env`. Keep `.env` out of Git.
-2. Apply every unapplied migration (`0000` through `0004`) with `npm run db:migrate` against the intended database. Earlier work recorded only the initial migration on hosted Turso; this verification did not inspect or change hosted migration state.
+2. Apply every unapplied migration with `npm run db:migrate` against the intended database.
 3. Run `npm run dev` and open `http://localhost:3000/sign-up`.
 4. Local account emails are saved as JSON in `.data/mail-preview/`. Open the verification URL from the latest preview. Configure `SMTP_HOST`, `SMTP_FROM`, and any needed SMTP credentials before production use; local preview files are not a delivery mechanism.
 5. Sign in and verify the account email. Grant the initial super-admin capability with `npm run staff:grant-access -- user@example.com "Initial administrator bootstrap"`. This command changes the configured database and records an audit event; check its target before running it. Staff API routes check the active staff role on every request.
 6. A super admin can register the first-party desktop OAuth client from the internal overview. Copy its public client ID and exact redirect URI into the desktop application configuration.
+
+## Super Admin Dashboard
+
+The dashboard at `/internal/overview` shows solo and firm account activity, tickets needing a response, and the service checks. Apply `0005_service_failure_counts.sql` before deploying it. Failure counts include API responses observed by Nitro when Turso is reachable. Use production monitoring for hosting outages and database downtime.
 
 ## Desktop authorization contract
 

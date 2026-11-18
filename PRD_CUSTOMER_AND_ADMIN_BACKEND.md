@@ -6,9 +6,11 @@
 
 ## 1. Product boundary
 
-The web application has four purposes: user login, subscription management, device licensing, and support tickets. Account membership, staff access, audit events, transactional messages, and safe error handling exist only to make those four purposes work securely. The desktop application owns document preparation and local matter files; the web application must not receive matter or document content.
+The customer portal provides user login, subscription management, device licensing, and support tickets. The desktop application owns document preparation and local matter files. Customer matter and document content stays in the desktop application.
 
-Do not add product usage reporting, analytics dashboards, a notification inbox, marketing campaigns, bulk communications, product issue or incident management, release management, general CRM features, or cloud document features to this application. Operational logs and the minimum licence data needed for entitlement checks are permitted; neither is a product usage reporting feature.
+The Super Admin Dashboard shows account creation, membership changes, support activity, and service health across solo advocate and law firm accounts. Service health uses on-demand database and desktop registration checks and hourly counts of API failures the application can record.
+
+The application excludes desktop usage tracking, a notification inbox, marketing campaigns, bulk communications, product incident management, release management, general CRM features, and cloud document features.
 
 The current architecture is Nuxt/Nitro, Better Auth, Turso and Netlify. Customer and staff experiences have separate, server-enforced permissions. A verified individual account and active staff role are required for staff access; MFA is not a current requirement.
 

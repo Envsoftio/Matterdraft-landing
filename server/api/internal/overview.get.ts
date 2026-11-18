@@ -1,25 +1,24 @@
-import { applicationRoute } from '../../utils/application-error'
+import { applicationFailure, applicationRoute } from '../../utils/application-error'
 import { client } from '../../../lib/db'
 import { requireStaff } from '../../utils/customer-account'
+import {
+  auditActivityRead,
+  businessOperations,
+  customerIssues,
+} from '../../utils/customer-activity'
+import { recentServiceFailures } from '../../utils/service-failure'
 
 export default applicationRoute('/api/internal/overview', async (event) => {
-  await requireStaff(event, 'super_admin')
-  const [users, accounts, organisations, staff] = await Promise.all([
-    client.execute(`SELECT COUNT(*) AS count FROM user
-      WHERE NOT EXISTS (SELECT 1 FROM staff_access WHERE user_id = user.id)`),
-    client.execute(`SELECT COUNT(*) AS count FROM customer_account
-      WHERE NOT EXISTS (SELECT 1 FROM staff_access WHERE user_id = personal_owner_user_id)`),
-    client.execute(
-      "SELECT COUNT(*) AS count FROM customer_account WHERE account_type = 'organisation'",
-    ),
-    client.execute('SELECT COUNT(*) AS count FROM staff_access WHERE active = 1'),
+  const actor = await requireStaff(event, 'super_admin')
+  const days = getQuery(event).days ?? '7'
+  if (days !== '7' && days !== '30') applicationFailure(422)
+  setHeader(event, 'Cache-Control', 'private, no-store')
+  const now = Date.now()
+  const [counts, issues, failures] = await Promise.all([
+    businessOperations(client, now - Number(days) * 86_400_000),
+    customerIssues(client),
+    recentServiceFailures(client, now),
   ])
-  return {
-    counts: {
-      users: Number(users.rows[0]?.count || 0),
-      accounts: Number(accounts.rows[0]?.count || 0),
-      organisations: Number(organisations.rows[0]?.count || 0),
-      staff: Number(staff.rows[0]?.count || 0),
-    },
-  }
+  await auditActivityRead(client, actor.id)
+  return { counts, issues, failures, checkedAt: now }
 })

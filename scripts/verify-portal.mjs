@@ -452,6 +452,8 @@ try {
 
   const internalPaths = [
     '/api/internal/overview',
+    '/api/internal/account-activity',
+    `/api/internal/account-activity/${accountId}`,
     '/api/internal/customers',
     '/api/internal/organisations',
     '/api/internal/tickets',
@@ -860,6 +862,7 @@ try {
     'Signout failure retains visible session state; real organisation rate limit returns safe 429',
   )
 
+  const previousFailures = (await api(staff, '/api/internal/overview')).failures
   await db.execute('ALTER TABLE support_message RENAME TO support_message_verification_unavailable')
   try {
     await api(owner, `${tickets}/${ticketId}`, 'GET', undefined, 503)
@@ -888,6 +891,42 @@ try {
   }
   note(
     'Real database-query failure returns redacted 503; matching request IDs; no ticket text, credentials, invitation/auth tokens, SQL or hydration warnings in captured logs',
+  )
+
+  await api(staff, `/api/internal/tickets/${ticketId}/status`, 'PATCH', { status: 'open' })
+  const dashboard = await api(staff, '/api/internal/overview?days=30')
+  assert.ok(dashboard.counts.personal > 0 && dashboard.counts.organisations > 0)
+  assert.ok(dashboard.counts.activeAccounts > 0)
+  assert.ok(dashboard.counts.needsSupport > 0)
+  assert.ok(dashboard.issues.some((issue) => issue.id === ticketId))
+  assert.equal(dashboard.failures.failures, previousFailures.failures + 1)
+  assert.equal(dashboard.failures.unavailable, previousFailures.unavailable + 1)
+  await api(staff, '/api/internal/overview?days=5', 'GET', undefined, 422)
+  const filteredAccounts = await api(
+    staff,
+    `/api/internal/account-activity?type=personal&search=${solo.email}`,
+  )
+  assert.equal(filteredAccounts.accounts.length, 1)
+  assert.equal(filteredAccounts.accounts[0].accountType, 'personal')
+  const activity = await api(staff, `/api/internal/account-activity/${accountId}`)
+  assert.equal(activity.account.accountType, 'organisation')
+  assert.ok(activity.events.some((event) => event.ticketId === ticketId))
+  assert.ok(!JSON.stringify(activity).includes(marker), 'Activity excludes ticket message bodies')
+  await api(staff, `/api/internal/account-activity/${staff.accounts[0].id}`, 'GET', undefined, 404)
+  await screen(staff, '/internal/overview', 'super-admin-dashboard', 1280)
+  await staff.page.getByRole('heading', { name: 'Super Admin Dashboard' }).waitFor()
+  await staff.page.getByLabel('Activity period').selectOption('30')
+  await staff.page.getByRole('heading', { name: 'System health' }).waitFor()
+  await screen(staff, '/internal/overview', 'super-admin-dashboard')
+  await staff.page.getByLabel('Account type', { exact: true }).selectOption('organisation')
+  await staff.page.getByRole('searchbox').fill(`Verification ${run}`)
+  await staff.page.getByRole('button', { name: 'Search', exact: true }).click()
+  await staff.page.getByRole('link', { name: `Verification ${run}`, exact: true }).click()
+  await staff.page.waitForURL(`**/internal/activity/${accountId}`)
+  await staff.page.getByRole('heading', { name: 'Activity timeline' }).waitFor()
+  await screen(staff, `/internal/activity/${accountId}`, 'super-admin-account-activity')
+  note(
+    'Super Admin dashboard shows scoped customer activity, support queue and recorded API failures',
   )
 
   await screen(owner, `/a/${accountId}/members`, 'members')

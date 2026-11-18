@@ -1,15 +1,45 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
+
 definePageMeta({ layout: 'portal' })
-usePrivatePageSeo('Administration', 'View the MatterDraft staff administration overview.')
-const { data, error, refresh } = await useFetch('/api/internal/overview')
-const { data: desktop, refresh: refreshDesktop } = await useFetch('/api/internal/desktop-client')
-const countLabels: Record<string, string> = {
-  users: 'Customer users',
-  accounts: 'Customer accounts',
-  organisations: 'Organisations',
-  staff: 'Staff members',
+usePrivatePageSeo('Super Admin Dashboard', 'Oversee MatterDraft customers and service health.')
+
+const route = useRoute()
+const search = computed(() => (typeof route.query.search === 'string' ? route.query.search : ''))
+const type = computed(() =>
+  route.query.type === 'personal' || route.query.type === 'organisation' ? route.query.type : '',
+)
+const page = computed(() => Math.max(1, Math.trunc(Number(route.query.page || 1)) || 1))
+const searchInput = ref(search.value)
+const typeInput = ref(type.value)
+watch([search, type], () => {
+  searchInput.value = search.value
+  typeInput.value = type.value
+})
+
+const days = ref('7')
+const [
+  { data, error, pending, refresh },
+  { data: activity, error: activityError, pending: loadingActivity, refresh: refreshActivity },
+  { data: desktop, error: desktopError, refresh: refreshDesktop },
+] = await Promise.all([
+  useFetch('/api/internal/overview', { query: { days } }),
+  useFetch('/api/internal/account-activity', { query: { search, type, page } }),
+  useFetch('/api/internal/desktop-client'),
+])
+
+function filterActivity(next = 1) {
+  return navigateTo({
+    path: '/internal/overview',
+    query: {
+      search: searchInput.value.trim() || undefined,
+      type: typeInput.value || undefined,
+      page: next > 1 ? String(next) : undefined,
+    },
+    hash: '#account-activity',
+  })
 }
+
 const registering = ref(false)
 const registerError = ref('')
 async function registerDesktop() {
@@ -18,68 +48,269 @@ async function registerDesktop() {
   try {
     await $fetch('/api/internal/desktop-client', { method: 'POST' })
     await refreshDesktop()
-  } catch {
-    registerError.value = 'Could not register the desktop app. Sign in again and retry.'
+  } catch (cause) {
+    registerError.value = parseApiError(cause).text
   } finally {
     registering.value = false
   }
 }
+
+async function refreshDashboard() {
+  await Promise.all([refresh(), refreshActivity(), refreshDesktop()])
+}
 </script>
+
 <template>
   <div class="portal-content">
-    <template v-if="data">
-      <p class="portal-eyebrow">Internal administration</p>
-      <h1 class="portal-page-title">Customer administration</h1>
-      <div class="portal-counts">
-        <div v-for="(value, label) in data.counts" :key="label">
-          <p class="text-sm text-studio-muted">{{ countLabels[String(label)] || label }}</p>
-          <p class="mt-2 font-heading text-3xl font-semibold tabular-nums">{{ value }}</p>
-        </div>
+    <header class="flex flex-wrap items-end justify-between gap-4">
+      <h1 class="portal-page-title">Super Admin Dashboard</h1>
+      <div class="flex flex-wrap items-center gap-4">
+        <a v-if="data && !error" class="portal-link text-sm" href="#account-activity"
+          >Browse accounts</a
+        >
+        <button
+          class="portal-button-secondary"
+          :disabled="pending || loadingActivity"
+          @click="refreshDashboard()"
+        >
+          Refresh dashboard
+        </button>
       </div>
-      <div class="mt-11 grid gap-10 lg:grid-cols-[1.3fr_1fr]">
-        <section class="portal-detail">
-          <h2 class="font-heading text-lg font-semibold">Staff access</h2>
-          <p class="mt-3 text-sm leading-6 text-studio-muted">
-            Staff sign in with their own verified account. Customer matters are not shown here.
-          </p>
-        </section>
-        <aside v-if="desktop" class="portal-detail">
-          <h2 class="font-heading text-lg font-semibold">Desktop app connection</h2>
-          <p class="mt-2 text-sm text-studio-muted">
-            Register the desktop app to let customers sign in from it.
-          </p>
-          <dl class="mt-5 space-y-3 break-all text-xs">
+    </header>
+
+    <div v-if="error" role="alert" class="portal-error mt-8">
+      {{
+        error.statusCode === 403
+          ? 'Your account does not have super-admin access.'
+          : parseApiError(error).text
+      }}
+    </div>
+    <template v-else-if="data">
+      <section aria-labelledby="customer-metrics" class="mt-8">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 id="customer-metrics" class="font-heading text-xl font-semibold">
+            Customer activity
+          </h2>
+          <label class="flex items-center gap-3 text-sm">
+            Activity period
+            <select v-model="days" class="portal-input w-auto!">
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+            </select>
+          </label>
+        </div>
+        <dl class="portal-counts mt-0!" :aria-busy="pending">
+          <div class="flex flex-col justify-between">
+            <dt class="text-sm text-studio-muted">Total solo accounts</dt>
+            <dd class="mt-2 font-heading text-3xl font-semibold tabular-nums">
+              {{ data.counts.personal }}
+            </dd>
+          </div>
+          <div class="flex flex-col justify-between">
+            <dt class="text-sm text-studio-muted">Total law firms</dt>
+            <dd class="mt-2 font-heading text-3xl font-semibold tabular-nums">
+              {{ data.counts.organisations }}
+            </dd>
+          </div>
+          <div class="flex flex-col justify-between">
+            <dt class="text-sm text-studio-muted">Accounts with activity</dt>
+            <dd class="mt-2 font-heading text-3xl font-semibold tabular-nums">
+              {{ pending ? '…' : data.counts.activeAccounts }}
+            </dd>
+          </div>
+          <div class="flex flex-col justify-between">
+            <dt class="text-sm text-studio-muted">Tickets opened</dt>
+            <dd class="mt-2 font-heading text-3xl font-semibold tabular-nums">
+              {{ pending ? '…' : data.counts.newTickets }}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <div class="mt-9 grid items-start gap-5 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <section class="portal-detail" aria-labelledby="support-queue">
+          <header class="flex flex-wrap items-start justify-between gap-2">
             <div>
-              <dt class="text-studio-muted">Return address</dt>
-              <dd class="mt-1 font-medium">{{ desktop.redirectUri }}</dd>
+              <h2 id="support-queue" class="font-heading text-xl font-semibold">Needs support</h2>
+              <p class="mt-1 text-sm text-studio-muted">
+                {{ data.counts.needsSupport }} awaiting a response or open
+              </p>
             </div>
-            <div v-if="desktop.clientId">
-              <dt class="text-studio-muted">Client ID</dt>
-              <dd class="mt-1 font-medium">{{ desktop.clientId }}</dd>
+            <NuxtLink class="portal-link text-sm" to="/internal/tickets"
+              >All support tickets</NuxtLink
+            >
+          </header>
+          <p v-if="!data.issues.length" class="mt-5 text-sm text-studio-muted">
+            No tickets need a response.
+          </p>
+          <ul v-else class="mt-4 divide-y divide-studio-rule border-t border-studio-rule">
+            <li v-for="issue in data.issues" :key="issue.id" class="py-3 last:pb-0">
+              <NuxtLink
+                class="portal-link break-words font-semibold"
+                :to="`/internal/tickets/${issue.id}`"
+              >
+                {{ issue.subject }}
+              </NuxtLink>
+              <p class="mt-1 break-words text-sm text-studio-muted">
+                {{ issue.customerName }} · {{ issue.accountName }} · {{ issue.category }} ·
+                <NuxtTime :datetime="issue.updatedAt" date-style="medium" />
+              </p>
+            </li>
+          </ul>
+        </section>
+
+        <section class="portal-detail" aria-labelledby="system-health">
+          <h2 id="system-health" class="font-heading text-xl font-semibold">System health</h2>
+          <dl class="mt-4 space-y-3 text-sm">
+            <div class="flex items-baseline justify-between gap-3">
+              <dt>Database check</dt>
+              <dd class="font-semibold">Passed</dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt>Desktop sign-in registration</dt>
+              <dd class="text-right font-semibold">
+                <span v-if="desktopError">Check unavailable</span>
+                <span v-else-if="desktop?.clientId">Registered</span>
+                <a v-else-if="desktop" class="portal-link" href="#desktop-connection"
+                  >Setup needed</a
+                >
+                <span v-else>Checking…</span>
+              </dd>
+            </div>
+            <div class="flex items-baseline justify-between gap-3">
+              <dt>Recorded API failures · 24 hours</dt>
+              <dd class="font-semibold tabular-nums">{{ data.failures.failures }}</dd>
+            </div>
+            <div v-if="data.failures.unavailable" class="flex items-baseline justify-between gap-3">
+              <dt>Service unavailable responses</dt>
+              <dd class="font-semibold tabular-nums">{{ data.failures.unavailable }}</dd>
             </div>
           </dl>
-          <button
-            v-if="!desktop.clientId"
-            class="portal-button mt-5"
-            :disabled="registering"
-            @click="registerDesktop"
+          <p
+            class="mt-4 border-t border-studio-rule pt-3 text-xs leading-relaxed text-studio-muted"
           >
-            {{ registering ? 'Registering…' : 'Register desktop app' }}
-          </button>
-          <p v-if="registerError" role="alert" class="portal-error mt-4">{{ registerError }}</p>
-        </aside>
+            Checked <NuxtTime :datetime="data.checkedAt" date-style="medium" time-style="short" />.
+            Failure counts cover API responses recorded while the database is reachable.
+          </p>
+        </section>
       </div>
+
+      <section id="account-activity" aria-labelledby="accounts-heading" class="mt-10 scroll-mt-24">
+        <h2 id="accounts-heading" class="font-heading text-xl font-semibold">Account activity</h2>
+        <p class="mt-1 text-sm text-studio-muted">
+          Account creation, membership changes and customer support messages.
+        </p>
+        <form class="mt-4 flex flex-col gap-3 sm:flex-row" @submit.prevent="filterActivity()">
+          <label class="sr-only" for="activity-search"
+            >Search by account name or solo owner's email</label
+          >
+          <input
+            id="activity-search"
+            v-model="searchInput"
+            class="portal-input min-w-0 sm:max-w-sm"
+            type="search"
+            maxlength="100"
+            placeholder="Account name or solo email"
+          />
+          <label class="sr-only" for="activity-type">Account type</label>
+          <select id="activity-type" v-model="typeInput" class="portal-input sm:w-auto!">
+            <option value="">All account types</option>
+            <option value="organisation">Law firms</option>
+            <option value="personal">Solo advocates</option>
+          </select>
+          <button class="portal-button-secondary">Search</button>
+        </form>
+
+        <div v-if="activityError" role="alert" class="mt-4">
+          <p class="portal-error">{{ parseApiError(activityError).text }}</p>
+          <button class="portal-button-secondary mt-3" @click="refreshActivity()">Try again</button>
+        </div>
+        <p v-else-if="loadingActivity" role="status" class="mt-4 text-sm text-studio-muted">
+          Loading account activity…
+        </p>
+        <p v-else-if="!activity?.accounts.length" class="mt-4 text-sm text-studio-muted">
+          {{ search || type ? 'No accounts match this search.' : 'No customer accounts yet.' }}
+        </p>
+        <ul v-else class="mt-5 divide-y divide-studio-rule border-y border-studio-rule">
+          <li
+            v-for="account in activity.accounts"
+            :key="account.id"
+            class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3.5"
+          >
+            <div class="min-w-0">
+              <NuxtLink
+                class="portal-link break-words font-semibold"
+                :to="`/internal/activity/${account.id}`"
+              >
+                {{ account.name }}
+              </NuxtLink>
+              <p class="mt-0.5 text-sm text-studio-muted">
+                {{ account.accountType === 'personal' ? 'Solo advocate' : 'Law firm' }}
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm text-studio-muted">
+              <span v-if="account.needsSupport" class="font-semibold text-studio-heading"
+                >{{ account.needsSupport }} need support</span
+              >
+              <span
+                >Last activity <NuxtTime :datetime="account.lastActivityAt" date-style="medium"
+              /></span>
+            </div>
+          </li>
+        </ul>
+        <nav
+          v-if="activity && (page > 1 || activity.hasMore)"
+          aria-label="Account pages"
+          class="mt-5 flex items-center gap-3"
+        >
+          <button
+            class="portal-button-secondary"
+            :disabled="page === 1 || loadingActivity"
+            @click="filterActivity(page - 1)"
+          >
+            Previous
+          </button>
+          <span>Page {{ page }}</span>
+          <button
+            class="portal-button-secondary"
+            :disabled="!activity.hasMore || loadingActivity"
+            @click="filterActivity(page + 1)"
+          >
+            Next
+          </button>
+        </nav>
+      </section>
+
+      <details
+        v-if="desktop"
+        id="desktop-connection"
+        class="portal-detail mt-10 max-w-2xl scroll-mt-24"
+        :open="!desktop.clientId"
+      >
+        <summary class="cursor-pointer font-heading font-semibold">Desktop app connection</summary>
+        <dl class="mt-4 space-y-3 break-all text-sm">
+          <div>
+            <dt class="text-studio-muted">Return address</dt>
+            <dd class="mt-1 font-medium">{{ desktop.redirectUri }}</dd>
+          </div>
+          <div v-if="desktop.clientId">
+            <dt class="text-studio-muted">Client ID</dt>
+            <dd class="mt-1 font-medium">{{ desktop.clientId }}</dd>
+          </div>
+        </dl>
+        <button
+          v-if="!desktop.clientId"
+          class="portal-button mt-4"
+          :disabled="registering"
+          @click="registerDesktop"
+        >
+          {{ registering ? 'Registering…' : 'Register desktop app' }}
+        </button>
+        <p v-if="registerError" role="alert" class="portal-error mt-4">{{ registerError }}</p>
+      </details>
     </template>
-    <div v-else role="alert">
-      <h1 class="portal-page-title">Administration unavailable</h1>
-      <p class="mt-3 text-studio-muted">
-        {{
-          error?.statusCode === 403
-            ? 'Your account does not have staff access.'
-            : parseApiError(error).text
-        }}
-      </p>
-      <button class="portal-button mt-6" @click="refresh()">Try again</button>
-    </div>
+    <p v-else-if="pending" role="status" class="mt-8 text-sm text-studio-muted">
+      Loading dashboard…
+    </p>
   </div>
 </template>

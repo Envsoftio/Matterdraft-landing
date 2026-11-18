@@ -127,3 +127,13 @@ export const supportMessage = sqliteTable(
   },
   (table) => [index('support_message_ticket_idx').on(table.ticketId, table.createdAt)],
 )
+
+export const serviceFailureCount = sqliteTable(
+  'service_failure_count',
+  {
+    hourStartedAt: integer('hour_started_at').notNull(),
+    statusCode: integer('status_code').notNull(),
+    requestCount: integer('request_count').notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.hourStartedAt, table.statusCode] })],
+)

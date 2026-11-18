@@ -152,10 +152,12 @@ async function signOut() {
               v-if="isInternal"
               class="mx-2 mb-7 rounded-md bg-studio-chip px-3 py-3 text-xs leading-5 text-studio-heading"
             >
-              <strong class="block text-sm">Internal administration</strong>
-              <span v-if="context?.staffRole"
-                >Staff access · {{ context.staffRole.replace('_', ' ') }}</span
-              >
+              <strong class="block text-sm">MatterDraft administration</strong>
+              <span v-if="context?.staffRole">{{
+                context.staffRole === 'super_admin'
+                  ? 'Super Admin'
+                  : context.staffRole.replaceAll('_', ' ')
+              }}</span>
             </div>
             <div
               v-else-if="currentAccount"
@@ -183,7 +185,7 @@ async function signOut() {
                   ? 'portal-nav-active'
                   : ''
               "
-              ><LayoutDashboard :size="18" />Overview</NuxtLink
+              ><LayoutDashboard :size="18" />{{ isInternal ? 'Dashboard' : 'Overview' }}</NuxtLink
             >
             <NuxtLink
               v-if="
@@ -269,7 +271,7 @@ async function signOut() {
               <p class="truncate text-xs font-medium uppercase tracking-wider text-studio-muted">
                 {{
                   isInternal
-                    ? 'Internal administration'
+                    ? 'MatterDraft'
                     : currentAccount?.accountType === 'personal'
                       ? 'Personal account'
                       : currentAccount
@@ -278,7 +280,7 @@ async function signOut() {
                 }}
               </p>
               <p class="truncate font-heading text-base font-semibold text-studio-heading">
-                {{ isInternal ? 'Administration' : currentAccount?.name || 'Your accounts' }}
+                {{ isInternal ? 'Super Admin' : currentAccount?.name || 'Your accounts' }}
               </p>
             </div>
           </div>
