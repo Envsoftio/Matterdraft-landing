@@ -3,7 +3,7 @@ import { FormRoot } from 'reka-ui'
 import { authClient } from '~~/lib/auth-client'
 
 definePageMeta({ layout: false })
-useHead({ title: 'Sign in · MatterDraft Studio' })
+usePrivatePageSeo('Sign in', 'Sign in to your MatterDraft Studio account.')
 const route = useRoute()
 const email = ref('')
 const password = ref('')

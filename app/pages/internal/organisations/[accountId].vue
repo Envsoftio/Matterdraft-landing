@@ -2,7 +2,7 @@
 import { parseApiError } from '~/utils/api-error'
 
 definePageMeta({ layout: 'portal' })
-useHead({ title: 'Organisation details · MatterDraft Studio' })
+usePrivatePageSeo('Organisation details', 'Review an organisation and its members in the staff workspace.')
 
 type Detail = {
   organisation: { id: string; name: string; createdAt: number }

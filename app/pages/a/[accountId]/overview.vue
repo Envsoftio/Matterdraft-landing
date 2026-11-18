@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
 definePageMeta({ layout: 'portal' })
-useHead({ title: 'Account overview · MatterDraft Studio' })
+usePrivatePageSeo('Account overview', 'View your MatterDraft account details and membership.')
 const route = useRoute()
 const accountId = computed(() => String(route.params.accountId))
 const { data, error, refresh } = await useFetch(() => `/api/accounts/${accountId.value}/overview`, { watch: [accountId] })

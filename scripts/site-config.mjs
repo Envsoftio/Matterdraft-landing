@@ -55,9 +55,10 @@ function booleanSetting(env, name, fallback) {
 }
 
 export function resolveSiteConfig(env = process.env, facts = defaultFacts) {
+  const isPreview = ['deploy-preview', 'branch-deploy'].includes(env.CONTEXT)
   return {
     siteUrl: validateSiteOrigin(env.NUXT_PUBLIC_SITE_URL || facts.defaultOrigin),
-    indexable: booleanSetting(env, 'INDEXABLE', true),
+    indexable: booleanSetting(env, 'INDEXABLE', !isPreview),
     earlyAccessEnabled: Boolean(getEarlyAccessDestination(env)),
     facts,
   }

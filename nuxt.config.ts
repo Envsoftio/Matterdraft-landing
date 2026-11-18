@@ -1,8 +1,10 @@
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
+import { discoveryHeaders, NO_INDEX } from './scripts/discovery.mjs'
 import { loadSiteConfig } from './scripts/site-config.mjs'
 
 const settings = loadSiteConfig()
+const seoHeaders = discoveryHeaders(settings)
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-10-30',
@@ -22,10 +24,12 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      htmlAttrs: { lang: 'en-IN' },
+      title: settings.facts.name,
+      htmlAttrs: { lang: settings.facts.language },
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
       meta: [
+        { name: 'robots', content: NO_INDEX },
         { name: 'theme-color', content: '#071b37' },
         { name: 'color-scheme', content: 'light dark' },
         { name: 'format-detection', content: 'telephone=no' },
@@ -45,23 +49,20 @@ export default defineNuxtConfig({
   experimental: { payloadExtraction: true },
   prerender: {
     crawlLinks: false,
-    routes: ['/', '/privacy', '/terms', '/refund-policy'],
+    routes: [settings.facts.homepage.path, ...settings.facts.legalDocuments.map(({ slug }: { slug: string }) => `/${slug}`)],
   },
   nitro: { prerender: { failOnError: true, concurrency: 4 } },
   serverHandlers: [
     { route: '/.netlify/functions/early-access', handler: fileURLToPath(new URL('./server/handlers/early-access.ts', import.meta.url)) },
   ],
   routeRules: {
-    '/api/**': { headers: { 'Cache-Control': 'private, no-store' } },
-    '/a/**': { headers: { 'Cache-Control': 'private, no-store' } },
-    '/internal/**': { headers: { 'Cache-Control': 'private, no-store' } },
-    '/portal/**': { headers: { 'Cache-Control': 'private, no-store' } },
+    ...Object.fromEntries(Object.entries(seoHeaders).map(([path, headers]) => [path, { headers }])),
     '/**': { headers: {
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-      'Link': '</llms.txt>; rel="describedby"',
+      ...seoHeaders['/**'],
     } },
     '/_nuxt/**': { headers: { 'Cache-Control': 'public, max-age=31536000, immutable' } },
     '/_nuxt/builds/latest.json': { headers: { 'Cache-Control': 'no-cache' } },

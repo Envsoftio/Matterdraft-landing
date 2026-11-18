@@ -3,7 +3,7 @@ import { FormRoot } from 'reka-ui'
 import { authClient } from '~~/lib/auth-client'
 
 definePageMeta({ layout: false })
-useHead({ title: 'Verify email · MatterDraft Studio' })
+usePrivatePageSeo('Verify email', 'Verify the email address on your MatterDraft Studio account.')
 const email = ref(String(useRoute().query.email || ''))
 const busy = ref(false)
 const message = ref('')

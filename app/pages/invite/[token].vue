@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
 definePageMeta({ layout: 'portal' })
+usePrivatePageSeo('Organisation invitation', 'Review an invitation to join a MatterDraft organisation or accept ownership.')
 const route = useRoute(); const token = String(route.params.token)
 const { data, error, refresh } = await useFetch<{ accountName: string; accountId: string; inviteeEmail: string; invitedRole: string; invitationType: string; invitationStatus: string; expiresAt: number }>(`/api/membership/invitations/${token}`)
 const busy = ref(false); const issue = ref(''); const accepted = ref(false); const uncertain = ref(false)

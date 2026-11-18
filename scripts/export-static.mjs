@@ -3,10 +3,12 @@ import { createHash } from 'node:crypto'
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 import { dirname, extname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { discoveryHeaders } from './discovery.mjs'
 import { loadSiteConfig } from './site-config.mjs'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const settings = loadSiteConfig({ projectRoot: root })
+const seoHeaders = discoveryHeaders(settings)
 const destination = join(root, 'dist')
 await rm(destination, { recursive: true, force: true })
 await cp(join(root, '.output/public'), destination, { recursive: true })
@@ -55,7 +57,7 @@ const commonHeaders = {
   'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-  Link: '</llms.txt>; rel="describedby"',
+  ...seoHeaders['/**'],
 }
 const headerLines = ['/*', ...Object.entries(commonHeaders).map(([name,value]) => `  ${name}: ${value}`),
   '', '/_nuxt/*', '  Cache-Control: public, max-age=31536000, immutable',
@@ -63,14 +65,14 @@ const headerLines = ['/*', ...Object.entries(commonHeaders).map(([name,value]) =
   '', '/fonts/*', '  Cache-Control: public, max-age=86400, stale-while-revalidate=604800',
   '', '/brand/*', '  Cache-Control: public, max-age=86400',
   '', '/og/*', '  Cache-Control: public, max-age=86400',
-  '', '/', '  Link: </index.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"',
-  '', '/404.html', '  X-Robots-Tag: noindex, follow',
 ]
-for (const route of ['/privacy', '/terms', '/refund-policy']) headerLines.push('', route, '  X-Robots-Tag: noindex, follow')
-if (!settings.indexable) headerLines.push('', '/*', '  X-Robots-Tag: noindex, nofollow')
+for (const [route, headers] of Object.entries(seoHeaders)) {
+  if (route === '/**') continue
+  headerLines.push('', route.replace('/**', '/*'), ...Object.entries(headers).map(([name, value]) => `  ${name}: ${value}`))
+}
 await writeFile(join(destination, '_headers'), `${headerLines.join('\n')}\n`)
 await mkdir(join(root, 'deploy'), { recursive: true })
-await writeFile(join(root, 'deploy/headers.json'), `${JSON.stringify({ commonHeaders, indexable: settings.indexable }, null, 2)}\n`)
+await writeFile(join(root, 'deploy/headers.json'), `${JSON.stringify({ commonHeaders, discoveryHeaders: seoHeaders }, null, 2)}\n`)
 // Static compression is included for hosts that can negotiate these sidecars.
 // Netlify can also compress the original files itself.
 let compressed = 0

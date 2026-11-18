@@ -1,10 +1,11 @@
 import { createServer } from 'node:http'
 import { existsSync } from 'node:fs'
 import { readFile, stat } from 'node:fs/promises'
-import { dirname, extname, join, resolve, sep } from 'node:path'
+import { dirname, extname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 import { cacheControlForStaticResponse, negotiateEncoding } from './static-response.mjs'
+import { NO_INDEX } from './discovery.mjs'
 import earlyAccess from '../lib/early-access-sheets.mjs'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
@@ -47,13 +48,19 @@ createServer(async (request, response) => {
     if (!await exists(file)) file = join(candidate, 'index.html')
     let status = 200
     if (!await exists(file)) { file = join(directory, '404.html'); status = 404 }
-    const headers = { ...deployment.commonHeaders, 'Content-Type': mime[extname(file)] || 'application/octet-stream', Vary:'Accept-Encoding' }
+    const route = '/' + relative(directory, file).split(sep).join('/').replace(/(?:^|\/)index\.html$/, '')
+    const headers = {
+      ...deployment.commonHeaders,
+      'Content-Type': mime[extname(file)] || 'application/octet-stream',
+      ...deployment.discoveryHeaders?.[route],
+      Vary: 'Accept-Encoding',
+    }
     headers['Cache-Control'] = cacheControlForStaticResponse(pathname, status)
-    if (!deployment.indexable || status===404 || ['/privacy','/terms','/refund-policy'].includes(pathname.replace(/\/$/,''))) headers['X-Robots-Tag'] = 'noindex, follow'
+    if (status === 404) headers['X-Robots-Tag'] = NO_INDEX
     const [br, gzip] = await Promise.all([exists(`${file}.br`), exists(`${file}.gz`)])
     const encoding = negotiateEncoding(request.headers['accept-encoding'], { br, gzip })
     if (encoding === null) {
-      response.writeHead(406, { ...headers, 'Content-Type': 'text/plain; charset=utf-8', 'Content-Length': '0', 'Cache-Control': 'no-cache', 'X-Robots-Tag': 'noindex, follow' })
+      response.writeHead(406, { ...headers, 'Content-Type': 'text/plain; charset=utf-8', 'Content-Length': '0', 'Cache-Control': 'no-cache', 'X-Robots-Tag': NO_INDEX })
       response.end()
       return
     }

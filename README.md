@@ -68,7 +68,7 @@ Copy `.env.example` to `.env` to override the defaults, or provide the same vari
 | Variable | Default | Effect |
 | --- | --- | --- |
 | `NUXT_PUBLIC_SITE_URL` | `https://matterdraft.legal` | The one origin used for canonical URLs, social URLs, sitemap entries and Markdown links. |
-| `NUXT_PUBLIC_INDEXABLE` | `true` | Enables homepage indexing. Set to `false` for a non-indexable preview build. |
+| `NUXT_PUBLIC_INDEXABLE` | `true` in production, `false` on Netlify deploy previews and branch deploys | Controls homepage indexing. Set to `false` for a non-indexable build on another host. |
 | `EARLY_ACCESS_GOOGLE_SHEETS_URL` | unset | Private Google Apps Script web app `/exec` URL, available to Netlify Functions and the build. |
 | `EARLY_ACCESS_GOOGLE_SHEETS_SECRET` | unset | Private shared secret, at least 32 characters, available to Netlify Functions and the build. |
 
@@ -121,16 +121,16 @@ The client controller owns event listeners, timers, animation frames, observers 
 
 All workflow examples use sample data. OCR text, template fields, document ordering, pagination, bookmarks, volume planning, validation and PDF tool appearances are demonstrations. They do not open, upload, process, redact or export actual legal files. In particular, a visual redaction example does not remove underlying file content.
 
-SEO uses Nuxt's built-in `useSeoMeta` and `useHead`. Pages have individual metadata and canonical links, a local social image, and truthful structured data that retains the product's development status. The markup does not invent pricing, customer ratings or released availability.
+The homepage and policy pages have individual titles, descriptions, canonical URLs and social previews. The homepage includes structured data describing MatterDraft Studio as software in development. Account, invitation, staff and sign-in pages use generic page descriptions and `noindex`. Both the Netlify server build and static export use the same response-header rules.
 
 The build generates:
 
-- `robots.txt` and `sitemap.xml` with the configured indexing rules.
+- `robots.txt` points to `sitemap.xml` and allows public content to be crawled by search engines and OpenAI's search crawler. The production sitemap lists the canonical homepage.
 - `llms.txt` as a concise guide following the [llms.txt proposal](https://llmstxt.org/).
-- `index.md` as a readable product overview.
+- `index.md` as a readable product overview with links to the corresponding workflow sections and early access form.
 - `llms-full.txt` containing the product overview; draft policy text is excluded.
 
-Markdown alternates and a `rel="describedby"` response link make these resources discoverable. These files do not guarantee search ranking or inclusion in an AI answer. [Google's guidance](https://developers.google.com/search/docs/appearance/ai-features) says its AI search features use the normal SEO fundamentals and do not require a special AI text file.
+The homepage links to its Markdown alternate in HTML and advertises the alternate and LLM directory in its HTTP headers. The Markdown and full-text overview identify the homepage as canonical. [Google's AI search guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
 
 ## Static deployment and headers
 

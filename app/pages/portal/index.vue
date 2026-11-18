@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
 definePageMeta({ layout: 'portal' })
-useHead({ title: 'Accounts · MatterDraft Studio' })
+usePrivatePageSeo('Accounts', 'View and switch between your personal and organisation accounts.')
 type Context = { accounts: { id: string; name: string; accountType: string; role: string }[] }
 const { data, refresh, error: loadError } = await useFetch<Context>('/api/portal/context', { key: 'portal-context' })
 const name = ref('')

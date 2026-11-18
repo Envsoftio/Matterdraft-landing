@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
 definePageMeta({ layout: 'portal' })
-useHead({ title: 'Support tickets · MatterDraft Studio' })
+usePrivatePageSeo('Support tickets', 'Review the MatterDraft support queue.')
 const route = useRoute()
 const searchInput = ref(typeof route.query.search === 'string' ? route.query.search : '')
 const search = computed(() => typeof route.query.search === 'string' ? route.query.search : '')

@@ -1,14 +1,15 @@
 # MatterDraft Studio
 
-> MatterDraft is being developed as a local-first desktop workspace for preparing and organising legal documents, from source files to a reviewed, indexed document bundle.
+> MatterDraft Studio is a local-first desktop workspace in development for lawyers, advocates, chambers and legal teams preparing legal documents and indexed court bundles.
 
-In development for Windows and macOS. Website examples use fictional data and do not establish released functionality. There is no website checkout. Outputs require professional review.
-Legal pages are review drafts awaiting completion and adoption, not final published policies.
-
-
-Local-first does not mean every connected feature works offline. OCR produces editable recognised text; it is not generative legal advice or a guarantee of accuracy.
+In development for Windows and macOS. Website examples use fictional data. Release timing has not been announced. Website policies are review drafts.
 
 ## Product
 
-- [Product overview](https://matterdraft.legal/index.md): Scope, intended workflows and limitations.
-- [Complete content export](https://matterdraft.legal/llms-full.txt): The product overview; draft policies are excluded.
+- [Product overview in Markdown](https://matterdraft.legal/index.md): Scope, intended workflows and limitations.
+- [Product website](https://matterdraft.legal/): Public feature descriptions and interactive examples.
+- [Early access](https://matterdraft.legal/#early-access): Current registration availability and terms of the early access offer.
+
+## Optional
+
+- [Complete text export](https://matterdraft.legal/llms-full.txt): A plain-text copy of the product overview.

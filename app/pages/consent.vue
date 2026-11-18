@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { authClient } from '~~/lib/auth-client'
 definePageMeta({ layout: false })
-useHead({ title: 'Connect desktop app · MatterDraft Studio' })
+usePrivatePageSeo('Connect desktop app', 'Review the desktop app’s request to connect to your MatterDraft account.')
 const route = useRoute()
 const { data: request, error: loadError } = await useFetch('/api/portal/oauth-request', { query: route.query })
 const accessDescription = computed(() => {

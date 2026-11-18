@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
 definePageMeta({ layout: 'portal' })
-useHead({ title: 'Administration · MatterDraft Studio' })
+usePrivatePageSeo('Administration', 'View the MatterDraft staff administration overview.')
 const { data, error, refresh } = await useFetch('/api/internal/overview')
 const { data: desktop, refresh: refreshDesktop } = await useFetch('/api/internal/desktop-client')
 const countLabels: Record<string, string> = { users: 'Registered users', accounts: 'Customer accounts', organisations: 'Organisations', staff: 'Staff members' }

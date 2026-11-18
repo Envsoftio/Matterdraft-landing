@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtemp, mkdir, readFile, writeFile, rm, access } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
+import { discoveryHeaders, DRAFT_ROBOTS, NO_INDEX, privateAreas } from '../scripts/discovery.mjs'
 import {
   canonicalUrl, resolveSiteConfig, validateSiteOrigin, PROJECT_ROOT,
 } from '../scripts/site-config.mjs'
@@ -34,6 +35,8 @@ test('canonical URLs retain the configured origin and reject ambiguous paths', (
 
 test('indexing defaults to on and preview flags remain explicit', () => {
   assert.equal(resolveSiteConfig({}).indexable, true)
+  assert.equal(resolveSiteConfig({ CONTEXT: 'deploy-preview' }).indexable, false)
+  assert.equal(resolveSiteConfig({ CONTEXT: 'branch-deploy', NUXT_PUBLIC_INDEXABLE: 'true' }).indexable, true)
   assert.equal(resolveSiteConfig({ INDEXABLE: 'false' }).indexable, false)
   assert.throws(() => resolveSiteConfig({ INDEXABLE: 'perhaps' }), /true or false/)
   assert.throws(() => resolveSiteConfig({
@@ -62,7 +65,15 @@ test('preview builds advertise no sitemap and contain no indexable sitemap URLs'
 test('draft policies stay out of discovery while remaining crawlable for noindex', () => {
   const config = resolveSiteConfig({ NUXT_PUBLIC_SITE_URL: 'https://example.com' })
   const robots = renderRobots(config)
-  assert.match(robots, /Disallow: \/api\n/)
+  for (const group of ['User-agent: *', 'User-agent: OAI-SearchBot']) {
+    const rules = robots.split('\n\n').find((section) => section.startsWith(group + '\n'))
+    assert.ok(rules, group)
+    assert.ok(rules.includes('Allow: /\n'), group)
+    for (const path of privateAreas) {
+      assert.ok(rules.split('\n').includes(`Disallow: ${path}/`), path)
+      assert.ok(rules.split('\n').includes(`Disallow: ${path}$`), path)
+    }
+  }
   assert.doesNotMatch(robots, /Disallow: \/(?:privacy|terms|refund-policy)/)
   assert.match(robots, /Sitemap: https:\/\/example\.com\/sitemap\.xml/)
   assert.equal((renderSitemap(config).match(/<url>/g) || []).length, 1)
@@ -71,8 +82,30 @@ test('draft policies stay out of discovery while remaining crawlable for noindex
   assert.match(llms, /review drafts/)
   assert.match(llms, /\]\(https:\/\/example\.com\/index\.md\)/)
   assert.match(llms, /\]\(https:\/\/example\.com\/llms-full\.txt\)/)
+  assert.match(llms, /\]\(https:\/\/example\.com\/#early-access\)/)
   assert.doesNotMatch(llms, /\/legal\/.*\.md/)
   assert.doesNotMatch(llms, /matterdraft\.legal/)
+})
+
+test('discovery headers scope public links, private pages and preview indexing', () => {
+  const config = resolveSiteConfig({ NUXT_PUBLIC_SITE_URL: 'https://example.com' })
+  const headers = discoveryHeaders(config)
+  assert.match(headers['/'].Link, /<\/index\.md>.*<\/llms\.txt>/)
+  assert.equal(headers['/index.md'].Link, '<https://example.com/>; rel="canonical"')
+  assert.equal(headers['/index.md']['Content-Type'], 'text/markdown; charset=utf-8')
+  assert.equal(headers['/llms-full.txt'].Link, headers['/index.md'].Link)
+  assert.equal(headers['/llms.txt']['X-Robots-Tag'], DRAFT_ROBOTS)
+  assert.equal(headers['/privacy']['X-Robots-Tag'], DRAFT_ROBOTS)
+  for (const path of ['/sign-in', '/reset-password', '/verify-email', '/consent', '/maintenance.html', ...privateAreas]) {
+    assert.equal(headers[path]['X-Robots-Tag'], NO_INDEX, path)
+    assert.equal(headers[path].Link, undefined, path)
+  }
+  for (const path of privateAreas) assert.equal(headers[`${path}/**`]['X-Robots-Tag'], NO_INDEX)
+  const preview = discoveryHeaders({ ...config, indexable: false })
+  assert.equal(preview['/'], undefined)
+  assert.equal(preview['/index.md'].Link, undefined)
+  assert.equal(preview['/**']['X-Robots-Tag'], NO_INDEX)
+  assert.equal(preview['/privacy']['X-Robots-Tag'], NO_INDEX)
 })
 
 test('sitemap paths use the configured origin and escape XML', () => {

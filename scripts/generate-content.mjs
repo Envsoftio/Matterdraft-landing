@@ -1,6 +1,7 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { privateAreas } from './discovery.mjs'
 import { canonicalUrl, loadSiteConfig, PROJECT_ROOT } from './site-config.mjs'
 
 const LEGAL_SLUGS = ['privacy', 'terms', 'refund-policy']
@@ -43,19 +44,25 @@ function rewriteLegalLink(href) {
 
 export function renderRobots(config) {
   if (!config.indexable) return 'User-agent: *\nDisallow: /\n'
+  const rules = [
+    'Allow: /',
+    ...privateAreas.flatMap((path) => [
+      'Disallow: ' + path + '$',
+      'Disallow: ' + path + '/',
+      'Disallow: ' + path + '?',
+    ]),
+  ]
   return [
-    'User-agent: *',
-    'Disallow: /api',
-    '',
+    'User-agent: *', ...rules, '',
+    'User-agent: OAI-SearchBot', ...rules, '',
     'Sitemap: ' + canonicalUrl('/sitemap.xml', config.siteUrl),
     '',
   ].join('\n')
 }
 
-export function renderSitemap(config, paths) {
-  const routes = paths || ['/']
+export function renderSitemap(config, paths = [config.facts.homepage.path]) {
   const entries = config.indexable
-    ? [...new Set(routes)].map((path) =>
+    ? [...new Set(paths)].map((path) =>
       '  <url><loc>' + escapeXml(canonicalUrl(path, config.siteUrl)) + '</loc></url>')
     : []
   return [
@@ -69,14 +76,15 @@ export function renderSitemap(config, paths) {
 
 export function renderProductMarkdown(config) {
   const { facts, siteUrl } = config
+  const homepage = canonicalUrl(facts.homepage.path, siteUrl)
   const lines = [
     '# ' + facts.name,
     '',
     '> ' + facts.summary,
     '',
-    'Website: ' + canonicalUrl('/', siteUrl),
+    '[MatterDraft Studio website](' + homepage + ')',
     '',
-    'Status: In development for ' + facts.platforms.join(' and ') + '.',
+    facts.status + ' for ' + facts.platforms.join(' and ') + '.',
     '',
     '## Product scope',
     '',
@@ -84,43 +92,43 @@ export function renderProductMarkdown(config) {
     '',
     '## Intended workflows',
     '',
-    ...facts.capabilities.flatMap(({ title, description }) => [
+    ...facts.capabilities.flatMap(({ title, description, anchor }) => [
       '### ' + title, '', description, '',
+      '[See this workflow on the website](' + homepage + '#' + anchor + ')', '',
     ]),
     '## Availability',
     '',
-    'MatterDraft Studio is in development. Release timing has not been announced. ' +
-    'The early access form on the homepage shows current registration availability. ' +
-    'Early access signups are offered one month free after launch.',
+    'The [early access section](' + homepage + '#early-access) shows whether registration is open. ' +
+    'Early access signups receive launch updates and are offered one month free after launch.',
     '',
     '## Policies',
     '',
-    'The website policy pages are review drafts awaiting business details and adoption. ' +
-    'They are excluded from the sitemap and this content export.',
+    'The website policy pages are review drafts awaiting business details and adoption.',
   ]
   return lines.join('\n').trimEnd() + '\n'
 }
 
 export function renderLlmsIndex(config) {
   const { facts, siteUrl } = config
+  const homepage = canonicalUrl(facts.homepage.path, siteUrl)
   const lines = [
     '# ' + facts.name,
     '',
     '> ' + facts.summary,
     '',
-    'In development for Windows and macOS. Website examples use fictional data and do not ' +
-    'establish released functionality. There is no website checkout. Outputs require professional review.',
-    '',
-    'Local-first does not mean every connected feature works offline. OCR produces editable ' +
-    'recognised text; it is not generative legal advice or a guarantee of accuracy.',
+    facts.status + ' for ' + facts.platforms.join(' and ') + '. Website examples use fictional data. ' +
+    'Release timing has not been announced. Website policies are review drafts.',
     '',
     '## Product',
     '',
-    '- [Product overview](' + canonicalUrl('/index.md', siteUrl) + '): Scope, intended workflows and limitations.',
-    '- [Complete content export](' + canonicalUrl('/llms-full.txt', siteUrl) + '): The product overview; draft policies are excluded.',
+    '- [Product overview in Markdown](' + canonicalUrl(facts.homepage.markdownPath, siteUrl) + '): Scope, intended workflows and limitations.',
+    '- [Product website](' + homepage + '): Public feature descriptions and interactive examples.',
+    '- [Early access](' + homepage + '#early-access): Current registration availability and terms of the early access offer.',
+    '',
+    '## Optional',
+    '',
+    '- [Complete text export](' + canonicalUrl('/llms-full.txt', siteUrl) + '): A plain-text copy of the product overview.',
   ]
-  lines.splice(5, 0,
-    'Legal pages are review drafts awaiting completion and adoption, not final published policies.', '')
   return lines.join('\n') + '\n'
 }
 
@@ -177,7 +185,7 @@ export async function generateContent({ projectRoot = PROJECT_ROOT, env = proces
   output.set('public/robots.txt', renderRobots(config))
   output.set('public/sitemap.xml', renderSitemap(config))
   output.set('public/llms.txt', renderLlmsIndex(config))
-  output.set('public/index.md', product)
+  output.set('public' + config.facts.homepage.markdownPath, product)
   output.set('public/llms-full.txt', product)
 
   // Finish validation and parsing before replacing any previously generated file.

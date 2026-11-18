@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NuxtError } from '#app'
+import { NO_INDEX } from '~~/scripts/discovery.mjs'
 const props = defineProps<{ error: NuxtError }>()
 const path = useRequestURL().pathname
 const accountArea = /^\/(portal|internal|a|invite)(\/|$)/.test(path)
@@ -8,7 +9,8 @@ const reference = computed(() => {
   const id = data?.error?.requestId
   return typeof id === 'string' && /^req_[0-9a-f]{24}$/.test(id) ? id : ''
 })
-useSeoMeta({ title: 'Page unavailable | MatterDraft Studio', robots: 'noindex, follow' })
+usePrivatePageSeo('Page unavailable', 'Return to MatterDraft Studio or try opening the page again.')
+useResponseHeader('X-Robots-Tag').value = NO_INDEX
 const home = () => clearError({ redirect: accountArea ? '/portal' : '/' })
 </script>
 <template>

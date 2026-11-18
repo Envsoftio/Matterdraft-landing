@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'portal' })
-useHead({ title: 'Support ticket · MatterDraft Studio' })
+usePrivatePageSeo('Manage support ticket', 'Review and manage a support ticket in the staff workspace.')
 const route = useRoute()
 const ticketId = computed(() => String(route.params.ticketId))
 </script>

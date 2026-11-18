@@ -1,11 +1,111 @@
 {
   "commonHeaders": {
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-BppKBi1MLzT8gC0dVKZx/gG+t0vIhe9SmF39VFsRpvk=' 'sha256-Cw2984uRa6GFIV8hYn5HF/8hDbTYsf8BmdgE/Rv0pLc=' 'sha256-7VoVSydZbFhd9J9aveKINS42VqA2mKmR+JXRhv8J8E4=' 'sha256-JH6zXY1MnpjylabQ4U6qSHNTc3l0EOhKqJLkH54Kjxs=' 'sha256-Gxmfl0wqHImolo34G2ltLjYBQ7Ej71em1snDzt0fuXg='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-pIEqyHWR5oGt2XKSnenvorpE27EbrohLKgaCoKtpr/k=' 'sha256-K0MN1vJtLT/HWbzvajPehdzvWvnKoL7iaDmw3sat8pI=' 'sha256-kMt1zpMgHVOHtVlSQlpPs/fGdqextxTGR/YRINaacmw=' 'sha256-uDJyntPy/0RJ6RjV40zDzRskeUFlRq0039b4PGD6JNY=' 'sha256-LU91QSvAgiPiQ47izFNxv+Bv6mglA1RUexHZhEFprGw='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-    "Link": "</llms.txt>; rel=\"describedby\""
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()"
   },
-  "indexable": true
+  "discoveryHeaders": {
+    "/api": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/api/**": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/.netlify/functions": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/.netlify/functions/**": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/a": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/a/**": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/internal": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/internal/**": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/invite": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/invite/**": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/portal": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/portal/**": {
+      "Cache-Control": "private, no-store",
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/sign-in": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/sign-up": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/forgot-password": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/reset-password": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/verify-email": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/consent": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/maintenance.html": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/200.html": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/404.html": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/__nuxt_error": {
+      "X-Robots-Tag": "noindex, nofollow"
+    },
+    "/privacy": {
+      "X-Robots-Tag": "noindex, follow"
+    },
+    "/terms": {
+      "X-Robots-Tag": "noindex, follow"
+    },
+    "/refund-policy": {
+      "X-Robots-Tag": "noindex, follow"
+    },
+    "/index.md": {
+      "Content-Type": "text/markdown; charset=utf-8",
+      "Link": "<https://matterdraft.legal/>; rel=\"canonical\""
+    },
+    "/": {
+      "Link": "</index.md>; rel=\"alternate\"; type=\"text/markdown\", </llms.txt>; rel=\"describedby\""
+    },
+    "/llms-full.txt": {
+      "Link": "<https://matterdraft.legal/>; rel=\"canonical\""
+    },
+    "/llms.txt": {
+      "X-Robots-Tag": "noindex, follow"
+    }
+  }
 }

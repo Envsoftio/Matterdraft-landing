@@ -2,7 +2,7 @@
 import { FormRoot } from 'reka-ui'
 import { authClient } from '~~/lib/auth-client'
 definePageMeta({ layout: false })
-useHead({ title: 'Reset password · MatterDraft Studio' })
+usePrivatePageSeo('Reset password', 'Request a password reset email for your MatterDraft Studio account.')
 const email = ref('')
 const busy = ref(false)
 const sent = ref(false)

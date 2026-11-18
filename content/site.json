@@ -3,15 +3,25 @@
   "shortName": "MatterDraft",
   "defaultOrigin": "https://matterdraft.legal",
   "language": "en-IN",
-  "title": "MatterDraft Studio — Legal document workflows",
-  "description": "A local-first legal document desktop workspace in development for Windows and macOS. Organise, OCR, collate and review matter documents.",
-  "summary": "MatterDraft is being developed as a local-first desktop workspace for preparing and organising legal documents, from source files to a reviewed, indexed document bundle.",
-  "status": "in-development",
+  "homepage": {
+    "path": "/",
+    "title": "Legal Document and Court Bundle Software | MatterDraft Studio",
+    "description": "Explore MatterDraft Studio, a local-first desktop workspace in development for lawyers and advocates. Organise case files, OCR PDFs and prepare indexed court bundles.",
+    "markdownPath": "/index.md"
+  },
+  "socialImage": {
+    "path": "/og/matterdraft-social.jpg",
+    "width": 1200,
+    "height": 630,
+    "alt": "MatterDraft Studio legal document workspace"
+  },
+  "summary": "MatterDraft Studio is a local-first desktop workspace in development for lawyers, advocates, chambers and legal teams preparing legal documents and indexed court bundles.",
+  "status": "In development",
   "platforms": ["Windows", "macOS"],
   "qualifications": [
     "The product is in development. Release timing has not been announced; illustrated features are intended workflows, not evidence of a released production feature.",
     "Website demonstrations use fictional documents and sample data. They do not process or upload a real legal matter.",
-    "The website does not offer checkout, process purchases or create customer accounts.",
+    "Early access registration does not require payment details. The website does not offer checkout or process purchases.",
     "Local-first describes local document workflows. Separately offered sharing or other connected features may require a network connection and their own disclosure.",
     "OCR output is editable recognised text; it is not a promise of generative legal drafting or error-free recognition.",
     "Electronic signature placement is distinct from digital certification. Court acceptance and legal validity require separate review.",
@@ -20,34 +30,52 @@
   "capabilities": [
     {
       "title": "Import and organise",
+      "anchor": "matter-workspace",
       "description": "Bring PDF, Word and image source material into matter workflows. Organise documents into categories and parts, work across matter tabs, and choose the order of included documents."
     },
     {
-      "title": "Recognise text and prepare documents",
-      "description": "Intended OCR workflows turn scanned content into editable text for review. Structured templates use supplied fields to prepare documents; the website examples do not generate legal arguments."
+      "title": "Recognise text with OCR",
+      "anchor": "ocr",
+      "description": "OCR turns scanned content into recognised text that users can review and edit in a working copy."
+    },
+    {
+      "title": "Prepare documents from templates",
+      "anchor": "document-generation",
+      "description": "Select a document template and enter the relevant matter details to produce a formatted document for review."
     },
     {
       "title": "Edit and manage pages",
+      "anchor": "pdf-engine",
       "description": "Intended document tools cover merging, splitting, extracting, replacing, reordering, cropping, rotating, deleting and inserting pages."
     },
     {
       "title": "Collate, paginate and index",
+      "anchor": "collation",
       "description": "Arrange documents within parts and rebuild a coordinated bundle, page numbering and index. Review updated page ranges after a change to the source order."
     },
     {
       "title": "Create and edit bookmarks",
+      "anchor": "automation",
       "description": "Generate bookmarks from the document structure and review them alongside manual bookmark labels, page references and hierarchy."
     },
     {
       "title": "Plan document-aware volumes",
+      "anchor": "volumes",
       "description": "Plan volumes around an approximate 300-page target while considering document boundaries. The target is not an absolute limit; an oversized individual document needs separate review."
     },
     {
-      "title": "Check and export",
-      "description": "Review validation findings before export. Intended output workflows include PDF and other supported document or archive formats; support depends on the relevant feature and release."
+      "title": "Validate the bundle",
+      "anchor": "validation",
+      "description": "Review missing dates, unassigned categories and numbering issues before export."
+    },
+    {
+      "title": "Export the bundle",
+      "anchor": "export",
+      "description": "Prepare a PDF bundle with numbered pages, an index and bookmarks. Use separate volumes when the document sequence calls for them."
     },
     {
       "title": "Apply document controls",
+      "anchor": "production-tools",
       "description": "Intended tools include password protection, redaction, electronic signature placement, watermarks and timestamps. Users remain responsible for checking the resulting documents and applicable requirements."
     }
   ],

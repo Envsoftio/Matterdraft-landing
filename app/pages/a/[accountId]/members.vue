@@ -2,7 +2,7 @@
 import { DialogRoot, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogDescription } from 'reka-ui'
 import { parseApiError } from '~/utils/api-error'
 definePageMeta({ layout: 'portal' })
-useHead({ title: 'Members · MatterDraft Studio' })
+usePrivatePageSeo('Members', 'Manage organisation invitations and member roles.')
 const route = useRoute()
 const accountId = computed(() => String(route.params.accountId))
 type Member = { user_id: string; name: string; email: string; role: string; created_at: number }

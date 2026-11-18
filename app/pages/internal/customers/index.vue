@@ -2,7 +2,7 @@
 import { parseApiError } from '~/utils/api-error'
 
 definePageMeta({ layout: 'portal' })
-useHead({ title: 'Customers · MatterDraft Studio' })
+usePrivatePageSeo('Customers', 'Find customer accounts in the staff workspace.')
 
 type Customer = { id: string; name: string; email: string; emailVerified: boolean; createdAt: number; accountCount: number }
 const route = useRoute()

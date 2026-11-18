@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
 definePageMeta({ layout: 'portal' })
-useHead({ title: 'Support · MatterDraft Studio' })
+usePrivatePageSeo('Support', 'Open and manage support tickets for your MatterDraft account.')
 const route = useRoute()
 const router = useRouter()
 const accountId = computed(() => String(route.params.accountId))

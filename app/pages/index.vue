@@ -4,32 +4,34 @@ import LandingHero from '~/components/landing/LandingHero.vue'
 import LandingEarlyAccess from '~/components/landing/LandingEarlyAccess.vue'
 import LandingFeatures from '~/components/landing/LandingFeatures.vue'
 import LandingFooter from '~/components/landing/LandingFooter.vue'
+import site from '~~/content/site.json'
 
-const title = 'MatterDraft Studio | Legal Document Workspace for Lawyers and Advocates'
-const description = 'A local-first desktop workspace for lawyers, advocates and legal teams. Edit and OCR PDFs, generate documents, collate case files and prepare indexed legal bundles.'
-useSiteSeo({ title, description, path: '/', markdownPath: '/index.md' })
+const { homepage, name, language } = site
+useSiteSeo(homepage)
 useLandingExperience()
 
-const origin = String(useRuntimeConfig().public.siteUrl).replace(/\/+$/, '')
+const origin = useRuntimeConfig().public.siteUrl
+const canonical = new URL(homepage.path, origin).href
+const websiteId = `${canonical}#website`
+const softwareId = `${canonical}#software`
 const schema = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'WebSite', '@id': `${origin}/#website`, url: `${origin}/`, name: 'MatterDraft Studio', inLanguage: 'en-IN' },
+    { '@type': 'WebSite', '@id': websiteId, url: canonical, name, alternateName: site.shortName, inLanguage: language },
     {
-      '@type': 'WebPage', '@id': `${origin}/#webpage`, url: `${origin}/`, name: title,
-      description, isPartOf: { '@id': `${origin}/#website` },
-      mainEntity: { '@id': `${origin}/#software` }, inLanguage: 'en-IN',
-      primaryImageOfPage: { '@type': 'ImageObject', url: `${origin}/og/matterdraft-social.jpg`, width: 1200, height: 630 },
+      '@type': 'WebPage', '@id': `${canonical}#webpage`, url: canonical, name: homepage.title,
+      description: homepage.description, isPartOf: { '@id': websiteId },
+      mainEntity: { '@id': softwareId }, inLanguage: language,
+      primaryImageOfPage: {
+        '@type': 'ImageObject', url: new URL(site.socialImage.path, origin).href,
+        width: site.socialImage.width, height: site.socialImage.height,
+      },
     },
     {
-      '@type': 'SoftwareApplication', '@id': `${origin}/#software`, name: 'MatterDraft Studio',
-      url: `${origin}/`, description,
-      applicationCategory: 'BusinessApplication', operatingSystem: 'Windows, macOS',
-      featureList: [
-        'Matter and document organisation', 'PDF page operations', 'OCR-assisted document text',
-        'Template-based document generation', 'Document collation', 'Pagination and indexes',
-        'PDF bookmark hierarchy', 'Document-aware volume splitting', 'Production validation checks',
-      ],
+      '@type': 'SoftwareApplication', '@id': softwareId, name, url: canonical,
+      description: site.summary, creativeWorkStatus: site.status,
+      applicationCategory: 'BusinessApplication', operatingSystem: site.platforms.join(', '),
+      featureList: site.capabilities.map(({ title }) => title),
     },
   ],
 }
