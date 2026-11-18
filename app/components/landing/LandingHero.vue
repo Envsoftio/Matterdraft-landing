@@ -30,7 +30,7 @@ import {
   X,
   Zap,
 } from '@lucide/vue'
-import { matterName, numberedDocuments } from '~/data/example-matter'
+import { matterName, matterReference, numberedDocuments } from '~/data/example-matter'
 const selected = ref('Agreement')
 const compact = ref(false)
 const workspace = useTemplateRef('workspace')
@@ -82,20 +82,6 @@ const steps = [
   ['Validate', '#validation'],
   ['Export', '#export'],
 ]
-const sampleText: Record<string, string> = {
-  Petition:
-    'The applicant asks the court to consider the supporting records listed in this matter.',
-  Affidavit:
-    'The deponent confirms that the accompanying documents are true copies of the records described in the schedule.',
-  Agreement:
-    'This master commercial collaboration agreement is entered into on 14th March 2026 by and between Aster Works Enterprise and Banyan Projects Infrastructure LLP.',
-  Correspondence:
-    'Letters exchanged between the parties record the dates, requests and responses relevant to this matter.',
-  Evidence:
-    'The exhibits in this schedule are numbered in the order in which they appear in the bundle.',
-  'Additional records':
-    'Supplementary records accompany the principal exhibits and retain their original sequence.',
-}
 </script>
 
 <template>
@@ -143,7 +129,7 @@ const sampleText: Record<string, string> = {
           <Monitor :size="14" />
           MatterDraft Studio —
           <b>{{ matterName }}</b>
-          (MD-DEMO-026)
+          ({{ matterReference }})
         </span>
         <span class="local-state">● Fictional matter</span>
         <span class="window-version">Preview</span>
@@ -219,36 +205,20 @@ const sampleText: Record<string, string> = {
                 <h3>{{ file.name }} (Working Copy)</h3>
               </div>
               <div class="paper-ref">
-                REF: MD-DEMO-026
+                REF: {{ matterReference }}
                 <b>Original Preserved</b>
               </div>
             </header>
-            <h4>
-              {{
-                file.name === 'Agreement'
-                  ? '1. DELIVERY AND RECORDS'
-                  : '1. ' + file.name.toUpperCase()
-              }}
-            </h4>
-            <p>{{ sampleText[file.name] }}</p>
+            <h4>{{ file.heading }}</h4>
+            <p>{{ file.excerpt }}</p>
             <blockquote>
               <strong>
                 <PencilLine :size="13" />
                 Review note
               </strong>
-              {{
-                file.name === 'Agreement'
-                  ? 'Check the delivery dates against the schedule before including this agreement.'
-                  : 'Check this record against the original before including it in the final bundle.'
-              }}
+              {{ file.reviewNote }}
             </blockquote>
-            <p class="paper-note">
-              {{
-                file.name === 'Agreement'
-                  ? 'Section 2.4. Each party will keep a copy of the signed agreement and delivery schedule.'
-                  : 'This sample working copy preserves the original document.'
-              }}
-            </p>
+            <p class="paper-note">{{ file.recordNote }}</p>
             <footer>
               <span>{{ matterName }}</span>
               <span class="code-tag">BATES NO. MD-{{ String(file.start).padStart(4, '0') }}</span>
@@ -273,8 +243,8 @@ const sampleText: Record<string, string> = {
             </button>
           </div>
           <div class="workspace-label">
-            Bookmarks hierarchy
-            <small>1 → 1a → 1b</small>
+            Bookmark preview
+            <small>Parts and documents</small>
           </div>
           <div
             v-for="(part, i) in ['Core documents', 'Supporting documents']"

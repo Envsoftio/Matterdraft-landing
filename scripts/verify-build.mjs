@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { gzipSync } from 'node:zlib'
 import { createHash } from 'node:crypto'
 import { NO_INDEX } from './discovery.mjs'
+import { copyPlaceholderPattern } from './generate-content.mjs'
 import { loadSiteConfig } from './site-config.mjs'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url))),
@@ -15,6 +16,7 @@ const pages = ['', ...legalDocuments.map(({ slug }) => slug)]
 const pageReports = []
 for (const route of pages) {
   const html = await readFile(join(dist, route, 'index.html'), 'utf8')
+  assert.doesNotMatch(html, copyPlaceholderPattern, `Publication placeholder on /${route}`)
   const canonical = new URL(route ? `/${route}` : '/', settings.siteUrl).href
   assert(
     html.includes(`rel="canonical" href="${canonical}"`) ||
@@ -37,7 +39,7 @@ for (const route of pages) {
     assert.match(html, /<strong>Last updated:<\/strong> \d{1,2} \w+ \d{4}/)
     assert(html.includes('Envsoft Solutions LLP') && html.includes('Neha Sharma (CEO)'))
     assert(html.includes('mailto:hello@matterdraft.legal'))
-    assert.doesNotMatch(html, /Review draft|Publication notes|\[[A-Z]+_[A-Z_]+\]/)
+    assert.doesNotMatch(html, /Review draft|Publication notes/i)
   }
   assert(
     html.includes(new URL(socialImage.path, settings.siteUrl).href),

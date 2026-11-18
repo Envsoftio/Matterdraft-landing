@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { BadgeCheck, Play } from '@lucide/vue'
+import { agreementRecordsClause, matterName, matterReference } from '~/data/example-matter'
 import { featureHeadings } from '~/data/feature-headings'
 import SectionHeading from './SectionHeading.vue'
 const state = ref<'ready' | 'scanning' | 'done'>('ready')
@@ -23,15 +24,12 @@ onBeforeUnmount(() => clearTimeout(timer))
             <span class="code-tag">Original preserved</span>
           </header>
           <div class="scan-sheet" :class="{ scanning: state === 'scanning' }">
-            <i />
-            <i />
-            <i />
-            <span>Sample scan</span>
-            <i />
+            <h4>Supply agreement · Clause 3.2</h4>
+            <p>{{ agreementRecordsClause }}</p>
           </div>
           <footer>
-            Aster Works v. Banyan Projects
-            <span>MD-DEMO-026</span>
+            {{ matterName }}
+            <span>{{ matterReference }}</span>
           </footer>
         </article>
         <article class="panel ocr-card recognized">
@@ -40,8 +38,8 @@ onBeforeUnmount(() => clearTimeout(timer))
             <span class="status-tag">{{ state === 'scanning' ? 'Scanning…' : 'OCR Ready' }}</span>
           </header>
           <div class="ocr-result" aria-live="polite">
-            <h4>Supporting record: Clause 14.1 (Recognised)</h4>
-            <p>“The parties will keep copies of the signed agreement and the delivery schedule.”</p>
+            <h4>Supply agreement · Clause 3.2</h4>
+            <p>{{ agreementRecordsClause }}</p>
             <small class="positive">
               <BadgeCheck :size="13" />
               {{

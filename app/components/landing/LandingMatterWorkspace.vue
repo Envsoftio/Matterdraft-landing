@@ -114,8 +114,8 @@ const inspected = ref<(typeof numberedDocuments)[number]>()
         <TabsContent value="Generated" class="generated-files">
           <FileText />
           <div>
-            <h3>Procedural application</h3>
-            <p>Generate a document using the fields from this matter.</p>
+            <h3>Application to add delivery records</h3>
+            <p>See how the filing details appear in the application.</p>
             <a class="text-action" href="#document-generation">Open template preview →</a>
           </div>
         </TabsContent>

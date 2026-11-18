@@ -4,6 +4,7 @@ import { featureHeadings } from '~/data/feature-headings'
 import SectionHeading from './SectionHeading.vue'
 const target = ref(300)
 const documents = [18, 24, 60, 194, 125, 170, 148, 125]
+const totalPages = documents.reduce((total, pages) => total + pages, 0)
 const volumes = computed(() => {
   const result: { start: number; pages: number; count: number }[] = []
   let next = 1
@@ -22,10 +23,7 @@ const volumes = computed(() => {
 function description(index: number, pages: number) {
   if (pages > target.value)
     return 'One source document exceeds the target. It stays together in this volume.'
-  if (target.value === 300 && index === 1)
-    return 'The 125-page Correspondence record begins intact here without a mid-document split.'
-  if (index === volumes.value.length - 1)
-    return 'Concludes the master bundle file. 864 document pages across 8 preserved source files.'
+  if (index === volumes.value.length - 1) return 'The last volume ends on page ' + totalPages + '.'
   return (
     'Leaves ' +
     (target.value - pages) +
@@ -40,7 +38,7 @@ function description(index: number, pages: number) {
     <div class="frame">
       <SectionHeading v-bind="featureHeadings.volumes" layout="stack" />
       <div class="target-row">
-        <strong>Target per volume:</strong>
+        <strong>Page target for this {{ totalPages }}-page example</strong>
         <ToggleGroupRoot
           type="single"
           :model-value="String(target)"

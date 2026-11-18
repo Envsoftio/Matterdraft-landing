@@ -5,6 +5,9 @@ import { privateAreas } from './discovery.mjs'
 import { canonicalUrl, loadSiteConfig, PROJECT_ROOT } from './site-config.mjs'
 
 const LEGAL_SLUGS = ['privacy', 'terms', 'refund-policy']
+export const copyPlaceholderPattern =
+  /\b(?:lorem\s+ipsum|dummy text|placeholder text|tbd|tbc|fixme|todo)\b|\[[A-Z][A-Z0-9]*_[A-Z0-9_]+\b|\[(?:insert|enter|replace|your)\b[^\]\r\n]*\](?!\()/i
+
 export function escapeXml(value) {
   return String(value).replace(
     /[&<>"']/g,
@@ -27,7 +30,7 @@ export function prepareLegalMarkdown(markdown) {
   const heading = normalized.match(/^#[ \t]+([^\n]+)\n*/)
   if (!heading) throw new Error('Every legal source must start with one level-one title.')
   if (
-    /\[[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/.test(normalized) ||
+    copyPlaceholderPattern.test(normalized) ||
     /^#{1,6}\s+Publication notes\b|^>\s+\*{0,2}Review draft\b/im.test(normalized)
   ) {
     throw new Error('Remove placeholders and draft notes before publishing a legal policy.')

@@ -1291,32 +1291,9 @@ html[data-theme='dark'] .export-example {
   margin: 16px 0 24px;
   overflow: hidden;
 }
-.scan-sheet i,
-.scan-sheet span {
-  display: block;
-  border-radius: 4px;
-  background: var(--rule-soft);
-  height: 12px;
-  width: 75%;
-  margin-bottom: 6px;
-}
-.scan-sheet i:nth-child(2) {
-  width: 84%;
-}
-.scan-sheet i:nth-child(3) {
-  width: 50%;
-}
-.scan-sheet i:last-child {
-  width: 80%;
-  margin: 0;
-}
-.scan-sheet span {
-  width: 100%;
-  padding: 12px 0;
-  height: auto;
-  text-align: center;
-  font: 500 12px/16px var(--code);
-  background: var(--tint);
+.scan-sheet {
+  font-family: Georgia, serif;
+  color: var(--heading);
 }
 .scanning::after {
   content: '';
@@ -1351,6 +1328,7 @@ html[data-theme='dark'] .export-example {
   border-style: solid;
   padding: 20px;
 }
+.scan-sheet p,
 .ocr-result p {
   font-size: 12px;
   line-height: 19px;

@@ -177,7 +177,14 @@ test('legal preparation removes the duplicated title and rejects unpublished mat
     prepareLegalMarkdown(heading + '## Scope\nPolicy content.'),
     '## Scope\nPolicy content.\n',
   )
-  for (const text of ['[UNRESOLVED_FIELD]', '> **Review draft.**', '## Publication notes']) {
+  for (const text of [
+    '[UNRESOLVED_FIELD]',
+    '[Insert company address]',
+    'Lorem ipsum dolor sit amet.',
+    'Contact details are TBD.',
+    '> **Review draft.**',
+    '## Publication notes',
+  ]) {
     assert.throws(() => prepareLegalMarkdown(heading + text), /before publishing/)
   }
 })

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ToolbarRoot, ToolbarButton } from 'reka-ui'
+import { agreementRecordsClause } from '~/data/example-matter'
 import { featureHeadings } from '~/data/feature-headings'
 import SectionHeading from './SectionHeading.vue'
 const operations: Record<string, string> = {
@@ -12,7 +13,7 @@ const operations: Record<string, string> = {
   Delete: 'The selected page is removed from the working copy.',
   Highlight: 'The selected clause is highlighted for review.',
   Comment: 'A review note is attached to the selected clause.',
-  Redact: 'The selected text is masked in this example.',
+  Redact: 'Review marked text before exporting a redacted copy.',
   Rotate: 'The working page is rotated 90 degrees clockwise.',
   Crop: 'The margins of the working page are trimmed.',
 }
@@ -50,14 +51,11 @@ function apply(tool: string) {
         </ToolbarRoot>
         <div class="two-col pdf-details">
           <article class="pdf-paper">
-            <small>Imported original preserved</small>
-            <h3>{{ changed ? selection + ' · Working copy' : 'Sample PDF working copy' }}</h3>
-            <p aria-live="polite">
-              {{
-                changed
-                  ? operations[selection]
-                  : 'Try the tools on this sample. In the desktop app, changes are made to a working copy so the original stays intact.'
-              }}
+            <small>Agreement.pdf · Working copy</small>
+            <h3>3.2. Agreement and delivery records</h3>
+            <p>{{ agreementRecordsClause }}</p>
+            <p v-if="changed" class="mt-3" role="status">
+              {{ selection }} preview · {{ operations[selection] }}
             </p>
             <footer>
               Page 1 of {{ selection === 'Delete' ? 38 : selection === 'Insert' ? 40 : 39 }}　 Zoom

@@ -14,13 +14,17 @@ import { featureHeadings } from '~/data/feature-headings'
 import { categories } from '~/data/example-matter'
 import SectionHeading from './SectionHeading.vue'
 const findings = [
-  { title: 'Missing date: Affidavit.pdf', action: 'Add date', label: 'Document date' },
+  { title: 'Index date missing: Affidavit.pdf', action: 'Add date', label: 'Index date' },
   {
-    title: 'Document category not assigned',
+    title: 'Review category: Additional records.pdf',
     action: 'Assign category',
     label: 'Document category',
   },
-  { title: 'Page numbering requires review', action: 'Review numbering', label: 'Starting page' },
+  {
+    title: 'Confirm the bundle’s starting page',
+    action: 'Review numbering',
+    label: 'Starting page',
+  },
 ] as const
 const editing = ref<number | null>(null)
 const values = ref(['', '', ''])
