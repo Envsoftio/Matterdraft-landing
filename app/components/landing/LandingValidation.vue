@@ -12,6 +12,7 @@ import {
 import { CircleCheck, CircleAlert } from '@lucide/vue'
 import { featureHeadings } from '~/data/feature-headings'
 import { categories } from '~/data/example-matter'
+import { vAnimateChange } from '~/utils/landing/animate-change'
 import SectionHeading from './SectionHeading.vue'
 const findings = [
   { title: 'Index date missing: Affidavit.pdf', action: 'Add date', label: 'Index date' },
@@ -30,9 +31,16 @@ const editing = ref<number | null>(null)
 const values = ref(['', '', ''])
 const input = ref('')
 const remaining = computed(() => values.value.filter((v) => !v).length)
-function edit(index: number) {
+let editButton: HTMLButtonElement | undefined
+function edit(index: number, event: MouseEvent) {
+  editButton = event.currentTarget as HTMLButtonElement
   editing.value = index
   input.value = values.value[index] || (index === 2 ? '1' : '')
+}
+function restoreFocus(event: Event) {
+  if (!editButton) return
+  event.preventDefault()
+  editButton.focus({ preventScroll: true })
 }
 function save() {
   if (editing.value === null || !input.value) return
@@ -53,7 +61,7 @@ function save() {
       <div class="panel inspector" data-enter>
         <header>
           <strong>Pre-export bundle validation</strong>
-          <span aria-live="polite"
+          <span v-animate-change="remaining" aria-live="polite"
             >{{ remaining }} {{ remaining === 1 ? 'item' : 'items' }} to inspect</span
           >
         </header>
@@ -74,8 +82,10 @@ function save() {
           :class="{ attention: !values[i] }"
         >
           <component :is="values[i] ? CircleCheck : CircleAlert" />
-          <span>{{ values[i] ? finding.label + ': ' + values[i] : finding.title }}</span>
-          <button @click="edit(i)">{{ values[i] ? 'Edit' : finding.action }}</button>
+          <span v-animate-change="values[i]">
+            {{ values[i] ? finding.label + ': ' + values[i] : finding.title }}
+          </span>
+          <button @click="edit(i, $event)">{{ values[i] ? 'Edit' : finding.action }}</button>
         </div>
       </div>
       <DialogRoot
@@ -88,7 +98,11 @@ function save() {
       >
         <DialogPortal>
           <DialogOverlay class="studio-overlay" />
-          <DialogContent v-if="editing !== null" class="studio-dialog">
+          <DialogContent
+            v-if="editing !== null"
+            class="studio-dialog"
+            @close-auto-focus="restoreFocus"
+          >
             <DialogTitle>{{ findings[editing]?.action }}</DialogTitle>
             <DialogDescription>Update this finding in the sample bundle.</DialogDescription>
             <form @submit.prevent="save">

@@ -31,6 +31,7 @@ import {
   Zap,
 } from '@lucide/vue'
 import { matterName, matterReference, numberedDocuments } from '~/data/example-matter'
+import { vAnimateChange } from '~/utils/landing/animate-change'
 const selected = ref('Agreement')
 const compact = ref(false)
 const workspace = useTemplateRef('workspace')
@@ -180,7 +181,7 @@ const steps = [
           @pointercancel="gesture = undefined"
         >
           <div class="reading-tools">
-            <span>Page 1 of {{ file.pages }}</span>
+            <span v-animate-change="file.pages">Page 1 of {{ file.pages }}</span>
             <i />
             <span>Zoom 100%</span>
             <i />

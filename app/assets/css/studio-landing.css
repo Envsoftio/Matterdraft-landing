@@ -1697,12 +1697,8 @@ html[data-theme='dark'] .export-example {
   padding-bottom: 66px;
   border: none;
 }
-.workflow-grid a {
-  display: block;
-  height: 100%;
-  padding: 16px;
-}
 .studio-landing .workflow-grid .panel {
+  padding: 16px;
   border-radius: 12px;
   border-color: var(--rule-soft);
 }
@@ -1710,18 +1706,14 @@ html[data-theme='dark'] .export-example {
   font: 500 12px/16px var(--code);
   color: var(--accent);
 }
-.workflow-grid h4 {
+.studio-landing .workflow-grid h3 {
   margin: 8px 0 4px;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: normal;
 }
 .workflow-grid p {
   font-size: 12px;
-}
-.workflow-grid li:last-child .panel {
-  background: #0054ca;
-  color: #e7edff;
-}
-.workflow-grid li:last-child :is(h4, small) {
-  color: white;
 }
 .closing-section {
   padding: 54px 0 88px;
@@ -1818,13 +1810,14 @@ html[data-theme='dark'] .export-example {
   text-decoration: underline;
 }
 @media (hover: hover) {
-  :is(.utility-card, .workflow-grid a, .part-file, .document-item, .production-ribbon a) {
-    transition:
-      background 0.18s,
-      border-color 0.18s,
-      transform 0.18s;
+  .studio-landing .workflow-grid .panel:hover {
+    --heading: #fff;
+    --accent: #fff;
+    background-color: #0054ca;
+    border-color: #0054ca;
+    color: #e7edff;
   }
-  :is(.utility-card, .workflow-grid a):hover {
+  .utility-card:hover {
     transform: translateY(-3px);
     border-color: var(--accent);
   }
@@ -1836,15 +1829,70 @@ html[data-theme='dark'] .export-example {
   }
 }
 @media (prefers-reduced-motion: no-preference) {
+  :where(.studio-landing, .studio-dialog, .studio-options, .studio-popover)
+    :is(button:enabled, a[href], [role='option'], [role='menuitem']) {
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      color 160ms ease,
+      transform 160ms ease,
+      filter 120ms ease-out,
+      opacity 120ms ease-out;
+  }
+  :where(.studio-landing, .studio-dialog, .studio-options, .studio-popover)
+    :is(button:enabled, a[href], [role='option'], [role='menuitem']):active {
+    filter: brightness(0.92);
+  }
+  .workflow-grid .panel,
+  .workflow-grid :is(h3, small) {
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      color 180ms ease,
+      translate 180ms ease-out;
+  }
+  @media (hover: hover) {
+    .workflow-grid .panel:hover {
+      translate: 0 -3px;
+      box-shadow: var(--elevation);
+    }
+  }
   .arrived {
     animation: studio-arrive 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
   .sample-paper {
     animation: document-appear 0.18s ease-out;
   }
-  .studio-options[data-state='open'],
-  .studio-popover[data-state='open'] {
-    animation: document-appear 0.14s ease-out;
+  :is(.studio-options, .studio-popover, .studio-dialog)[data-state='open'],
+  .matter-table [role='tabpanel'][data-state='active'],
+  .studio-landing :is(.signup-status, .signup-error, .signup-field-error),
+  .studio-volume-enter-active {
+    animation: studio-feedback-in 180ms ease-out;
+  }
+  .studio-overlay[data-state='open'],
+  .studio-landing .theme-toggle .icon,
+  .signup-consent [role='checkbox'][data-state='checked'] > span {
+    animation: document-appear 160ms ease-out;
+  }
+  :is(.studio-options, .studio-popover, .studio-dialog, .studio-overlay)[data-state='closed'] {
+    animation: studio-feedback-out 120ms ease-in;
+  }
+  @keyframes studio-feedback-in {
+    from {
+      opacity: 0;
+      translate: 0 5px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+  @keyframes studio-feedback-out {
+    to {
+      opacity: 0;
+    }
   }
   @keyframes studio-arrive {
     from {
@@ -2329,10 +2377,10 @@ html[data-theme='dark'] .export-example {
   .shortcut-panel dl {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .workflow-grid a {
+  .studio-landing .workflow-grid .panel {
     padding: 12px;
   }
-  .workflow-grid h4 {
+  .studio-landing .workflow-grid h3 {
     line-height: 1.35;
   }
   .closing-section {
@@ -2396,7 +2444,6 @@ html[data-theme='dark'] .export-example {
   }
   .action:hover,
   .mini-action:hover,
-  .workflow-grid a:hover,
   .utility-card:hover {
     transform: none;
   }
@@ -2429,9 +2476,6 @@ html[data-theme='dark'] .closing-card {
   background:
     radial-gradient(ellipse at 100% 100%, #142e59, transparent 35%),
     linear-gradient(135deg, #123f7a, #0a2a54 28%, #061a39 74%, #031128);
-}
-html[data-theme='dark'] .workflow-grid li:last-child .panel {
-  background: #3478ea;
 }
 html[data-theme='dark'] .window-bar,
 html[data-theme='dark'] .document-desk,

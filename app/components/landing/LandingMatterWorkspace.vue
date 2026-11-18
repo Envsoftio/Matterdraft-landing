@@ -18,6 +18,18 @@ import { numberedDocuments, categories, matterName } from '~/data/example-matter
 import SectionHeading from './SectionHeading.vue'
 const tabs = ['Documents', 'Categories', 'Generated', 'Parts (4)']
 const inspected = ref<(typeof numberedDocuments)[number]>()
+let inspectButton: HTMLButtonElement | undefined
+
+function inspect(document: (typeof numberedDocuments)[number], event: MouseEvent) {
+  inspectButton = event.currentTarget as HTMLButtonElement
+  inspected.value = document
+}
+
+function restoreFocus(event: Event) {
+  if (!inspectButton) return
+  event.preventDefault()
+  inspectButton.focus({ preventScroll: true })
+}
 </script>
 <template>
   <section id="matter-workspace" class="studio-section alt">
@@ -64,7 +76,7 @@ const inspected = ref<(typeof numberedDocuments)[number]>()
                   <button
                     class="text-action"
                     :aria-label="'Inspect ' + doc.name"
-                    @click="inspected = doc"
+                    @click="inspect(doc, $event)"
                   >
                     Inspect
                   </button>
@@ -133,7 +145,7 @@ const inspected = ref<(typeof numberedDocuments)[number]>()
       >
         <DialogPortal>
           <DialogOverlay class="studio-overlay" />
-          <DialogContent v-if="inspected" class="studio-dialog">
+          <DialogContent v-if="inspected" class="studio-dialog" @close-auto-focus="restoreFocus">
             <DialogTitle>{{ inspected.name }}.pdf</DialogTitle>
             <DialogDescription>
               {{ categories[inspected.part] }} · {{ inspected.pages }} pages

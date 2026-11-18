@@ -10,28 +10,19 @@
   document.documentElement.dataset.theme =
     saved === 'dark' || saved === 'light' ? saved : prefersDark ? 'dark' : 'light'
 
-  function syncButtons() {
+  function syncThemeColor() {
     var dark = document.documentElement.dataset.theme === 'dark'
     var themeColor = document.querySelector('meta[name="theme-color"]')
     if (themeColor) themeColor.setAttribute('content', dark ? '#071b37' : '#f4f7fc')
-    document.querySelectorAll('.theme-toggle').forEach(function (button) {
-      var label = dark ? 'Switch to light mode' : 'Switch to dark mode'
-      if (button.getAttribute('aria-label') !== label) button.setAttribute('aria-label', label)
-      if (button.getAttribute('title') !== label) button.setAttribute('title', label)
-    })
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', syncButtons, { once: true })
+    document.addEventListener('DOMContentLoaded', syncThemeColor, { once: true })
   } else {
-    syncButtons()
+    syncThemeColor()
   }
-  new MutationObserver(syncButtons).observe(document.documentElement, {
+  new MutationObserver(syncThemeColor).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ['data-theme'],
-  })
-  new MutationObserver(syncButtons).observe(document.documentElement, {
-    childList: true,
-    subtree: true,
   })
 })()

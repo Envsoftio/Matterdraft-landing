@@ -2,6 +2,7 @@
 import { ToolbarRoot, ToolbarButton } from 'reka-ui'
 import { agreementRecordsClause } from '~/data/example-matter'
 import { featureHeadings } from '~/data/feature-headings'
+import { vAnimateChange } from '~/utils/landing/animate-change'
 import SectionHeading from './SectionHeading.vue'
 const operations: Record<string, string> = {
   Merge: 'Two working copies are combined into one document.',
@@ -19,6 +20,11 @@ const operations: Record<string, string> = {
 }
 const selection = ref('Highlight')
 const changed = ref(false)
+function focusTool(event: MouseEvent) {
+  const button = event.currentTarget as HTMLButtonElement
+  button.focus({ preventScroll: true })
+}
+
 function apply(tool: string) {
   selection.value = tool
   changed.value = true
@@ -43,6 +49,7 @@ function apply(tool: string) {
               :key="tool"
               :aria-pressed="selection === tool"
               :class="{ danger: tool === 'Delete' }"
+              @mousedown.left.prevent="focusTool"
               @click="apply(tool)"
             >
               {{ tool }}
@@ -50,7 +57,7 @@ function apply(tool: string) {
           </template>
         </ToolbarRoot>
         <div class="two-col pdf-details">
-          <article class="pdf-paper">
+          <article v-animate-change="changed ? selection : null" class="pdf-paper">
             <small>Agreement.pdf · Working copy</small>
             <h3>3.2. Agreement and delivery records</h3>
             <p>{{ agreementRecordsClause }}</p>

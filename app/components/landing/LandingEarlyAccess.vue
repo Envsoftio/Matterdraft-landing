@@ -10,6 +10,7 @@ import {
   FormRoot,
 } from 'reka-ui'
 import { ArrowRight, Check, Star } from '@lucide/vue'
+import { vAnimateChange } from '~/utils/landing/animate-change'
 const roles = [
   'Advocate',
   'Barrister or solicitor',
@@ -94,7 +95,7 @@ async function submitEarlyAccess() {
         <template v-else>
           <header>
             <h3 id="early-access-form-title">Early access registration</h3>
-            <p>
+            <p v-animate-change="enabled">
               {{
                 enabled ? 'Share your details to join the list.' : 'Registration isn’t open yet.'
               }}
@@ -132,7 +133,7 @@ async function submitEarlyAccess() {
                 >
               </FieldRoot>
 
-              <FieldRoot name="role" :disabled="pending">
+              <FieldRoot v-animate-change="form.role" name="role" :disabled="pending">
                 <FieldLabel for="early-access-role">Your role <span>(optional)</span></FieldLabel>
                 <StudioSelect
                   id="early-access-role"
@@ -143,7 +144,7 @@ async function submitEarlyAccess() {
                 />
               </FieldRoot>
 
-              <FieldRoot name="platform" :disabled="pending">
+              <FieldRoot v-animate-change="form.platform" name="platform" :disabled="pending">
                 <FieldLabel for="early-access-platform"
                   >Preferred platform <span>(optional)</span></FieldLabel
                 >
@@ -182,7 +183,9 @@ async function submitEarlyAccess() {
 
             <p v-if="errorMessage" class="signup-error" role="alert">{{ errorMessage }}</p>
             <button class="action primary" type="submit" :disabled="!ready || pending">
-              {{ pending ? 'Sending…' : 'Join early access' }}
+              <span v-animate-change="pending">{{
+                pending ? 'Sending…' : 'Join early access'
+              }}</span>
               <ArrowRight aria-hidden="true" />
             </button>
             <noscript><p>Enable JavaScript to register online.</p></noscript>

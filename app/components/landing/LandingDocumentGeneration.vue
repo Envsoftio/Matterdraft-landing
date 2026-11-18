@@ -2,6 +2,7 @@
 import { Label } from 'reka-ui'
 import { RefreshCw } from '@lucide/vue'
 import { featureHeadings } from '~/data/feature-headings'
+import { vAnimateChange } from '~/utils/landing/animate-change'
 import SectionHeading from './SectionHeading.vue'
 const fields = {
   applicant: 'Applicant',
@@ -59,7 +60,7 @@ function generate() {
             Generate template preview
           </button>
         </form>
-        <article class="panel court-paper" aria-live="polite">
+        <article v-animate-change="preview" class="panel court-paper" aria-live="polite">
           <header>
             <small>In the {{ preview.court }}</small>
             <h3>Application to add delivery records</h3>

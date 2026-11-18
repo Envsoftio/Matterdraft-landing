@@ -6,4 +6,5 @@ export function toggleStudioTheme() {
   } catch {
     /* The theme still applies for this visit. */
   }
+  return theme
 }

@@ -2,6 +2,7 @@
 import { BadgeCheck, Play } from '@lucide/vue'
 import { agreementRecordsClause, matterName, matterReference } from '~/data/example-matter'
 import { featureHeadings } from '~/data/feature-headings'
+import { vAnimateChange } from '~/utils/landing/animate-change'
 import SectionHeading from './SectionHeading.vue'
 const state = ref<'ready' | 'scanning' | 'done'>('ready')
 let timer: ReturnType<typeof setTimeout>
@@ -35,9 +36,11 @@ onBeforeUnmount(() => clearTimeout(timer))
         <article class="panel ocr-card recognized">
           <header>
             02 / Searchable working copy
-            <span class="status-tag">{{ state === 'scanning' ? 'Scanning…' : 'OCR Ready' }}</span>
+            <span v-animate-change="state" class="status-tag">
+              {{ state === 'scanning' ? 'Scanning…' : 'OCR Ready' }}
+            </span>
           </header>
-          <div class="ocr-result" aria-live="polite">
+          <div v-animate-change="state === 'done'" class="ocr-result" aria-live="polite">
             <h4>Supply agreement · Clause 3.2</h4>
             <p>{{ agreementRecordsClause }}</p>
             <small class="positive">

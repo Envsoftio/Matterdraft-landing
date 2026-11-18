@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ToggleGroupRoot, ToggleGroupItem, ProgressRoot, ProgressIndicator } from 'reka-ui'
 import { featureHeadings } from '~/data/feature-headings'
+import { vAnimateChange } from '~/utils/landing/animate-change'
 import SectionHeading from './SectionHeading.vue'
 const target = ref(300)
 const documents = [18, 24, 60, 194, 125, 170, 148, 125]
@@ -54,13 +55,21 @@ function description(index: number, pages: number) {
           </ToggleGroupItem>
         </ToggleGroupRoot>
       </div>
-      <div class="volume-grid" data-enter aria-live="polite">
+      <TransitionGroup
+        name="studio-volume"
+        tag="div"
+        class="volume-grid"
+        data-enter
+        aria-live="polite"
+      >
         <article v-for="(volume, i) in volumes" :key="i" class="volume-card panel">
           <header>
             <h3>Volume {{ i + 1 }}</h3>
-            <span class="status-tag">{{ volume.pages }} / {{ target }} pp</span>
+            <span v-animate-change="target" class="status-tag">
+              {{ volume.pages }} / {{ target }} pp
+            </span>
           </header>
-          <small>
+          <small v-animate-change="target">
             Pages {{ volume.start }}–{{ volume.start + volume.pages - 1 }} · {{ volume.count }}
             {{ volume.count === 1 ? 'document' : 'documents' }}
           </small>
@@ -76,7 +85,7 @@ function description(index: number, pages: number) {
           </ProgressRoot>
           <p>{{ description(i, volume.pages) }}</p>
         </article>
-      </div>
+      </TransitionGroup>
     </div>
   </section>
 </template>
