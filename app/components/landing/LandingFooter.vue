@@ -8,12 +8,10 @@ defineProps<{ policy?: boolean }>()
         <div>
           <NuxtLink :to="policy ? '/' : '/#top'" aria-label="MatterDraft Studio home"><BrandLogo /></NuxtLink>
           <p>
-            A local-first desktop workspace for legal drafting and bundle preparation. Organise case files,
-            review working copies, and export indexed, paginated bundles.
+            Prepare case files and indexed court bundles on your own computer.
           </p>
           <div class="footer-badges">
-            <span>Offline-first</span>
-            <span>Local processing</span>
+            <span>On-device processing</span>
           </div>
         </div>
         <nav aria-label="Product links">
@@ -21,7 +19,7 @@ defineProps<{ policy?: boolean }>()
           <NuxtLink to="/#pdf-engine">PDF tools</NuxtLink>
           <NuxtLink to="/#ocr">Scanned pages &amp; OCR</NuxtLink>
           <NuxtLink to="/#automation">Bundle indexing</NuxtLink>
-          <NuxtLink to="/#workflow">Production workflow</NuxtLink>
+          <NuxtLink to="/#workflow">Bundle workflow</NuxtLink>
         </nav>
         <nav aria-label="Legal and account links">
           <strong>Legal &amp; account</strong>
@@ -29,14 +27,15 @@ defineProps<{ policy?: boolean }>()
           <NuxtLink to="/terms">Terms</NuxtLink>
           <NuxtLink to="/refund-policy">Refund policy</NuxtLink>
           <NuxtLink to="/portal">Account portal</NuxtLink>
+          <a href="mailto:hello@matterdraft.legal">Contact support</a>
         </nav>
       </div>
       <div class="footer-baseline">
-        <span>Built with ❤️ in भारत for advocates globally</span>
+        <span>Built in India for legal teams</span>
         <span>
           MatterDraft Studio · An
           <a
-            href="https://envsoft.io/?utm_source=matterdraft&amp;utm_medium=footer&amp;utm_campaign=brand_attribution"
+            href="https://envsoft.io/"
             rel="noopener noreferrer"
             target="_blank"
           >

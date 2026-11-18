@@ -33,7 +33,7 @@ function apply(tool: string) {
             v-for="(group, index) in [Object.keys(operations).slice(0, 7), Object.keys(operations).slice(7)]"
             :key="index"
           >
-            <strong>{{ index ? 'Page annotation:' : 'Document ops:' }}</strong>
+            <strong>{{ index ? 'Page tools' : 'Document tools' }}</strong>
             <ToolbarButton
               v-for="tool in group"
               :key="tool"
@@ -48,17 +48,17 @@ function apply(tool: string) {
         <div class="two-col pdf-details">
           <article class="pdf-paper">
             <small>Imported original preserved</small>
-            <h3>{{ changed ? selection + ' · Working copy' : 'Multi-layer working copy architecture' }}</h3>
+            <h3>{{ changed ? selection + ' · Working copy' : 'Sample PDF working copy' }}</h3>
             <p aria-live="polite">
               {{
                 changed
                   ? operations[selection]
-                  : 'MatterDraft builds a non-destructive transformation layer over your legal records. Add annotations, extract sensitive clauses, or reorganize exhibits without corrupting the evidentiary integrity of the source PDF.'
+                  : 'Try the tools on this sample. In the desktop app, changes are made to a working copy so the original stays intact.'
               }}
             </p>
             <footer>
               Page 1 of {{ selection === 'Delete' ? 38 : selection === 'Insert' ? 40 : 39 }}　 Zoom 100%　
-              <span class="positive">Working copy synced</span>
+              <span class="positive">Sample working copy</span>
             </footer>
           </article>
           <div class="pdf-notes">

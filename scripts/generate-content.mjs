@@ -5,15 +5,6 @@ import { privateAreas } from './discovery.mjs'
 import { canonicalUrl, loadSiteConfig, PROJECT_ROOT } from './site-config.mjs'
 
 const LEGAL_SLUGS = ['privacy', 'terms', 'refund-policy']
-const LEGAL_LINKS = new Map([
-  ['MatterDraft-Privacy-Policy.md', 'privacy'],
-  ['MatterDraft-Terms-and-Conditions.md', 'terms'],
-  ['MatterDraft-Refund-Policy.md', 'refund-policy'],
-  ['privacy.md', 'privacy'],
-  ['terms.md', 'terms'],
-  ['refund-policy.md', 'refund-policy'],
-])
-
 export function escapeXml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;',
@@ -21,25 +12,13 @@ export function escapeXml(value) {
 }
 
 export function prepareLegalMarkdown(markdown) {
-  const normalized = markdown.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n')
-  const appendix = normalized.search(/^##[ \t]+Publication notes\b.*$/im)
-  const publicBody = (appendix < 0 ? normalized : normalized.slice(0, appendix))
-    .replace(/\n[ \t]*(?:---|\*\*\*|___)[ \t]*\n*$/, '')
-    .trim()
-  const heading = publicBody.match(/^#[ \t]+([^\n]+)\n*/)
+  const normalized = markdown.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n').trim()
+  const heading = normalized.match(/^#[ \t]+([^\n]+)\n*/)
   if (!heading) throw new Error('Every legal source must start with one level-one title.')
-  return {
-    markdown: publicBody + '\n',
-    body: publicBody.slice(heading[0].length).trim() + '\n',
+  if (/\[[A-Z][A-Z0-9]*_[A-Z0-9_]+\b/.test(normalized) || /^#{1,6}\s+Publication notes\b|^>\s+\*{0,2}Review draft\b/im.test(normalized)) {
+    throw new Error('Remove placeholders and draft notes before publishing a legal policy.')
   }
-}
-
-function rewriteLegalLink(href) {
-  const match = href.match(/^([^?#]+)([?#].*)?$/)
-  if (!match) return href
-  const slug = LEGAL_LINKS.get(match[1].replace(/^\.\//, ''))
-  if (!slug) return href
-  return '/' + slug + (match[2] || '')
+  return normalized.slice(heading[0].length).trim() + '\n'
 }
 
 export function renderRobots(config) {
@@ -60,7 +39,9 @@ export function renderRobots(config) {
   ].join('\n')
 }
 
-export function renderSitemap(config, paths = [config.facts.homepage.path]) {
+export function renderSitemap(config, paths = [
+  config.facts.homepage.path, ...config.facts.legalDocuments.map(({ slug }) => '/' + slug),
+]) {
   const entries = config.indexable
     ? [...new Set(paths)].map((path) =>
       '  <url><loc>' + escapeXml(canonicalUrl(path, config.siteUrl)) + '</loc></url>')
@@ -86,6 +67,12 @@ export function renderProductMarkdown(config) {
     '',
     facts.status + ' for ' + facts.platforms.join(' and ') + '.',
     '',
+    '## Document privacy',
+    '',
+    'Case files, working copies, recognised text and finished bundles stay on your device. ' +
+    'MatterDraft does not upload these files or their contents to its servers. ' +
+    '[Read the Privacy Policy](' + canonicalUrl('/privacy', siteUrl) + ') for how the website handles account and support information.',
+    '',
     '## Product scope',
     '',
     ...facts.qualifications.map((qualification) => '- ' + qualification),
@@ -103,7 +90,7 @@ export function renderProductMarkdown(config) {
     '',
     '## Policies',
     '',
-    'The website policy pages are review drafts awaiting business details and adoption.',
+    ...facts.legalDocuments.map(({ slug, title }) => '- [' + title + '](' + canonicalUrl('/' + slug, siteUrl) + ')'),
   ]
   return lines.join('\n').trimEnd() + '\n'
 }
@@ -117,13 +104,18 @@ export function renderLlmsIndex(config) {
     '> ' + facts.summary,
     '',
     facts.status + ' for ' + facts.platforms.join(' and ') + '. Website examples use fictional data. ' +
-    'Release timing has not been announced. Website policies are review drafts.',
+    'The desktop app processes case files on the user’s device and keeps generated bundles there.',
     '',
     '## Product',
     '',
     '- [Product overview in Markdown](' + canonicalUrl(facts.homepage.markdownPath, siteUrl) + '): Scope, intended workflows and limitations.',
     '- [Product website](' + homepage + '): Public feature descriptions and interactive examples.',
     '- [Early access](' + homepage + '#early-access): Current registration availability and terms of the early access offer.',
+    '',
+    '## Policies',
+    '',
+    ...facts.legalDocuments.map(({ slug, title, description }) =>
+      '- [' + title + '](' + canonicalUrl('/' + slug, siteUrl) + '): ' + description),
     '',
     '## Optional',
     '',
@@ -157,20 +149,13 @@ export async function generateContent({ projectRoot = PROJECT_ROOT, env = proces
   })))
   // Only repository-owned Markdown reaches this build-time parser, never form data.
   const { Marked } = await import('marked')
-  const parser = new Marked({
-    gfm: true,
-    breaks: false,
-    walkTokens(token) {
-      if (token.type === 'link') token.href = rewriteLegalLink(token.href)
-    },
-  })
+  const parser = new Marked({ gfm: true, breaks: false })
   const output = new Map()
   for (const document of documents) {
-    const prepared = prepareLegalMarkdown(document.markdown)
-    const html = parser.parse(prepared.body, { async: false })
+    const html = parser.parse(prepareLegalMarkdown(document.markdown), { async: false })
     const data = {
       title: document.title,
-      description: 'Review draft. ' + document.description,
+      description: document.description,
       slug: document.slug,
       html,
     }
@@ -205,7 +190,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   try {
     const result = await generateContent()
     console.log(
-      'Generated ' + result.written.length + ' content files; legal policies remain review drafts and are excluded from discovery.',
+      'Generated ' + result.written.length + ' content files, including policy pages and sitemap.',
     )
   } catch (error) {
     console.error('Content generation failed: ' + error.message)

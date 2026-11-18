@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { gzipSync } from 'node:zlib'
 import { createHash } from 'node:crypto'
-import { DRAFT_ROBOTS, NO_INDEX } from './discovery.mjs'
+import { NO_INDEX } from './discovery.mjs'
 import { loadSiteConfig } from './site-config.mjs'
 
 const root=dirname(dirname(fileURLToPath(import.meta.url))),dist=join(root,'dist')
@@ -20,8 +20,15 @@ for(const route of pages){
   assert(/<meta\s+name="description"\s+content="[^\"]+"/.test(html),`Missing description on /${route}`)
   assert(html.includes('property="og:image"'),`Missing social image on /${route}`)
   const robots = [...html.matchAll(/<meta name="robots" content="([^"]+)">/g)].map((match) => match[1])
-  const expectedRobots = !settings.indexable ? NO_INDEX : route ? DRAFT_ROBOTS : 'index, follow, max-image-preview:large'
+  const expectedRobots = settings.indexable ? 'index, follow, max-image-preview:large' : NO_INDEX
   assert.deepEqual(robots, [expectedRobots], `Incorrect robots metadata on /${route}`)
+  if (route) {
+    assert.match(html, /<strong>Effective date:<\/strong> \d{1,2} \w+ \d{4}/)
+    assert.match(html, /<strong>Last updated:<\/strong> \d{1,2} \w+ \d{4}/)
+    assert(html.includes('Envsoft Solutions LLP') && html.includes('Neha Sharma (CEO)'))
+    assert(html.includes('mailto:hello@matterdraft.legal'))
+    assert.doesNotMatch(html, /Review draft|Publication notes|\[[A-Z]+_[A-Z_]+\]/)
+  }
   assert(html.includes(new URL(socialImage.path, settings.siteUrl).href), `Missing absolute social image on /${route}`)
   assert(!html.includes('data:font/'),'Embedded font data should be externalized')
   assert(!html.includes('fonts.googleapis.com'),'Font must be self-hosted')
@@ -42,6 +49,7 @@ const home=await readFile(join(dist,'index.html'),'utf8')
 assert(home.includes(`<title>${homepage.title}</title>`), 'Homepage title does not match the site configuration')
 assert.equal(home.includes('type="text/markdown"'), settings.indexable, 'Unexpected Markdown alternate on homepage')
 for(const required of ['From case documents','to organised bundles.','196','Fictional','matterdraft-structured-data'])assert(home.includes(required),`Missing server-rendered content: ${required}`)
+assert(home.includes('We do not upload your documents, OCR text or finished bundles to our servers.'))
 for(const required of ['https://forms.gle/oZ4ziNTZoQ3QWEoh6','Early access registration','one month free after launch',settings.earlyAccessEnabled ? 'Share your details' : 'Registration isn’t open yet'])assert(home.includes(required),`Missing early access content: ${required}`)
 assert(!home.includes('Request a demo')&&!home.includes('data-demo')&&!home.includes('demo-dialog'),'Demo request UI must be absent')
 const structured=[...home.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)].find(m=>m[1].includes('application/ld+json'))
@@ -57,7 +65,8 @@ const sitemap=await readFile(join(dist,'sitemap.xml'),'utf8')
 assert(sitemap.includes('<urlset'),'Invalid sitemap')
 const canonical = new URL(homepage.path, settings.siteUrl).href
 const sitemapEntries = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1])
-assert.deepEqual(sitemapEntries, settings.indexable ? [canonical] : [], 'Sitemap includes unexpected URLs')
+const publicPages = pages.map((route) => new URL('/' + route, settings.siteUrl).href)
+assert.deepEqual(sitemapEntries, settings.indexable ? publicPages : [], 'Sitemap includes unexpected URLs')
 const robots = await readFile(join(dist, 'robots.txt'), 'utf8')
 assert.equal(robots.includes(`Sitemap: ${new URL('/sitemap.xml', settings.siteUrl).href}`), settings.indexable)
 const llms=await readFile(join(dist,'llms.txt'),'utf8');assert(llms.startsWith('# MatterDraft'),'llms.txt H1 missing');assert(llms.includes('/index.md'),'Markdown product description not discoverable')

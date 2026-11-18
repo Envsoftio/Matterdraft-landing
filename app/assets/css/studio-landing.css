@@ -1692,7 +1692,7 @@ html[data-theme='dark'] .export-example {
   margin-top: 4px;
 }
 .outputs {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 .studio-landing .outputs article {
   min-height: 106px;
@@ -1704,7 +1704,7 @@ html[data-theme='dark'] .export-example {
   width: 25px;
   margin-bottom: 6px;
 }
-.outputs h4 {
+.outputs h3 {
   font-size: 12px;
 }
 .outputs small {
@@ -2015,7 +2015,7 @@ html[data-theme='dark'] .export-example {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .outputs {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .volume-grid {
     gap: 10px;

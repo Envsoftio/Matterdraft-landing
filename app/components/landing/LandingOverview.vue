@@ -50,7 +50,7 @@ const darkCapabilities = [
       <SectionHeading v-bind="featureHeadings.overview" class="light-design" />
       <SectionHeading
         v-bind="featureHeadings.overview"
-        label="01 / More than a PDF editor"
+        label="Matter preparation"
         class="dark-design"
       />
       <div class="capability-grid">

@@ -22,13 +22,15 @@ const initiallyEnabled = useRuntimeConfig().public.earlyAccessEnabled
 const { data: availability } = useFetch<{ enabled: boolean }>(endpoint, { server: false, retry: 0 })
 const enabled = computed(() => availability.value?.enabled ?? initiallyEnabled)
 const form = reactive({ name: '', email: '', role: '', platform: '', contactConsent: false, website: '' })
+const ready = ref(false)
 const pending = ref(false)
 const submitted = ref(false)
 const errorMessage = ref('')
 const submissionStatus = useTemplateRef('submissionStatus')
+onMounted(() => { ready.value = true })
 
 async function submitEarlyAccess() {
-  if (pending.value || !enabled.value) return
+  if (!ready.value || pending.value || !enabled.value) return
   pending.value = true
   errorMessage.value = ''
   try {
@@ -126,6 +128,7 @@ async function submitEarlyAccess() {
                   I agree to receive emails about MatterDraft early access and launch.
                 </FieldLabel>
                 <FieldDescription class="signup-privacy">
+                  We store your registration details in Google Sheets.
                   <NuxtLink to="/privacy">Privacy policy</NuxtLink>
                 </FieldDescription>
                 <FieldError class="signup-field-error">Agree to receive emails to join the list.</FieldError>
@@ -133,10 +136,11 @@ async function submitEarlyAccess() {
             </FieldRoot>
 
             <p v-if="errorMessage" class="signup-error" role="alert">{{ errorMessage }}</p>
-            <button class="action primary" type="submit" :disabled="pending">
+            <button class="action primary" type="submit" :disabled="!ready || pending">
               {{ pending ? 'Sending…' : 'Join early access' }}
               <ArrowRight aria-hidden="true" />
             </button>
+            <noscript><p>Enable JavaScript to register online.</p></noscript>
           </FormRoot>
         </template>
       </div>

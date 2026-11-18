@@ -26,7 +26,7 @@ onBeforeUnmount(() => clearTimeout(timer))
             <i />
             <i />
             <i />
-            <span>[Non-searchable bitmap image layer]</span>
+            <span>Sample scan</span>
             <i />
           </div>
           <footer>
@@ -42,8 +42,7 @@ onBeforeUnmount(() => clearTimeout(timer))
           <div class="ocr-result" aria-live="polite">
             <h4>Supporting record: Clause 14.1 (Recognised)</h4>
             <p>
-              “All contractual covenants and indemnities under this schedule shall remain enforceable across
-              secondary filings...”
+              “The parties will keep copies of the signed agreement and the delivery schedule.”
             </p>
             <small class="positive">
               <BadgeCheck :size="13" />

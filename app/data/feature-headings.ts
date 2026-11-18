@@ -3,71 +3,71 @@ export const featureHeadings = {
     label: 'The whole matter, in view',
     title: 'A PDF is one file.\nA matter is everything around it.',
     description:
-      'For lawyers, advocates and legal teams, a case file is more than a PDF. Keep source documents, matter details, generated documents, references and final bundles together.',
+      'Keep source documents, working copies, references and final bundles together for each matter.',
   },
   workspace: {
-    label: '02 / WORK AT MATTER LEVEL',
+    label: 'Matter workspace',
     title: 'One matter.\nA clear place for everything.',
     description:
-      'Move between documents, categories, generated files and parts without losing the matter context. Build relationships before building the final bundle.',
+      'Group documents by category and arrange them in the order they should appear in the bundle.',
   },
   pdf: {
-    label: '03 / EDIT AND ORGANIZE PDFS',
+    label: 'PDF tools',
     title: 'Work on the pages.\nKeep the matter in view.',
     description:
-      'Merge, split, extract, reorder, replace, insert and delete. Refine the source material before it becomes part of the final legal bundle.',
+      'Merge and split PDFs, reorder pages, and prepare working copies for the bundle.',
   },
   ocr: {
-    label: '04 / SCANS BELONG IN THE WORKFLOW',
+    label: 'Scans and OCR',
     title: 'Turn scanned pages\ninto usable content.',
     description:
-      'Recognise text, review it and edit the working copy. OCR feeds the same organisation, pagination, indexing and bundling process.',
+      'Use OCR to make scanned text searchable. Review and correct the recognised text in your working copy.',
   },
   tools: {
-    label: '05 / PRODUCTION TOOLS, TOGETHER',
-    title: 'The finishing details are part of the job.',
-    description: 'Apply protection, presentation and review tools within the same document workspace.',
+    label: 'Document tools',
+    title: 'Prepare your working copies.',
+    description: 'Add review notes, page numbers, and other details before exporting.',
   },
   templates: {
-    label: '06 / LEGAL DOCUMENTS FROM STRUCTURED TEMPLATES',
+    label: 'Document templates',
     title: 'The matter supplies the fields.\nThe template gives them form.',
     description:
-      'Select a category and subcategory, complete the relevant fields and generate a formatted document from the chosen template.',
+      'Fill in the details a template asks for and preview the formatted document.',
   },
   collation: {
-    label: '07 / REFERENCES THAT FOLLOW THE STRUCTURE',
+    label: 'Pagination and indexing',
     title: 'Stop chasing page numbers.\nWork from one source of order.',
     description:
-      'The document sequence drives pagination. The numbered structure then supplies index page references and the bookmark hierarchy.',
+      'Arrange the bundle once. Page numbers, index entries and bookmarks follow the document order.',
   },
   volumes: {
-    label: '08 / DOCUMENT-AWARE VOLUME SPLITTING',
+    label: 'PDF volumes',
     title: 'A page target.\nA sensible place to split.',
     description:
-      'Aim for around 300 pages per volume while keeping each document intact. A document approaching the boundary moves into the next volume as a whole.',
+      'Choose a page target for each volume. The example keeps whole documents together.',
   },
   validation: {
-    label: '09 / RULE-BASED PRE-EXPORT CHECKS',
+    label: 'Bundle checks',
     title: 'Find what needs\na second look.',
     description:
-      'Check the structure across document categories. Bring missing dates, unassigned categories and numbering issues into view before export.',
+      'Find missing dates, categories and numbering issues before you export.',
   },
   local: {
-    label: '10 / LOCAL-FIRST BY DESIGN',
-    title: 'Serious document work.\nOn your own computer.',
+    label: 'Document privacy',
+    title: 'Your case files stay\non your device.',
     description:
-      'Prepare case files on your Windows or Mac computer, even when you are offline. Keep originals intact while you work with copies and create final documents.',
+      'MatterDraft processes files, runs OCR and creates bundles on your computer. We do not upload your documents, OCR text or finished bundles to our servers.',
   },
   outputs: {
-    label: '11 / STRUCTURED FINAL OUTPUTS',
+    label: 'Bundle export',
     title: 'Ready for the next step.\nEasy to find your way through.',
     description:
-      'Bring the cover, index, bookmarks, numbered pages and volumes together. Review the finished result, then create the files your workflow needs.',
+      'Review the index, bookmarks and page numbers before saving the bundle on your device.',
   },
   workflow: {
-    label: '12 / THE WHOLE PRODUCTION WORKFLOW',
+    label: 'Bundle workflow',
     title: 'From the first file to the final output.',
     description:
-      'Document processing, legal workflow and automation are connected around the matter. Return to a stage whenever the documents need to change.',
+      'See how each step fits together, from organising case files to exporting the bundle.',
   },
 } as const

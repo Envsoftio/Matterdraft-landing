@@ -15,7 +15,12 @@ onMounted(() => {
 <template>
   <section id="local-processing" class="studio-section">
     <div class="frame two-col local-grid">
-      <SectionHeading v-bind="featureHeadings.local" layout="stack" />
+      <div>
+        <SectionHeading v-bind="featureHeadings.local" layout="stack" />
+        <NuxtLink class="mt-3 inline-block text-sm text-studio-accent underline underline-offset-4" to="/privacy">
+          Read the Privacy Policy
+        </NuxtLink>
+      </div>
       <div class="panel shortcut-panel" data-enter>
         <strong>Everyday desktop essentials</strong>
         <dl>

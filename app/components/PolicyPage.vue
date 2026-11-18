@@ -4,7 +4,7 @@ import LandingFooter from '~/components/landing/LandingFooter.vue'
 const props = defineProps<{ title: string; description: string; slug: string; html: string }>()
 useSiteSeo({
   title: `${props.title} | MatterDraft Studio`, description: props.description,
-  path: `/${props.slug}`, indexable: false,
+  path: `/${props.slug}`,
 })
 </script>
 
@@ -25,9 +25,6 @@ useSiteSeo({
     <main id="policy-content" class="mx-auto max-w-4xl px-6 py-14 sm:py-20 flex-1 w-full">
       <p class="mb-4 text-xs font-semibold tracking-[0.18em] text-brand uppercase">MatterDraft Studio</p>
       <h1 class="max-w-3xl text-4xl leading-tight font-medium tracking-tight text-ink sm:text-5xl">{{ title }}</h1>
-      <aside class="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950" aria-label="Draft policy status">
-        <strong class="font-semibold">Review draft.</strong> The business and service details marked below need to be completed before this policy is published. This draft is excluded from search indexing.
-      </aside>
       <!-- Trusted, repository-owned Markdown is converted to HTML at build time. -->
       <article class="policy-prose mt-10" v-html="html" />
     </main>

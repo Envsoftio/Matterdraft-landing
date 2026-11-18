@@ -1,11 +1,10 @@
 import site from '~~/content/site.json'
-import { DRAFT_ROBOTS, NO_INDEX } from '~~/scripts/discovery.mjs'
+import { NO_INDEX } from '~~/scripts/discovery.mjs'
 
 export interface PageSeo {
   title: string
   description: string
   path: string
-  indexable?: boolean
   markdownPath?: string
 }
 
@@ -14,13 +13,12 @@ export function useSiteSeo(page: PageSeo): void {
   const config = useRuntimeConfig().public
   const canonical = new URL(page.path, config.siteUrl).href
   const image = new URL(site.socialImage.path, config.siteUrl).href
-  const indexingEnabled = ['true', '1'].includes(String(config.indexable).toLowerCase())
-  const indexable = indexingEnabled && page.indexable !== false
+  const indexable = ['true', '1'].includes(String(config.indexable).toLowerCase())
 
   useSeoMeta({
     title: page.title,
     description: page.description,
-    robots: indexable ? 'index, follow, max-image-preview:large' : indexingEnabled ? DRAFT_ROBOTS : NO_INDEX,
+    robots: indexable ? 'index, follow, max-image-preview:large' : NO_INDEX,
     ogType: 'website',
     ogSiteName: site.name,
     ogLocale: site.language.replace('-', '_'),

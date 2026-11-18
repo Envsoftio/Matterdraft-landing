@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { mkdtemp, mkdir, readFile, writeFile, rm, access } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { discoveryHeaders, DRAFT_ROBOTS, NO_INDEX, privateAreas } from '../scripts/discovery.mjs'
+import { discoveryHeaders, NO_INDEX_FOLLOW, NO_INDEX, privateAreas } from '../scripts/discovery.mjs'
 import {
   canonicalUrl, resolveSiteConfig, validateSiteOrigin, PROJECT_ROOT,
 } from '../scripts/site-config.mjs'
@@ -62,7 +62,7 @@ test('preview builds advertise no sitemap and contain no indexable sitemap URLs'
   assert.doesNotMatch(renderSitemap(config), /<url>/)
 })
 
-test('draft policies stay out of discovery while remaining crawlable for noindex', () => {
+test('published policies appear in discovery without listing private routes', () => {
   const config = resolveSiteConfig({ NUXT_PUBLIC_SITE_URL: 'https://example.com' })
   const robots = renderRobots(config)
   for (const group of ['User-agent: *', 'User-agent: OAI-SearchBot']) {
@@ -76,10 +76,13 @@ test('draft policies stay out of discovery while remaining crawlable for noindex
   }
   assert.doesNotMatch(robots, /Disallow: \/(?:privacy|terms|refund-policy)/)
   assert.match(robots, /Sitemap: https:\/\/example\.com\/sitemap\.xml/)
-  assert.equal((renderSitemap(config).match(/<url>/g) || []).length, 1)
-  assert.doesNotMatch(renderSitemap(config), /\/(?:privacy|terms|refund-policy)</)
+  assert.equal((renderSitemap(config).match(/<url>/g) || []).length, 4)
+  for (const path of ['/privacy', '/terms', '/refund-policy']) {
+    assert.ok(renderSitemap(config).includes(`<loc>https://example.com${path}</loc>`))
+    assert.ok(renderLlmsIndex(config).includes(`(https://example.com${path})`))
+  }
   const llms = renderLlmsIndex(config)
-  assert.match(llms, /review drafts/)
+  assert.doesNotMatch(llms, /review drafts/)
   assert.match(llms, /\]\(https:\/\/example\.com\/index\.md\)/)
   assert.match(llms, /\]\(https:\/\/example\.com\/llms-full\.txt\)/)
   assert.match(llms, /\]\(https:\/\/example\.com\/#early-access\)/)
@@ -94,8 +97,8 @@ test('discovery headers scope public links, private pages and preview indexing',
   assert.equal(headers['/index.md'].Link, '<https://example.com/>; rel="canonical"')
   assert.equal(headers['/index.md']['Content-Type'], 'text/markdown; charset=utf-8')
   assert.equal(headers['/llms-full.txt'].Link, headers['/index.md'].Link)
-  assert.equal(headers['/llms.txt']['X-Robots-Tag'], DRAFT_ROBOTS)
-  assert.equal(headers['/privacy']['X-Robots-Tag'], DRAFT_ROBOTS)
+  assert.equal(headers['/llms.txt']['X-Robots-Tag'], NO_INDEX_FOLLOW)
+  assert.equal(headers['/privacy'], undefined)
   for (const path of ['/sign-in', '/reset-password', '/verify-email', '/consent', '/maintenance.html', ...privateAreas]) {
     assert.equal(headers[path]['X-Robots-Tag'], NO_INDEX, path)
     assert.equal(headers[path].Link, undefined, path)
@@ -105,7 +108,6 @@ test('discovery headers scope public links, private pages and preview indexing',
   assert.equal(preview['/'], undefined)
   assert.equal(preview['/index.md'].Link, undefined)
   assert.equal(preview['/**']['X-Robots-Tag'], NO_INDEX)
-  assert.equal(preview['/privacy']['X-Robots-Tag'], NO_INDEX)
 })
 
 test('sitemap paths use the configured origin and escape XML', () => {
@@ -115,28 +117,15 @@ test('sitemap paths use the configured origin and escape XML', () => {
   assert.doesNotMatch(renderSitemap(config), /lastmod|changefreq|priority/)
 })
 
-test('legal preparation retains review status but removes the duplicated title and appendix', () => {
-  const prepared = prepareLegalMarkdown([
-    '# MatterDraft Studio — Privacy Policy',
-    '',
-    '> Review draft prepared for confirmation.',
-    '',
-    '## 1. Scope',
-    'Policy content.',
-    '',
-    '---',
-    '',
-    '## Publication notes — remove this section before publishing',
-    'Internal adoption instructions.',
-  ].join('\n'))
-  assert.match(prepared.markdown, /^# MatterDraft Studio/)
-  assert.doesNotMatch(prepared.body, /^# /m)
-  assert.match(prepared.body, /Review draft/)
-  assert.match(prepared.body, /Policy content/)
-  assert.doesNotMatch(prepared.markdown, /Publication notes|Internal adoption|---/)
+test('legal preparation removes the duplicated title and rejects unpublished material', () => {
+  const heading = '# MatterDraft Studio — Privacy Policy\n\n'
+  assert.equal(prepareLegalMarkdown(heading + '## Scope\nPolicy content.'), '## Scope\nPolicy content.\n')
+  for (const text of ['[UNRESOLVED_FIELD]', '> **Review draft.**', '## Publication notes']) {
+    assert.throws(() => prepareLegalMarkdown(heading + text), /before publishing/)
+  }
 })
 
-async function createFixture(t, unresolved = false) {
+async function createFixture(t) {
   const root = await mkdtemp(join(tmpdir(), 'matterdraft-seo-'))
   t.after(() => rm(root, { recursive: true, force: true }))
   await mkdir(join(root, 'content/legal'), { recursive: true })
@@ -146,24 +135,17 @@ async function createFixture(t, unresolved = false) {
     await writeFile(join(root, 'content/legal', slug + '.md'), [
       '# MatterDraft Studio — ' + slug,
       '',
-      '> Review draft for the website.',
-      '',
-      unresolved ? 'Operator: [LEGAL_OPERATOR_NAME]' : 'Operator: Example Operator',
+      'Operator: Example Operator',
       '',
       '## 1. Scope',
-      '[Terms and Conditions](MatterDraft-Terms-and-Conditions.md).',
-      '',
-      '---',
-      '',
-      '## Publication notes — remove this section before publishing',
-      'Internal publication instructions.',
+      '[Terms and Conditions](/terms).',
     ].join('\n'))
   }
   return root
 }
 
-test('generation prepares HTML modules, preserves sources and does not export raw drafts', async (t) => {
-  const projectRoot = await createFixture(t, true)
+test('generation prepares policy HTML and keeps the Markdown source intact', async (t) => {
+  const projectRoot = await createFixture(t)
   const sourcePath = join(projectRoot, 'content/legal/privacy.md')
   const before = await readFile(sourcePath, 'utf8')
   const result = await generateContent({ projectRoot, env: {} })
@@ -171,13 +153,13 @@ test('generation prepares HTML modules, preserves sources and does not export ra
   const module = await readFile(join(projectRoot, 'app/data/legal/privacy.ts'), 'utf8')
   const data = JSON.parse(module.slice(module.indexOf('export default ') + 'export default '.length))
   assert.equal(data.slug, 'privacy')
-  assert.match(data.description, /^Review draft\./)
-  assert.match(data.html, /Review draft/)
+  assert.doesNotMatch(data.description, /Review draft/)
+  assert.match(data.html, /Example Operator/)
   assert.match(data.html, /href="\/terms"/)
   assert.doesNotMatch(data.html, /<h1|Publication notes|Internal publication/)
   assert.equal(await readFile(sourcePath, 'utf8'), before)
   await assert.rejects(access(join(projectRoot, 'public/legal/privacy.md')))
-  assert.doesNotMatch(await readFile(join(projectRoot, 'public/llms-full.txt'), 'utf8'), /LEGAL_OPERATOR_NAME/)
+  assert.match(await readFile(join(projectRoot, 'public/llms-full.txt'), 'utf8'), /\(https:\/\/matterdraft\.legal\/privacy\)/)
 })
 
 test('generation removes stale policy Markdown exports', async (t) => {

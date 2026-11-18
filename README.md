@@ -50,7 +50,7 @@ This serves `dist/` at `http://localhost:3000` with the generated security heade
 | `app/composables/` | Landing lifecycle and shared page SEO. |
 | `app/assets/css/` | Tailwind setup, shared tokens, typography and the approved responsive illustration styles. |
 | `content/site.json` | Product facts and descriptions used in the generated Markdown and discovery content. Keep these aligned with the visible landing-page copy. |
-| `content/legal/` | Editable source policy drafts. These are the source of truth for the policy pages. |
+| `content/legal/` | Editable Markdown source for the website policies. |
 | `app/data/legal/` | Generated policy modules. Recreate these with `npm run content`. |
 | `public/` | Fonts, brand and social assets, icons, manifest and generated discovery files. |
 | `scripts/` | Shared settings, content generation, static export, preview server and build verification. |
@@ -68,7 +68,7 @@ Copy `.env.example` to `.env` to override the defaults, or provide the same vari
 | Variable | Default | Effect |
 | --- | --- | --- |
 | `NUXT_PUBLIC_SITE_URL` | `https://matterdraft.legal` | The one origin used for canonical URLs, social URLs, sitemap entries and Markdown links. |
-| `NUXT_PUBLIC_INDEXABLE` | `true` in production, `false` on Netlify deploy previews and branch deploys | Controls homepage indexing. Set to `false` for a non-indexable build on another host. |
+| `NUXT_PUBLIC_INDEXABLE` | `true` in production, `false` on Netlify deploy previews and branch deploys | Controls indexing of the homepage and legal policies. Set to `false` for a non-indexable build on another host. |
 | `EARLY_ACCESS_GOOGLE_SHEETS_URL` | unset | Private Google Apps Script web app `/exec` URL, available to Netlify Functions and the build. |
 | `EARLY_ACCESS_GOOGLE_SHEETS_SECRET` | unset | Private shared secret, at least 32 characters, available to Netlify Functions and the build. |
 
@@ -82,7 +82,7 @@ The content generator and Nuxt configuration use the same settings loader. It re
 
 The on-page form submits to the existing Google Apps Script receiver through `/.netlify/functions/early-access`. A GET checks whether the running server has the webhook URL and shared secret. A POST validates the fields and waits for the receiver to confirm the Sheet write. Only the availability flag and submission result reach the browser.
 
-Follow [the Sheet and Apps Script setup guide](docs/early-access-google-sheets.md) to create the Sheet, deploy the receiver, configure Netlify, and test a real submission. Complete the privacy policy's provider, contact and retention details before opening registration.
+Follow [the Sheet and Apps Script setup guide](docs/early-access-google-sheets.md) to create the Sheet, deploy the receiver, configure Netlify, and test a real submission. Keep the registration and retention practices aligned with the Privacy Policy.
 
 `npm run dev`, `npm run preview` (after generation), and Netlify serve the same handler. For local use, put both private settings in `.env`. For deployment, build from the repository so Netlify includes the function.
 
@@ -99,7 +99,7 @@ Deploy the regenerated `dist/` and its matching header configuration together. C
 
 With `NUXT_PUBLIC_INDEXABLE=false`, page metadata requests `noindex`, `robots.txt` disallows crawling, and the sitemap contains no page entries. The generated `_headers` file and local preview also add a noindex response header. Search directives are not access controls; use the hosting provider's access protection when a preview must be private.
 
-## Policy drafts and publication
+## Policy pages
 
 The three policy routes are rendered from:
 
@@ -107,11 +107,7 @@ The three policy routes are rendered from:
 - `content/legal/terms.md`
 - `content/legal/refund-policy.md`
 
-They are **review drafts**, with unresolved business details. By default they have a visible draft banner and `noindex` metadata, are omitted from the sitemap and agent exports, and have no exported `public/legal/*.md` copies. They remain crawlable so a crawler can read their noindex metadata. They are accessible website routes, not confidential documents.
-
-The generator parses trusted, repository-owned Markdown at build time. It removes the first H1 from the HTML because the policy layout supplies the page heading, removes the Publication notes appendix, preserves the draft introductory text, and rewrites the old policy filenames to the correct site routes. The source Markdown is unchanged by generation. The parser is not an untrusted-content sanitization service.
-
-The publication environment flag has been removed. These pages remain visible review drafts with `noindex` metadata until the source policies are completed and a separate publication change is made. The refund draft preserves mandatory remedies alongside the no-voluntary-refunds business position.
+The build renders these Markdown sources as HTML and includes the public URLs in the sitemap and LLM directory. It rejects unresolved placeholders and publication notes. Maintain the effective and last-updated dates in the source files when the policies change.
 
 ## Rendering, interaction and discovery
 
@@ -125,10 +121,10 @@ The homepage and policy pages have individual titles, descriptions, canonical UR
 
 The build generates:
 
-- `robots.txt` points to `sitemap.xml` and allows public content to be crawled by search engines and OpenAI's search crawler. The production sitemap lists the canonical homepage.
+- `robots.txt` points to `sitemap.xml` and allows public content to be crawled by search engines and OpenAI's search crawler. The production sitemap lists the homepage and three policy pages.
 - `llms.txt` as a concise guide following the [llms.txt proposal](https://llmstxt.org/).
 - `index.md` as a readable product overview with links to the corresponding workflow sections and early access form.
-- `llms-full.txt` containing the product overview; draft policy text is excluded.
+- `llms-full.txt` containing the product overview and links to the published policies.
 
 The homepage links to its Markdown alternate in HTML and advertises the alternate and LLM directory in its HTTP headers. The Markdown and full-text overview identify the homepage as canonical. [Google's AI search guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide)
 
@@ -172,7 +168,7 @@ npm run verify
 npm run preview
 ```
 
-The verifier checks generated page metadata, one H1 per route, duplicate IDs, draft-policy indexing, required assets, structured-data consistency and inline-script hashes against the HTML CSP. It prints asset-size checks to the terminal. See `VALIDATION.md` for the completed browser checks and their scope. These checks are not a Lighthouse score or a real-user loading-time measurement.
+The verifier checks generated page metadata, one H1 per route, duplicate IDs, policy publication and indexing, required assets, structured-data consistency and inline-script hashes against the HTML CSP. It prints asset-size checks to the terminal. See `VALIDATION.md` for the completed browser checks and their scope. These checks are not a Lighthouse score or a real-user loading-time measurement.
 
 Review responsive layouts and interactive flows in a browser after meaningful markup or behavior changes, including keyboard navigation, reduced motion, product-view dialogs and navigation back from a policy route. Test the deployed host's routes and headers as well as the local preview.
 

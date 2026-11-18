@@ -38,9 +38,8 @@ function save() {
       <div>
         <SectionHeading v-bind="featureHeadings.validation" layout="stack" />
         <p class="review-note">
-          <strong>Production checks, with a human review.</strong>
-          Validation helps inspect fields and document structure. It does not certify legal correctness or
-          court compliance.
+          <strong>Review before filing.</strong>
+          Check the final bundle against the court’s requirements.
         </p>
       </div>
       <div class="panel inspector" data-enter>

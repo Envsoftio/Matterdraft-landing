@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { FileText, Files, FileType, Table2, SquarePlay, FolderArchive } from '@lucide/vue'
+import { FileText, Files, FileType, Table2 } from '@lucide/vue'
 import { featureHeadings } from '~/data/feature-headings'
 import SectionHeading from './SectionHeading.vue'
 const outputs = [
   [FileText, 'Combined PDF', 'Indexed & paginated'],
-  [Files, 'Individual Volumes', 'Dedicated indexes'],
-  [FileType, 'Word Documents', 'Template outputs'],
-  [Table2, 'Excel / CSV Index', 'Structured tabular'],
-  [SquarePlay, 'PowerPoint', 'Where supported'],
-  [FolderArchive, 'Structured ZIP', 'Complete archive'],
+  [Files, 'Separate PDF volumes', 'Index for each volume'],
+  [FileType, 'Word documents', 'From templates'],
+  [Table2, 'Excel or CSV index', 'Page references in a table'],
 ] as const
 </script>
 <template>
@@ -18,7 +16,7 @@ const outputs = [
       <div class="outputs" data-enter>
         <article v-for="[icon, name, caption] in outputs" :key="name" class="panel">
           <component :is="icon" />
-          <h4>{{ name }}</h4>
+          <h3>{{ name }}</h3>
           <small>{{ caption }}</small>
         </article>
       </div>

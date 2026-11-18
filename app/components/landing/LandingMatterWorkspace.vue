@@ -27,7 +27,7 @@ const inspected = ref<(typeof numberedDocuments)[number]>()
         <div class="table-top">
           <h3>
             <Workflow />
-            Matter workspace / {{ matterName }}
+            Sample matter / {{ matterName }}
           </h3>
           <TabsList aria-label="Matter workspace view">
             <TabsTrigger v-for="tab in tabs" :key="tab" :value="tab">{{ tab }}</TabsTrigger>
@@ -105,8 +105,7 @@ const inspected = ref<(typeof numberedDocuments)[number]>()
           </div>
         </TabsContent>
         <div class="table-foot">
-          <span>Structure first. Output follows. Total 196 pages across 4 structured parts.</span>
-          <span>PDFs, Word documents and images can be organised within the matter.</span>
+          <span>196 pages across 4 parts in this sample.</span>
         </div>
       </TabsRoot>
       <DialogRoot

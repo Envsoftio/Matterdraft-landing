@@ -31,10 +31,11 @@ function generate() {
     <div class="frame">
       <SectionHeading v-bind="featureHeadings.templates" />
       <div class="template-grid" data-enter>
-        <form class="panel template-form" @submit.prevent="generate">
+        <form class="panel template-form" autocomplete="off" aria-describedby="template-privacy" @submit.prevent="generate">
           <header>
-            <small>Dynamic form fields</small>
-            <h3>Procedural Application Generator</h3>
+            <small>Template example</small>
+            <h3>Procedural application</h3>
+            <p id="template-privacy" class="mt-2 text-sm text-studio-muted">Use fictional details in this example.</p>
           </header>
           <div class="template-fields">
             <div
@@ -68,17 +69,15 @@ function generate() {
             </span>
           </div>
           <p>
-            1. The Applicant respectfully submits this application seeking leave for expedited presentation of
-            the evidentiary bundle annexures listed in this matter.
+            1. The applicant requests permission to submit the documents listed in the bundle.
           </p>
           <p>
-            2. The evidentiary exhibits referenced herein have been indexed and partitioned into volumes to
-            facilitate direct bench review.
+            2. The bundle index shows which volume and page each document appears on.
           </p>
           <p v-if="generated">{{ preview.date }} · {{ preview.representative }}</p>
           <footer>
-            <span>Template-driven document preview 01</span>
-            <span class="positive">{{ generated ? 'Preview updated' : 'Structured document preview' }}</span>
+            <span>Sample document</span>
+            <span v-if="generated" class="positive">Preview updated</span>
           </footer>
         </article>
       </div>

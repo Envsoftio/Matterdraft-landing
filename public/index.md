@@ -6,12 +6,16 @@
 
 In development for Windows and macOS.
 
+## Document privacy
+
+Case files, working copies, recognised text and finished bundles stay on your device. MatterDraft does not upload these files or their contents to its servers. [Read the Privacy Policy](https://matterdraft.legal/privacy) for how the website handles account and support information.
+
 ## Product scope
 
 - The product is in development. Release timing has not been announced; illustrated features are intended workflows, not evidence of a released production feature.
 - Website demonstrations use fictional documents and sample data. They do not process or upload a real legal matter.
 - Early access registration does not require payment details. The website does not offer checkout or process purchases.
-- Local-first describes local document workflows. Separately offered sharing or other connected features may require a network connection and their own disclosure.
+- The account portal, early access and support use a network connection. The desktop document workflow keeps case files and bundles on your device.
 - OCR output is editable recognised text; it is not a promise of generative legal drafting or error-free recognition.
 - Electronic signature placement is distinct from digital certification. Court acceptance and legal validity require separate review.
 - Users must review document content, ordering, page ranges, indexes, bookmarks and other outputs before use or filing.
@@ -84,4 +88,6 @@ The [early access section](https://matterdraft.legal/#early-access) shows whethe
 
 ## Policies
 
-The website policy pages are review drafts awaiting business details and adoption.
+- [Privacy Policy](https://matterdraft.legal/privacy)
+- [Terms and Conditions](https://matterdraft.legal/terms)
+- [Refund and Cancellation Policy](https://matterdraft.legal/refund-policy)

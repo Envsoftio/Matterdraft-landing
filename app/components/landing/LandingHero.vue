@@ -104,8 +104,8 @@ const sampleText: Record<string, string> = {
       </p>
       <h1 id="hero-title">From case documents to organised bundles.</h1>
       <p class="hero-description">
-        Prepare case files in one desktop workspace: edit and OCR PDFs, generate documents from templates,
-        collate evidence, and export indexed, paginated and bookmarked legal bundles.
+        Edit PDFs, recognise text in scans, and prepare indexed court bundles. Your case files and finished
+        bundles stay on your device.
       </p>
       <div class="hero-actions">
         <a href="#early-access" class="action primary">
@@ -138,7 +138,7 @@ const sampleText: Record<string, string> = {
           <b>{{ matterName }}</b>
           (MD-DEMO-026)
         </span>
-        <span class="local-state">● Offline / Saved Locally</span>
+        <span class="local-state">● Fictional matter</span>
         <span class="window-version">Preview</span>
       </figcaption>
       <div class="workspace-columns">
@@ -219,7 +219,7 @@ const sampleText: Record<string, string> = {
             <h4>
               {{
                 file.name === 'Agreement'
-                  ? '1. DEFINITIONS AND OPERATIVE PROVISIONS'
+                  ? '1. DELIVERY AND RECORDS'
                   : '1. ' + file.name.toUpperCase()
               }}
             </h4>
@@ -227,18 +227,18 @@ const sampleText: Record<string, string> = {
             <blockquote>
               <strong>
                 <PencilLine :size="13" />
-                Working-copy clause annotation: Review this section
+                Review note
               </strong>
               {{
                 file.name === 'Agreement'
-                  ? '“The parties unconditionally stipulate to an air-gapped forensic audit mechanism governed exclusively by deterministic local verification protocols.”'
+                  ? 'Check the delivery dates against the schedule before including this agreement.'
                   : 'Check this record against the original before including it in the final bundle.'
               }}
             </blockquote>
             <p class="paper-note">
               {{
                 file.name === 'Agreement'
-                  ? 'Section 2.4 - Confidentiality. Neither party shall transmit raw unencrypted evidentiary records across public multitenant server architectures without prior cryptographic sign-off.'
+                  ? 'Section 2.4. Each party will keep a copy of the signed agreement and delivery schedule.'
                   : 'This sample working copy preserves the original document.'
               }}
             </p>
@@ -291,14 +291,14 @@ const sampleText: Record<string, string> = {
           <DialogRoot>
             <DialogTrigger class="export-example">
               <Download :size="15" />
-              Export Court Bundle (PDF/A)
+              Preview bundle export
             </DialogTrigger>
             <DialogPortal>
               <DialogOverlay class="studio-overlay" />
               <DialogContent class="studio-dialog">
                 <DialogTitle>Bundle export preview</DialogTitle>
                 <DialogDescription>
-                  This fictional matter contains six documents across four parts and 196 numbered pages.
+                  This fictional matter contains six documents across four parts and 196 numbered pages. The preview shows what a bundle includes.
                 </DialogDescription>
                 <ul class="export-checks">
                   <li

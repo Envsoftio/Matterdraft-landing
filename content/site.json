@@ -6,7 +6,7 @@
   "homepage": {
     "path": "/",
     "title": "Legal Document and Court Bundle Software | MatterDraft Studio",
-    "description": "Explore MatterDraft Studio, a local-first desktop workspace in development for lawyers and advocates. Organise case files, OCR PDFs and prepare indexed court bundles.",
+    "description": "Prepare indexed court bundles with MatterDraft Studio, a desktop workspace in early preview. Your case files, OCR text and finished bundles stay on your device.",
     "markdownPath": "/index.md"
   },
   "socialImage": {
@@ -22,7 +22,7 @@
     "The product is in development. Release timing has not been announced; illustrated features are intended workflows, not evidence of a released production feature.",
     "Website demonstrations use fictional documents and sample data. They do not process or upload a real legal matter.",
     "Early access registration does not require payment details. The website does not offer checkout or process purchases.",
-    "Local-first describes local document workflows. Separately offered sharing or other connected features may require a network connection and their own disclosure.",
+    "The account portal, early access and support use a network connection. The desktop document workflow keeps case files and bundles on your device.",
     "OCR output is editable recognised text; it is not a promise of generative legal drafting or error-free recognition.",
     "Electronic signature placement is distinct from digital certification. Court acceptance and legal validity require separate review.",
     "Users must review document content, ordering, page ranges, indexes, bookmarks and other outputs before use or filing."
@@ -83,17 +83,17 @@
     {
       "slug": "privacy",
       "title": "Privacy Policy",
-      "description": "How MatterDraft Studio describes local processing, information it receives, privacy choices and contact responsibilities."
+      "description": "How MatterDraft Studio keeps legal files on your device and handles account, early access and support information."
     },
     {
       "slug": "terms",
       "title": "Terms and Conditions",
-      "description": "Terms for MatterDraft Studio, including product availability, permitted use, professional review and applicable rights."
+      "description": "Terms for using the MatterDraft website, account portal and desktop app."
     },
     {
       "slug": "refund-policy",
       "title": "Refund and Cancellation Policy",
-      "description": "MatterDraft Studio's no-voluntary-refunds position, subject to mandatory remedies, billing corrections and binding purchase commitments."
+      "description": "How to cancel a subscription, report a billing error or request a refund you are entitled to."
     }
   ]
 }

@@ -10,10 +10,10 @@ import {
 import { ArrowUpRight, Menu, UserRound, Zap } from '@lucide/vue'
 const links = [
   ['Product', '#product'],
-  ['PDF Engine', '#pdf-engine'],
+  ['PDF Tools', '#pdf-engine'],
   ['Workflow', '#workflow'],
   ['Automation', '#automation'],
-  ['Local Processing', '#local-processing'],
+  ['Document Privacy', '#local-processing'],
 ] as const
 const current = ref('#product')
 onMounted(() => {
@@ -81,10 +81,10 @@ onMounted(() => {
   <div class="preview-banner">
     <div>
       <span class="preview-pill">Early preview</span>
-      <span>Windows + macOS · Offline-first · Local processing</span>
+      <span>For Windows and macOS</span>
     </div>
     <a href="https://forms.gle/oZ4ziNTZoQ3QWEoh6" target="_blank" rel="noopener noreferrer">
-      Advocate? Share your feedback in our advocate survey
+      Advocate survey on Google Forms
       <ArrowUpRight :size="14" />
     </a>
   </div>

@@ -14,8 +14,8 @@ import { featureHeadings } from '~/data/feature-headings'
 import SectionHeading from './SectionHeading.vue'
 const tools = [
   [RectangleEllipsis, 'Password', 'Access protection', 'Set a password for the prepared output.'],
-  [Eraser, 'Redaction', 'Permanent removal', 'Review marked passages before producing a redacted copy.'],
-  [Signature, 'E-signature', 'Document signing', 'Prepare signature fields on the working document.'],
+  [Eraser, 'Redaction', 'Review marked text', 'Check the redacted copy before sharing it.'],
+  [Signature, 'Signature fields', 'Place a signature', 'Place a signature on the working copy.'],
   [PanelsTopLeft, 'Watermark', 'Custom opacity', 'Apply a visible mark across selected pages.'],
   [Clock, 'Timestamp', 'Date and time', 'Add a time reference to the prepared document.'],
   [ListOrdered, 'Pagination', 'Bates numbering', 'Number pages consistently across the parts of the bundle.'],

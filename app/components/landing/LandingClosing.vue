@@ -11,8 +11,7 @@ import { ArrowRight } from '@lucide/vue'
         structured legal bundle.
       </h2>
       <p>
-        For advocates, barristers, solicitors, law firms and chambers — and the litigation, legal operations,
-        paralegal and document-production teams working alongside them.
+        For advocates, chambers and the legal teams that prepare court bundles.
       </p>
       <a class="action primary" href="#early-access">
         Get Early Access
