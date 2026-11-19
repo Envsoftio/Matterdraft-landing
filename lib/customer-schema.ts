@@ -137,3 +137,26 @@ export const serviceFailureCount = sqliteTable(
   },
   (table) => [primaryKey({ columns: [table.hourStartedAt, table.statusCode] })],
 )
+
+export const licencePlan = sqliteTable('licence_plan', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  accountType: text('account_type', { enum: ['personal', 'organisation'] }).notNull(),
+  monthlyDevicePrice: integer('monthly_device_price').notNull(),
+  status: text('status', { enum: ['draft', 'published', 'archived'] }).notNull(),
+  revision: integer('revision').notNull().default(1),
+  createdAt: integer('created_at').notNull(),
+})
+
+export const licenceTrial = sqliteTable('licence_trial', {
+  accountId: text('account_id')
+    .primaryKey()
+    .references(() => customerAccount.id),
+  startedByUserId: text('started_by_user_id')
+    .notNull()
+    .references(() => user.id),
+  startedAt: integer('started_at').notNull(),
+  expiresAt: integer('expires_at').notNull(),
+})
+

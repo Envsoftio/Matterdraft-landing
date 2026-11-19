@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto'
 import type { Client } from '@libsql/client'
-import type { H3Event } from 'h3'
 import { applicationFailure } from './application-error.ts'
 
 export const ticketStatuses = [
@@ -14,38 +13,7 @@ export const ticketCategories = ['question', 'bug', 'billing', 'feedback'] as co
 const keyPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 export const idPattern = /^[A-Za-z0-9_-]{16,128}$/
 
-export async function readSupportInput(event: H3Event): Promise<Record<string, unknown>> {
-  if (
-    event.node.req.headers.origin !==
-    new URL(process.env.BETTER_AUTH_URL || 'http://localhost:3000').origin
-  )
-    applicationFailure(403)
-  const limit = 49152
-  const length = Number(event.node.req.headers['content-length'] || 0)
-  if (Number.isFinite(length) && length > limit) applicationFailure(422)
-  if (
-    !String(event.node.req.headers['content-type'] || '')
-      .toLowerCase()
-      .startsWith('application/json')
-  )
-    applicationFailure(400)
-  const chunks: Buffer[] = []
-  let size = 0
-  for await (const chunk of event.node.req) {
-    const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)
-    size += bytes.length
-    if (size > limit) applicationFailure(422)
-    chunks.push(bytes)
-  }
-  try {
-    const input: unknown = JSON.parse(Buffer.concat(chunks).toString('utf8'))
-    if (input && typeof input === 'object' && !Array.isArray(input))
-      return input as Record<string, unknown>
-  } catch {
-    /* Invalid JSON uses the shared request error. */
-  }
-  applicationFailure(400)
-}
+export { readSameOriginJson as readSupportInput } from './json-request.ts'
 
 export function validKey(value: unknown): value is string {
   return typeof value === 'string' && keyPattern.test(value)

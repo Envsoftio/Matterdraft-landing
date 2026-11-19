@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
+import { licencePrice } from '~/utils/licence-price'
 definePageMeta({ layout: 'portal' })
 usePrivatePageSeo('Account overview', 'View your MatterDraft account details and membership.')
 const route = useRoute()
@@ -27,6 +28,41 @@ const { data, error, refresh } = await useFetch(() => `/api/accounts/${accountId
           </p>
         </div>
       </div>
+      <section v-if="data.canBill" class="portal-detail mt-5" aria-labelledby="licence-heading">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 id="licence-heading" class="font-heading text-xl font-semibold">
+              {{ data.trial ? '7-day free trial' : 'Device licences' }}
+            </h2>
+            <p v-if="data.trial?.status === 'active'" class="mt-1 text-sm text-studio-muted">
+              Full access ends
+              <NuxtTime :datetime="data.trial.expiresAt" date-style="medium" time-style="short" />
+            </p>
+            <p v-else-if="data.trial" class="mt-1 text-sm text-studio-muted">
+              {{
+                data.trial.status === 'ended'
+                  ? 'Your free trial has ended.'
+                  : 'Try all MatterDraft Studio features for seven days.'
+              }}
+            </p>
+          </div>
+          <NuxtLink :to="`/a/${accountId}/billing`" class="portal-button-secondary">
+            View plans &amp; billing
+          </NuxtLink>
+        </div>
+        <ul
+          v-if="data.plans.length"
+          aria-label="Available licence plans"
+          class="mt-4 flex flex-wrap gap-x-6 gap-y-3 border-t border-studio-rule pt-4"
+        >
+          <li v-for="plan in data.plans" :key="plan.id" class="text-sm">
+            <span class="font-semibold">{{ plan.name }}</span>
+            <span class="ml-2 text-studio-muted"
+              >{{ licencePrice(plan.monthlyDevicePrice) }} / device / month</span
+            >
+          </li>
+        </ul>
+      </section>
       <NuxtLink
         v-if="
           data.account.accountType === 'organisation' &&

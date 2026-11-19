@@ -1,6 +1,6 @@
 # MatterDraft portal foundation
 
-The product scope is user login, subscription management, device licensing and support tickets. Organisation membership and staff administration support those workflows. Product usage reporting, analytics dashboards, notification inboxes, campaigns and incident management are outside scope; see `PRD_CUSTOMER_AND_ADMIN_BACKEND.md`. Subscription and licensing integrations are not implemented by the current foundation.
+The product scope is user login, subscription management, device licensing and support tickets. Organisation membership and staff administration support those workflows. Product usage reporting, analytics dashboards, notification inboxes, campaigns and incident management are outside scope. See `PRD_CUSTOMER_AND_ADMIN_BACKEND.md`.
 
 The customer account area supports verified sign-in, personal and organisation accounts, member invitations, role changes, ownership transfers, and an activity log. Staff access requires a verified account with an active staff role.
 
@@ -15,6 +15,14 @@ The customer account area supports verified sign-in, personal and organisation a
 ## Super Admin Dashboard
 
 The dashboard at `/internal/overview` shows solo and firm account activity, tickets needing a response, and the service checks. Apply `0005_service_failure_counts.sql` before deploying it. Failure counts include API responses observed by Nitro when Turso is reachable. Use production monitoring for hosting outages and database downtime.
+
+## Licence plans and trials
+
+Apply `0006_licence_plans_and_billing.sql` with `npm run db:migrate`. A super admin can create, edit, publish and archive plans at `/internal/plans`. Set the audience and INR monthly price per device. A published plan keeps its name and price. Create a new draft for a replacement price and archive the old plan when it should leave the catalogue.
+
+Account owners and billing managers see the published plans for their selected account in **Plans & billing**. Owners start the trial explicitly there. The server records a full-access grant for 168 hours and returns the original grant on retries. The trial requires no payment details and ends automatically. Trial activation is on by default in development. Set `LICENCE_TRIALS_ENABLED=true` in production once the desktop app can enforce the grant. Device assignments, signed offline entitlements and feature enforcement require the separate desktop integration.
+
+Online purchases are currently unavailable. Choose a payment gateway and review merchant, tax, cancellation, and refund terms before implementing checkout.
 
 ## Desktop authorization contract
 
@@ -173,4 +181,4 @@ TURSO_DATABASE_URL=https://127.0.0.1:9 TURSO_AUTH_TOKEN=local-only BETTER_AUTH_U
 | Hosted preview Turso/libSQL | Apply all unapplied migrations after checking target history, verify foreign keys/data preservation, concurrent writes across independent connections/function instances, transaction/rollback behavior under latency/outage, backup and restore. No hosted schema or data was inspected or changed in this task. |
 | Controlled SMTP/test-delivery environment | Verification/resend, reset and invitation delivery; expired links, provider failures/timeouts, sender configuration and production delivery recovery. Local preview JSON and intercepted browser errors do not prove SMTP delivery or saved-invitation email-failure behavior. |
 | Separate native desktop app, supported operating systems | Register the public OAuth client; verify discovery metadata, external-browser Authorization Code + PKCE S256, state validation, exact private-scheme callback, code exchange/replay rejection, secure OS token storage and refresh/revocation. Portal sessions and local tests prove none of these native behaviors. |
-| Product decisions plus provider/native sandboxes | Subscription provider, tax and commercial terms; approved licensing/trial/expiry/transfer/recovery contract; then billing authenticity/idempotency and native entitlement/device behavior. These integrations remain pending and their unavailable controls were not added. |
+| Product decisions plus provider/native sandboxes | Exercise test checkout and upgrades against the hosted provider. Confirm the merchant, tax and commercial terms, then verify the native entitlement, expiry, transfer and recovery contract before enabling paid use. |

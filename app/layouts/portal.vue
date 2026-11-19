@@ -19,6 +19,7 @@ import {
   ScrollText,
   ContactRound,
   LifeBuoy,
+  CreditCard,
 } from '@lucide/vue'
 import { authClient } from '~~/lib/auth-client'
 
@@ -190,6 +191,17 @@ async function signOut() {
             <NuxtLink
               v-if="
                 !isInternal &&
+                currentAccount &&
+                ['owner', 'billing_manager'].includes(currentAccount.role)
+              "
+              :to="`/a/${currentAccount.id}/billing`"
+              class="portal-nav-link"
+              :class="route.path.endsWith('/billing') ? 'portal-nav-active' : ''"
+              ><CreditCard :size="18" />Plans &amp; billing</NuxtLink
+            >
+            <NuxtLink
+              v-if="
+                !isInternal &&
                 currentAccount?.accountType === 'organisation' &&
                 ['owner', 'admin'].includes(currentAccount.role)
               "
@@ -229,6 +241,13 @@ async function signOut() {
               class="portal-nav-link"
               :class="route.path.startsWith('/internal/customers') ? 'portal-nav-active' : ''"
               ><ContactRound :size="18" />Customers</NuxtLink
+            >
+            <NuxtLink
+              v-if="isInternal && context?.staffRole === 'super_admin'"
+              to="/internal/plans"
+              class="portal-nav-link"
+              :class="route.path === '/internal/plans' ? 'portal-nav-active' : ''"
+              ><CreditCard :size="18" />Licence plans</NuxtLink
             >
             <NuxtLink
               v-if="isInternal && context?.staffRole === 'super_admin'"
