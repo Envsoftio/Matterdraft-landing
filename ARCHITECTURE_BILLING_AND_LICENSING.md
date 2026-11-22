@@ -1,0 +1,80 @@
+# MatterDraft Studio — Billing, licensing and invoice architecture
+
+**Design for implementation, 22 November 2026.** The [licensing PRD](PRD_DEVICE_LICENSING_AND_PRICING.md) owns the offer. The [portal PRD](PRD_CUSTOMER_AND_ADMIN_BACKEND.md) owns dashboard actions and permissions. This design covers prepaid purchases, renewals and licence changes for individuals and firms.
+
+## Ownership and trust
+
+| Component | Responsibility |
+|---|---|
+| Nuxt portal and Better Auth | Identify the verified person and selected account. Show a server-issued quote, payment progress, invoices, assigned licences and computers according to the caller’s role. |
+| Nitro billing service and Turso | Own versioned INR prices, account billing periods, purchased quantities, quotes, payment attempts and invoice history. Reuse the existing account, membership, trial, plan, subscription and audit records. |
+| Hosted payment provider | Collect UPI or card payment and report payment and refund state. Evaluate Razorpay for the pilot. Nitro reconciles the provider order, payment, amount and currency against the stored account purchase. |
+| Nitro licence service | Check named assignment, available capacity and installation proof. Authorise trial start, activation, replacement and refresh. Use a restricted signing key. |
+| Desktop Rust core and Tauri | Keep the installation private key in OS credential storage, verify the signed grant locally and enforce access at protected operation entry points. Vue shows state and recovery actions. Local files, OCR and PDF processing stay on the computer. |
+| Durable background work | A scheduled worker claims persisted jobs for reconciliation, invoice rendering and transactional email. Jobs have unique business references, retry state and audit history so function restarts are recoverable. |
+
+## Records and invariants
+
+| Record | Stored facts and rules |
+|---|---|
+| Plan price and firm agreement | Version, audience, term, named-advocate unit, currency, unit amount in paise, tax basis and effective date. A firm quote records committed quantity, contracted rate, service lines and validity. Purchased periods retain their price version. |
+| Subscription and period | Payer account, period start and exclusive end, paid quantity, price version, scheduled next quantity and revision. Keep a history of periods. One current paid term per payer. Membership changes alone never change purchased quantity. |
+| Assignment and device registration | One current assignment per advocate per account. Current assignments cannot exceed paid capacity. Each assignment has up to two active installations with public key, user-visible label, registration time, last verification, revocation and generation. Trial grants allow one. Enforce counts and uniqueness inside the same database transaction as allocation. |
+| Quote and payment attempt | Freeze purchaser, payer, operation, period revision, effective instant, price and tax lines, due now, next renewal, expiry and provider references. Reuse the attempt for a retried request. A changed request requires a fresh quote. |
+| Invoice and adjustment | Immutable issuer and customer snapshots, unique invoice number, service period, line items, tax breakdown and total. Link captures, refunds and credit notes by reference. One issued invoice per billable purchase, including a separately paid mid-term addition. |
+| Event, work item and audit | Store unique provider event and payment IDs, processing state, reconciled outcome, and retryable follow-up work. Audit actor, account, action, reason, time and safe references. Restrict billing identities and device metadata to authorised readers. |
+
+## Service interfaces
+
+Use existing Nitro account routes and membership checks for portal requests. The following describes the proposed contracts.
+
+| Caller and operation | Server response or effect |
+|---|---|
+| Account overview and billing reads | Return account-scoped licence state and allowed actions. For billing roles include current and next quantities, paid-through, renewal total, invoice list and pending order references. |
+| Owner or billing manager requests quote, accepts quote, checks order | Return expiring quote ID, price breakdown and subscription revision. Acceptance returns the existing or new hosted checkout. Order status returns a safe recovery action and invoice reference when issued. |
+| Firm owner or admin assigns, reassigns or revokes | Validate current membership and capacity. Return the resulting assignment and available quantity. Removing someone from the firm revokes their assignment even if removal originates in the existing Members screen. |
+| Advocate starts trial, activates or refreshes | Validate desktop OAuth session, account selection and fresh installation proof. Return signed grant, server time and deadlines, or a reason such as computer limit, assignment removed or renewal required. Use the existing trial record and preserve the original start across retries. |
+| Billing customer downloads invoice or credit | Authorise billing role on the issuing payer account and verify document ownership. Return private PDF or generation status. Authorised reads work after term expiry. |
+| Provider webhook and staff reconciliation | Authenticate incoming events or the internal staff caller. Feed both paths through the same reconciliation operation. Return a processing reference and record any staff reason. |
+
+## From quote to access
+
+1. The account owner or billing manager requests a quote. Calculate the full charge for a new term or the incremental charge for added licences at the contracted unit price. For proration, multiply the full-term incremental price by remaining time divided by total time in that billing period. Use a fixed quote instant and integer paise at the monetary boundary. Display exact service dates, amount due today and full amount on the next manual renewal. Apply one approved rounding and tax allocation rule across checkout and invoice.
+2. Give the customer a hosted checkout for the stored order total. Use an operation key and subscription revision to prevent two open purchases from independently changing the same term. On browser return show **Confirming payment** and fetch the server’s order state. When the outcome is uncertain, reopen the existing attempt before offering another payment.
+3. Verify the provider event and reconcile the captured payment to the stored order. In one transaction, apply the purchase once, update capacity or paid-through, record the invoice obligation and enqueue follow-up work. A lost response, repeated event or reordered notification must converge on the same result. If a capture arrives for a superseded order, hold it for reconciliation, show the support reference and resolve the funds before closing it. A pending or failed attempt preserves already-paid access.
+4. The invoice worker issues the numbered document once and renders a downloadable PDF from its snapshot. If rendering or email fails, keep the purchase active, show **Invoice being prepared**, and retry the same invoice. The billing view remains the source for payment status and download.
+5. The licence service reads the committed term and active assignment. On verified activation or refresh, issue a grant bound to the account, advocate, assignment generation and installation key. A third paid computer requires removal of an existing registration. Removing a member revokes their assignment and future refreshes in the same transaction. An offline signed grant lasts until its expiry.
+
+## Offers and referral accounting
+
+Store offer and referral programme versions separately from plan prices. Record the amount, eligibility, validity dates and limits that apply to each accepted quote. Each referral links one verified new personal buyer to one distinct referring advocate. Public codes identify the referrer without exposing account data. Enforce one qualifying purchase per referred buyer across programme versions.
+
+1. Select the largest eligible buyer discount. Atomically reserve the offer redemption, referral attribution and full referral cost against their applicable limits before returning an actionable checkout. Record separate amounts for the buyer discount and promised referrer credit. When an offer wins, count one offer redemption and charge the actual discount plus ₹100 to the referral ceiling once. If a reservation fails, disclose that the referral is unavailable and require fresh acceptance of any alternative quote. Honour accepted reservations on pause. Release abandoned reservations after the order has expired and its provider outcome is reconciled.
+2. On verified capture, convert the reservation to a commitment and create one pending ₹100 reward tied to the qualifying purchase. Freeze the release date from the applicable refund policy. Failed attempts create no reward. Process release and refund events idempotently. A refund before release reverses the pending reward. Reconcile later disputes or refunds against the published adjustment policy and record the outcome with its original reference.
+3. Maintain an account-scoped credit ledger. Reserve available credit at renewal checkout, apply at most the amount payable, carry unused balance forward and settle the debit once on confirmed renewal. Release unused reservations on reconciled failure. A fully credit-funded renewal settles internally once without a zero-value provider charge. Invoice snapshots distinguish offer discounts and referral credit applied. Redeeming an already committed credit does not consume the programme budget again.
+4. Before rollout, test simultaneous claims for the last ₹200, a ₹150 public offer plus ₹100 referrer credit, duplicate captures/refunds, paused offers with existing reservations, failed renewal retries, annual credit validity and self-referral rejection. Reconcile the admin totals to the quote, invoice and credit ledger.
+
+## Changes within and between terms
+
+- **First purchase and renewal.** Assign the personal licence to its verified owner. For a firm, expose purchased capacity for assignment to verified members. Anchor a prepaid calendar month or year to the service start and preserve the renewal anchor across short months. Show the actual date before payment. Extend uninterrupted coverage from paid-through on early payment. After a lapse, start from confirmed payment. Renewals are manual in the pilot.
+- **Firm additions.** With a spare licence, assignment costs ₹0. Otherwise quote the difference to the existing renewal date. Three ₹499 monthly licences plus a fourth exactly halfway through the period gives ₹249.50 due now and ₹1,996 at next renewal under the inclusive pilot example. Use the actual contract price and service interval for annual accounts. If a later period has already been prepaid, show a separate line for adding the licence to that period, with its own price and service dates. Require confirmation of the combined total.
+- **Reductions and departures.** Reassigning a purchased licence costs ₹0. Apply a quantity reduction at the next renewal. Where assignments exceed the requested quantity, have the owner or organisation admin identify which assignments will end before confirming the reduced renewal. Show the effective date and preserve access through the current term. A billing manager can request the change and see when assignment selection is needed.
+- **Personal to firm.** An owner selects or creates a firm they own. Preview and confirm the source and destination accounts. Carry the owner’s assignment, two device slots and remaining paid term to an eligible firm without an overlapping paid contract. Transfer once, with account revisions checked, on verified payment for the additional licence. Remap current registrations, invalidate previous generations and refresh under the new account. Preserve personal invoice ownership, original trial history and firm invoice attribution. A pending or failed upgrade leaves the original licence usable. Route an overlapping paid firm contract for a reviewed quote.
+- **Enterprise orders.** Staff record a dated annual offer with committed quantity, renewal total and any agreed services. The authorised buyer sees and accepts the quote. Reconcile payment before releasing capacity and use the contracted rate for additions. Changing a published catalogue price cannot rewrite an accepted agreement.
+- **Refunds and disputes.** Track requested, pending, partial, full and disputed amounts against the original payment. Show confirmed adjustments and credit references. Apply a licence change only once under the approved refund or dispute policy. Preserve billing records, read access and completed work. Refund eligibility, tax corrections and dispute handling require merchant review before paid launch.
+- **AutoPay later.** Keep recurring authorisation separate from a one-off charge. A revised mandate requires explicit approval where applicable. Keep manual renewal available if authorisation fails. [Razorpay subscription update rules](https://razorpay.com/docs/payments/subscriptions/faqs/)
+
+## Invoice and billing profile
+
+Collect billing name, billing email, address and state, plus business name and GSTIN when applicable. Let a solo buyer purchase without a business GSTIN when the approved tax configuration allows it. Preview the billed-to identity and total before payment. Profile edits apply to future documents.
+
+Each issued document shows seller and buyer details, invoice number and issue date, INR currency, covered service dates, licence quantity, unit price, discount or proration, taxable value, applicable tax components and total. Include the applicable GST identifiers, place of supply, service classification and any required electronic invoice references under the merchant’s validated tax configuration. Payment detail separately shows dated amount paid, balance or refund, status and safe transaction reference. Tie any credit note or correction to the original invoice and retain both. Finance must validate the applicable invoice type, numbering, tax lines, rounding, retention and any electronic invoicing obligations before release. [CBIC invoice rules](https://cbic-gst.gov.in/gst-invoice-rules.html)
+
+Owners and billing managers can list, filter by date/status, open and download invoices and credit notes for the selected payer, including after paid access lapses. Check role and payer on each download. Store PDFs privately or render on demand. Renewal reminders and invoice-ready emails link to the authenticated portal and carry no matter information.
+
+## Migration and release sequence
+
+1. Add migrations after `0006_licence_plans_and_billing.sql`. Introduce explicit billing units, term prices and amount units. Preserve legacy catalogue and subscription references with their original meaning. Create new named-advocate price versions for sale. Inspect existing data before enabling checkout and reconcile any legacy paid records explicitly. Honour original portal-started trial timestamps. Move new trial initiation to first successful desktop activation.
+2. Deliver billing profile, quote, checkout, reconciliation and invoice history in the provider sandbox. Test early and lapsed renewal, month-end and leap-year boundaries, late capture, lost browser return, duplicate events, partial refund, invoice-render retry and historical downloads after profile edits.
+3. Deliver named assignment, computer management and signed desktop grants. Test concurrent claims for the final licence and computer slot, genuine replacement, reassignment while offline, expiry during a build and reactivation on each supported OS.
+4. Exercise dashboards end to end with two firms, one multi-account advocate, a billing manager and an organisation admin. Test direct object access, failed and successful solo upgrades, capacity reductions and billing-history isolation. Restore a backup and reconcile payments without issuing duplicate licences or invoices. Run the individual and firm pilots before publishing final prices.

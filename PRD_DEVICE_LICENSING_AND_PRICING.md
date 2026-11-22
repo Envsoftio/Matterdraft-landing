@@ -1,15 +1,28 @@
-# MatterDraft Studio — Device licensing and pricing PRD
+# MatterDraft Studio — Advocate licensing and pricing PRD
 
-**Status:** Commercial direction agreed; implementation and public launch pending  
-**Decision date:** 15 November 2026  
-**Updated:** 17 November 2026 — seven-day trial selected; security requirements below remain to be implemented and verified  
+**Status:** One named advocate per paid licence, full desktop access, two personal computers and a seven-day trial are agreed. Prepaid monthly and annual terms are the pilot design. Prices and the paid offline window require validation before publication.
+
+**Updated:** 22 November 2026
+
 **Scope:** Initial India offering for MatterDraft Studio
 
-**Related specification:** [Account, subscription, licensing and support PRD](PRD_CUSTOMER_AND_ADMIN_BACKEND.md). The later connectivity decision requires internet for sign-in/initial activation and excludes permanently offline activation/manual licence files from v1; this supersedes the earlier manual-refresh proposal below. Product usage reporting and analytics are outside the web application's scope. Licensing enforcement details remain a separate design discussion, not completed implementation.
+**Related architecture:** [Billing, licensing and invoice architecture](ARCHITECTURE_BILLING_AND_LICENSING.md).
 
-## 1. Decision
+**Related specification:** [Account, subscription, licensing and support PRD](PRD_CUSTOMER_AND_ADMIN_BACKEND.md). Internet is required for sign-in and initial activation. Permanently offline activation and manual licence files are outside v1. Product usage reporting and analytics are outside the web application's scope.
 
-MatterDraft will use **device licences**. The minimum paid plan is **₹499 per device per month**. One active device requires one licence; another concurrently active device requires another licence. The price is a proposed launch price, not an existing charge or a validated willingness-to-pay finding. Tax treatment and billing terms still need to be set before publication.
+## 1. Who buys a licence
+
+**One advocate, one licence, full access.** An advocate can use every available desktop feature on up to two of their own computers. A second advocate who uses the app needs a separate licence. A recipient can open a finished PDF without a MatterDraft account. The portal uses “licences” for customers and “computers” for registered installations.
+
+| Customer | Offer to test |
+|---|---|
+| Independent advocate | One licence at ₹499 for one month or ₹4,999 for one year. An office computer and a laptop are included. |
+| Chamber or firm | One account, bill and renewal date for all purchased licences. A firm with twenty advocates can start with two licences when two advocates use the app. Portal-only administration is free. |
+| Large firm | Quote a committed annual licence count, unit price and renewal terms. Itemise any agreed onboarding or priority support separately. Validate support cost and retention before offering volume discounts. |
+
+Test ₹499 and ₹4,999 as the amounts the customer pays. Confirm tax treatment and provider fees before publication. As an illustration, if 18% GST applies and the provider charges 2% plus GST on that fee, ₹499 leaves about ₹411 per paid month and ₹4,999 leaves about ₹343 per month before support, hosting, refunds and acquisition. The proposed annual price is about 16.5% below twelve monthly payments. [CBIC IT services FAQ](https://cbic-gst.gov.in/hindi/sectoral-faq.html) · [Razorpay gateway pricing](https://razorpay.com/pricing/)
+
+As a reference for the pilot, Adobe India listed Acrobat Standard at ₹477.90/month and Pro at ₹638.38/month, including GST, on annual commitments billed monthly when checked for this discussion. Validate MatterDraft's price against the time it saves in the court-bundle workflow. [Adobe India pricing](https://www.adobe.com/in/acrobat/pricing.html)
 
 The first plan should allow **unlimited matters, imported documents, pages, OCR runs and exports**, subject only to measured technical capacity and acceptable-use safeguards. Do not advertise a numerical matter or page capacity until it has passed supported-device testing. Core document preparation, review and bundle export belong in the base plan.
 
@@ -17,45 +30,65 @@ The first plan should allow **unlimited matters, imported documents, pages, OCR 
 
 The initial buyer is an Indian advocate or small chamber preparing case document bundles on a desktop computer. Usage may be intermittent. A predictable price and no document or export counting reduce hesitation to import complete matter files and review an output more than once.
 
-## 3. Licence experience requirements
+## 3. Proposed licence experience
 
-1. A paid licence activates one device at a time. Define a stable, privacy-conscious device identity and a recovery path for operating-system reinstall or hardware replacement before implementation.
-2. The customer can see the active device, deactivate it and transfer the licence without contacting support in the normal case. Specify a fallback when the old device is lost or unavailable.
-3. Core local processing remains usable during a documented offline grace period. An expired or temporarily unverifiable licence must not make existing local matter files inaccessible; define which creation and export actions are gated.
+1. A paid seat registers up to two installations for its assigned user. Require browser sign-in and fresh verification when registering a device. A one-time code sent to the user's verified email is the proposed confirmation for v1. Show the registered devices in the portal and send a security notice when one is added. A copied entitlement must fail on installations without the matching private key.
+2. Let a user deactivate a computer and register its replacement after reauthentication, including when the old computer is unavailable. Provide recovery for reinstall and hardware changes. Rate-limit repeated replacements and use additional verification or support review for suspicious swaps. Final thresholds are open.
+3. After hard expiry, preserve reading, backups and retrieval of completed exports. Gate new matters, imports, edits, OCR, builds and newly generated exports. Let work already in progress finish safely. Resume new work on successful renewal or verification.
 4. Show price, renewal cadence, device count and any tax before payment. Explain what happens on cancellation or expiry before asking the customer to subscribe.
 5. Licence checks must not upload matter names, source files, OCR text or exported PDFs. Document the minimum activation data and retention policy.
 6. Keep licensing separate from the deterministic PDF page-map engine and local document processing.
 
-These are product requirements for a low-friction device licence, **not claims that licensing or billing already exists**.
-
 ### Offline verification proposal
 
-At activation, the licensing service issues a **signed, device-bound entitlement** containing the licence ID, device ID, paid-through date and a short verification deadline. The app verifies the signature locally, so ordinary work does not require a live connection. When connected, it refreshes the entitlement and checks whether the device has been deactivated or the subscription has ended. A reasonable starting policy for testing is a **30-day verification window plus 7 days of connectivity grace**; this period is not yet an approved customer term. Show the next required check date in the app and warn before it expires. Provide a signed licence-file refresh route for customers whose computers have no internet access.
+At activation, the licensing service issues a signed entitlement for the installation. Pilot **up to 14 days from the last successful online verification**, capped at the paid-through date. Refresh automatically when connected, show the next required check date and warn before it expires. The earlier 30-day window plus seven days of connectivity grace is historical. Define payment-failure and outage behaviour before release.
 
-A device that never reconnects cannot report current use, receive revocation promptly or prove it is the only active copy. A device-bound token, local clock checks and a verification deadline reduce casual sharing but cannot prevent deliberate tampering. The commercial policy must accept that limit; do not claim perfect one-device enforcement. On expiry of the verification window and grace, keep existing matters readable and define the exact create/export restrictions before implementation.
+Two registered installations limit how widely a seat can be shared, but the app cannot reliably verify that the same person operates both computers. Accept the residual risk that a buyer deliberately gives someone the second slot. A removed device may still work offline until its last signed entitlement expires. Avoid invasive device fingerprinting and continuous usage monitoring.
 
 **Activity measurement is separate from entitlement checks.** Product analytics and aggregate usage upload are outside this application's scope. The service uses subscription payment and licence activation state for commercial decisions, without collecting matter activity or document content.
 
-## 4. Explicitly uncommitted options
+## 4. Payment, renewal and seat changes
 
-The selected acquisition offer is now a **seven-day free trial**, replacing the discussed 14-day proposal. One free matter every month is not selected. The trial specification and implementation requirements are in section 7.
+The acquisition offer remains a **seven-day free trial**. A 14-day trial and a recurring free matter were discussed and remain outside the proposed offer. See section 7 for the trial rules.
 
-The discussion considered a ₹4,999 annual Solo price, a ₹1,499 monthly chamber plan, a ₹199 per-matter purchase, a free pilot and a two-device allowance. None was selected in the final decision. Do not place these options in checkout or public pricing copy without a separate decision.
+### Payment proposal
+
+- Start with one-off hosted UPI or card payments for one month or one year of access. Evaluate Razorpay first. Show the exact expiry, remind customers before renewal, and extend the existing term when a customer renews early. After a lapse, start a new term on confirmed payment. Manual renewal never initiates a debit. The trial requires no payment method and ends without a debit.
+- Add optional monthly AutoPay after verifying renewals, payment failures and seat changes. Show the next debit amount and date. Obtain fresh authorisation where the provider requires it. Razorpay documents that UPI AutoPay and eMandate subscription details cannot be updated in place. A one-time seat charge must never silently change the next debit. [Razorpay subscription update rules](https://razorpay.com/docs/payments/subscriptions/faqs/)
+- Defer three- and six-month terms until demand is clear. If demand warrants a middle term, test three months at ₹1,497 per seat before adding another discount. Lifetime access, the earlier ₹1,499 flat chamber plan and ₹199 per matter remain unselected.
+
+### Published offers and advocate referrals
+
+**Give ₹100, get ₹100.** A new personal buyer can use a paid advocate’s referral link or enter their code before the first monthly or annual purchase, including during the trial. At the pilot prices the first month costs **₹399**, or the first year **₹4,899**. The next manual renewal is at the applicable regular price, shown before checkout. A chamber invitation, additional firm licence, self-referral or repeat purchase cannot qualify.
+
+The referring advocate earns **₹100 toward a personal renewal** once the first payment is confirmed and the published refund window has passed. Show the expected release date while pending. Reverse the pending reward on a qualifying payment refund. An available credit remains usable at least through the advocate’s next renewal, including an annual renewal. The advocate chooses when to renew. The credit has no cash payout.
+
+A super admin may publish a fixed-rupee offer with eligible plans, term, audience, first-purchase or renewal eligibility, start and end times and a redemption cap. At checkout apply the largest eligible buyer discount once. A larger public offer preserves the eligible referrer’s ₹100 reward. Show the applied discount and renewal price before payment, and itemise the saving on the invoice. Pausing ends new reservations and honours accepted checkouts and earned credits.
+
+**Pilot budget.** Retain the proposed ₹10,000 ceiling. Each standard referral commits ₹200, which funds up to **50** at that rate. If a public offer gives the referred buyer ₹150 off, the referral uses ₹250 of the ceiling, including the ₹100 referrer credit. Reserve the full amount before accepting checkout. Stop issuing new referral quotes when the remaining budget cannot cover both benefits. Judge the pilot by regular-price renewals and promotion cost per retained buyer.
+
+### Organisation seat changes
+
+1. Assign an already-paid spare seat to a new verified member without another charge. When a member leaves, the firm can revoke and reassign the paid seat within the term. The offline expiry limit applies to devices from the prior assignment.
+2. When no spare seat exists, show the prorated cost through the current renewal date and the full price at renewal. For example, a fourth ₹499 monthly seat added halfway through the term costs ₹249.50 now and brings renewal to ₹1,996/month. Activate it after the server verifies payment. Apply the same co-termination rule to annual contracts at the contracted seat rate.
+3. Schedule reductions in paid quantity for the next renewal. Changing an assignment during the term does not change the invoice quantity.
+4. When an independent advocate adds another advocate, carry the first licence, registered computers and exact paid-through date into the firm plan. Charge only the additional licence for the remaining term. Keep earlier personal invoices accessible to their original buyer. Preview the payer, dates, licences and next total before confirmation.
+5. Count assigned licences and registered computers. The licence holder may replace a computer and the firm may replace a departing advocate. Repeated changes require verification or audited support review.
 
 The earlier suggestion of 500 documents or 10,000 pages per matter was a performance-test target, not a verified capacity or customer entitlement. The adopted commercial plan has no document-count quota.
 
 ## 5. Release and validation gates
 
-- Complete the outstanding clean-device, Windows x64, Mac Intel, native export/save and installer checks recorded in `ACCEPTANCE_TESTS.md` before treating this as a production filing product.
-- Resolve distribution licensing, including PyMuPDF, before proprietary paid distribution.
+- Complete the outstanding clean-device, Windows x64, Mac Intel, native export/save and installer checks recorded in the desktop acceptance log before treating this as a production filing product.
+- Review licences for the components actually included in the Rust desktop package before paid distribution.
 - Test activation, transfer, offline grace, renewal, cancellation, reinstall and lost-device recovery using synthetic matters on supported devices.
-- Pilot the ₹499 offer with advocates who prepare bundles at different frequencies. Record conversion, active-device transfers, support contacts and reasons for declining; revise price or terms from evidence.
+- Pilot with advocates who prepare bundles at different frequencies and with chambers of different sizes. Measure trial-to-paid conversion, month-two renewals, support time per account, device replacements and reasons for declining. Ask how much time the workflow saves and who performs filing work. Use interviews and account, billing and support records. Keep desktop document activity out of reporting.
 - Update the marketing project's pricing FAQ only when commercial terms and release readiness are approved. The earlier deferred-pricing instruction in `MatterDraft_Project_Context_and_Handoff.md` describes its prior landing-page revision; this PRD records the later decision but does not publish a price.
 
 ## 6. Acceptance criteria for a future implementation ticket
 
-- A customer can purchase or activate one device licence and see its status and renewal terms.
-- A second active device requires another licence or an explicit transfer; normal transfer is self-service.
+- A customer can buy a named seat, register two installations and see the seat, devices and renewal terms. A third installation requires an existing registration to be removed. Normal device replacement is self-service.
+- A firm can assign or reassign a spare seat, buy a prorated extra seat after seeing today's and the next renewal's prices, and schedule a quantity reduction for renewal. Concurrent requests and duplicate payment events cannot grant more seats than were paid for.
 - A temporary connectivity failure does not block work within the defined offline grace period.
 - Existing local matters remain readable after expiry or cancellation, with export restrictions clearly disclosed and tested.
 - Licence activation and verification requests contain no matter content; synthetic-device and recovery tests pass on each supported platform.
@@ -69,14 +102,14 @@ The owner selected a seven-day trial and requested strong protection across lice
 
 Implementation defaults proposed for the selected trial:
 
-- Start at the first successful server-side activation, with a server-recorded UTC end exactly 168 hours later. A retried activation returns the original grant and expiry; reinstall, transfer and refresh never restart the trial.
+- Start at the first successful desktop activation, with a server-recorded UTC end exactly 168 hours later. A retried activation returns the original grant and expiry. Reinstall, transfer and refresh never restart the trial. The existing Nuxt portal starts the clock when the account owner clicks **Start free trial**. The proposed behaviour requires a change to that flow.
 - Require a verified account and online activation; allow one trial grant per account and one active trial device. Rate-limit grant and recovery operations. Multiple accounts remain an abuse limitation; do not introduce invasive hardware fingerprinting to claim otherwise.
 - Offer core preparation and export features without a payment method or artificial page quota. These are proposed trial defaults, not published customer terms.
 - Allow offline work within the signed trial validity. Trial expiry receives no automatic paid-plan connectivity grace. Display the exact local expiry time and warnings in advance.
-- Preserve reading, backups and retrieval of previously generated files after expiry. Define the final action-by-action editing, creation and new-export policy before implementation; never destroy or encrypt customer work as an enforcement measure.
+- Preserve reading, backups and retrieval of previously generated files after expiry. Gate new matter creation, import, edits, OCR, builds and newly generated exports until activation or renewal.
 - Separate login-session expiry, entitlement expiry, subscription cancellation and connectivity failure. An expired login session alone must not invalidate a still-valid offline entitlement.
 
-The paid 30-day verification plus seven-day connectivity-grace proposal in section 3 remains unapproved. Before release, define paid-through, refresh-by and hard-expiry semantics independently, including payment failure and outage handling. Connectivity grace must not silently extend a trial or imply a paid renewal.
+The proposed paid 14-day limit remains open for review. Before release, define paid-through, refresh-by and hard-expiry semantics independently, including payment failure and outage handling. Connectivity grace must not silently extend a trial or imply a paid renewal.
 
 ### Required security controls
 
