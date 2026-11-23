@@ -114,14 +114,14 @@ function save() {
                 :options="categories"
                 placeholder="Choose a category"
               />
-              <input
-                v-else
-                id="finding-value"
-                v-model="input"
-                :type="editing === 0 ? 'date' : 'number'"
-                :min="editing === 2 ? 1 : undefined"
-                required
-              />
+              <StudioField v-else
+                ><input
+                  id="finding-value"
+                  v-model="input"
+                  :type="editing === 0 ? 'date' : 'number'"
+                  :min="editing === 2 ? 1 : undefined"
+                  required
+              /></StudioField>
               <div class="dialog-actions">
                 <DialogClose class="action secondary" type="button">Cancel</DialogClose>
                 <button class="action primary" :disabled="!input">Save change</button>

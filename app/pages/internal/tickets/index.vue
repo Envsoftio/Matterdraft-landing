@@ -36,14 +36,15 @@ function goToPage(next: number) {
     <h1 class="portal-page-title mt-2">Support tickets</h1>
     <form class="mt-8 flex max-w-xl flex-col gap-3 sm:flex-row" @submit.prevent="submitSearch">
       <label class="sr-only" for="ticket-search">Search tickets</label
-      ><input
-        id="ticket-search"
-        v-model="searchInput"
-        class="portal-input flex-1"
-        type="search"
-        maxlength="100"
-        placeholder="Subject, account or customer email"
-      /><button class="portal-button">Search</button>
+      ><StudioField
+        ><input
+          id="ticket-search"
+          v-model="searchInput"
+          class="portal-input flex-1"
+          type="search"
+          maxlength="100"
+          placeholder="Subject, account or customer email" /></StudioField
+      ><button class="portal-button">Search</button>
     </form>
     <div v-if="error" role="alert" class="mt-8">
       <p class="portal-error">{{ parseApiError(error).text }}</p>

@@ -89,15 +89,16 @@ async function createOrganisation() {
       <h2 class="font-heading text-xl font-semibold">Create an organisation</h2>
       <p class="mt-2 text-sm text-studio-muted">Add colleagues and manage their roles.</p>
       <label for="org-name" class="portal-label mt-6">Organisation name</label
-      ><input
-        id="org-name"
-        v-model="name"
-        class="portal-input"
-        maxlength="100"
-        minlength="2"
-        required
-        autocomplete="organization"
-      />
+      ><StudioField
+        ><input
+          id="org-name"
+          v-model="name"
+          class="portal-input"
+          maxlength="100"
+          minlength="2"
+          required
+          autocomplete="organization"
+      /></StudioField>
       <p v-if="error" class="portal-error mt-4" role="alert">{{ error }}</p>
       <button class="portal-button mt-5" :disabled="busy || uncertain">
         {{ busy ? 'Creating…' : 'Create organisation' }}</button><button

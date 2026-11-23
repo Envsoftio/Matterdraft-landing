@@ -240,13 +240,14 @@ const assignable = computed(() =>
           <form class="portal-detail" @submit.prevent="invite">
             <h2 class="font-heading text-lg font-semibold">Invite member</h2>
             <label for="invite-email" class="portal-label mt-5">Email address</label
-            ><input
-              id="invite-email"
-              v-model="email"
-              type="email"
-              class="portal-input"
-              required
-            /><label for="invite-role" class="portal-label mt-5">Role</label
+            ><StudioField
+              ><input
+                id="invite-email"
+                v-model="email"
+                type="email"
+                class="portal-input"
+                required /></StudioField
+            ><label for="invite-role" class="portal-label mt-5">Role</label
             ><StudioSelect
               id="invite-role"
               v-model="role"

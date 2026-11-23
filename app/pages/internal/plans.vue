@@ -114,42 +114,51 @@ function save() {
           <form class="mt-5 space-y-4" @submit.prevent="save">
             <div>
               <label for="plan-name" class="portal-label">Plan name</label>
-              <input
-                id="plan-name"
-                v-model="editor.name"
-                class="portal-input"
-                maxlength="80"
-                required
-              />
+              <StudioField
+                ><input
+                  id="plan-name"
+                  v-model="editor.name"
+                  class="portal-input"
+                  maxlength="80"
+                  required
+              /></StudioField>
             </div>
             <div>
               <label for="plan-description" class="portal-label">Description</label>
-              <textarea
-                id="plan-description"
-                v-model="editor.description"
-                class="portal-input"
-                rows="3"
-                maxlength="700"
-                required
-              />
+              <StudioField>
+                <textarea
+                  id="plan-description"
+                  v-model="editor.description"
+                  class="portal-input"
+                  rows="3"
+                  maxlength="700"
+                  required
+                />
+              </StudioField>
             </div>
             <div>
               <label for="plan-account" class="portal-label">Available to</label>
-              <select id="plan-account" v-model="editor.accountType" class="portal-input">
-                <option value="personal">Personal accounts</option>
-                <option value="organisation">Organisation accounts</option>
-              </select>
+              <StudioSelect
+                id="plan-account"
+                v-model="editor.accountType"
+                class="portal-input normal-case!"
+                :options="[
+                  { value: 'personal', label: 'Personal accounts' },
+                  { value: 'organisation', label: 'Organisation accounts' },
+                ]"
+              />
             </div>
             <div>
               <label for="plan-price" class="portal-label">Price per device per month (₹)</label>
-              <input
-                id="plan-price"
-                v-model="editor.price"
-                class="portal-input"
-                inputmode="decimal"
-                maxlength="9"
-                required
-              />
+              <StudioField
+                ><input
+                  id="plan-price"
+                  v-model="editor.price"
+                  class="portal-input"
+                  inputmode="decimal"
+                  maxlength="9"
+                  required
+              /></StudioField>
             </div>
             <p v-if="editingError" role="alert" class="portal-error">{{ editingError }}</p>
             <div class="flex flex-wrap gap-3">
@@ -223,9 +232,7 @@ function save() {
               v-if="pendingArchive?.id === plan.id"
               class="mt-4 rounded-lg border border-studio-rule p-4"
             >
-              <p class="text-sm">
-                Archive this plan to remove it from the available plans.
-              </p>
+              <p class="text-sm">Archive this plan to remove it from the available plans.</p>
               <div class="mt-3 flex flex-wrap gap-3">
                 <button
                   type="button"

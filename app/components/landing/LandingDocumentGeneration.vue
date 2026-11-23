@@ -52,7 +52,9 @@ function generate() {
               :class="{ half: key === 'number' || key === 'date' }"
             >
               <Label :for="'field-' + key">{{ label }}</Label>
-              <input :id="'field-' + key" v-model.trim="draft[key]" required maxlength="120" />
+              <StudioField
+                ><input :id="'field-' + key" v-model.trim="draft[key]" required maxlength="120"
+              /></StudioField>
             </div>
           </div>
           <button class="mini-action" type="submit">

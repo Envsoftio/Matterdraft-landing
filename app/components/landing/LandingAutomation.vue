@@ -304,21 +304,23 @@
             </button>
             <label for="bookmark-manual-title">Add a manual bookmark to this example</label>
             <div class="bookmark-manual-row">
-              <input
-                id="bookmark-manual-title"
-                maxlength="80"
-                value="Supporting note"
-                aria-label="Manual bookmark title"
-              />
-              <input
-                id="bookmark-manual-page"
-                type="number"
-                min="1"
-                max="196"
-                value="1"
-                aria-label="Manual bookmark page"
-                style="max-width: 62px"
-              />
+              <StudioField
+                ><input
+                  id="bookmark-manual-title"
+                  maxlength="80"
+                  value="Supporting note"
+                  aria-label="Manual bookmark title"
+              /></StudioField>
+              <StudioField
+                ><input
+                  id="bookmark-manual-page"
+                  type="number"
+                  min="1"
+                  max="196"
+                  value="1"
+                  aria-label="Manual bookmark page"
+                  style="max-width: 62px"
+              /></StudioField>
               <button id="bookmark-add" type="button">Add</button>
             </div>
             <ol class="manual-bookmarks" id="manual-bookmarks"></ol>

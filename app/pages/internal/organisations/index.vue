@@ -46,15 +46,16 @@ function goToPage(nextPage: number) {
     </p>
     <form class="mt-8 flex max-w-xl flex-col gap-3 sm:flex-row" @submit.prevent="submitSearch">
       <label class="sr-only" for="organisation-search">Search organisations by name</label>
-      <input
-        id="organisation-search"
-        v-model="searchInput"
-        class="portal-input flex-1"
-        type="search"
-        maxlength="100"
-        placeholder="Search organisation name"
-        autocomplete="off"
-      />
+      <StudioField
+        ><input
+          id="organisation-search"
+          v-model="searchInput"
+          class="portal-input flex-1"
+          type="search"
+          maxlength="100"
+          placeholder="Search organisation name"
+          autocomplete="off"
+      /></StudioField>
       <button class="portal-button" type="submit">Search</button>
     </form>
     <div v-if="error" role="alert" class="mt-8">

@@ -90,6 +90,11 @@ select {
   border-color: var(--accent);
   outline: 2px solid var(--accent);
   outline-offset: -2px;
+  box-shadow: none;
+}
+:is(input, textarea, .studio-select)[aria-invalid='true']:focus {
+  border-color: var(--danger);
+  outline-color: var(--danger);
 }
 .page-enter-active,
 .page-leave-active {

@@ -92,6 +92,14 @@ async function screen(person, path, name, width = 390) {
     `Page overflow: ${name}`,
   )
 }
+async function assertInsetFocus(locator) {
+  await locator.focus()
+  const focus = await locator.evaluate((node) => {
+    const style = getComputedStyle(node)
+    return [style.outlineStyle, style.outlineWidth, style.outlineOffset, style.boxShadow]
+  })
+  assert.deepEqual(focus, ['solid', '2px', '-2px', 'none'])
+}
 async function hydrated(page) {
   await page.waitForFunction(
     () => document.querySelector('#__nuxt')?.__vue_app__?.$nuxt?.isHydrating === false,
@@ -918,16 +926,59 @@ try {
   assert.equal(await staff.page.getByText('Desktop app connection', { exact: true }).count(), 0)
   assert.equal(await staff.page.getByRole('button', { name: 'Register desktop app' }).count(), 0)
   await staff.page.getByText('Registered', { exact: true }).waitFor()
-  await staff.page.getByLabel('Activity period').selectOption('30')
+  const period = staff.page.getByRole('combobox', { name: 'Activity period', exact: true })
+  await assertInsetFocus(period)
+  await period.press('ArrowDown')
+  const currentPeriod = staff.page.getByRole('option', { name: 'Last 7 days', exact: true })
+  const nextPeriod = staff.page.getByRole('option', { name: 'Last 30 days', exact: true })
+  await expect(
+    () => currentPeriod.evaluate((option) => document.activeElement === option),
+    'The activity period menu focuses the selected option',
+  )
+  await currentPeriod.press('End')
+  await expect(
+    () => nextPeriod.evaluate((option) => document.activeElement === option),
+    'End focuses the last activity period',
+  )
+  const longerPeriod = staff.page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === '/api/internal/overview' &&
+      new URL(response.url()).searchParams.get('days') === '30' &&
+      response.ok(),
+  )
+  await nextPeriod.press('Enter')
+  await longerPeriod
+  assert.equal((await period.textContent()).trim(), 'Last 30 days')
   await staff.page.getByRole('heading', { name: 'System health' }).waitFor()
   await screen(staff, '/internal/overview', 'super-admin-dashboard')
-  await staff.page.getByLabel('Account type', { exact: true }).selectOption('organisation')
-  await staff.page.getByRole('searchbox').fill(`Verification ${run}`)
+  const accountType = staff.page.getByRole('combobox', { name: 'Account type', exact: true })
+  assert.equal((await accountType.textContent()).trim(), 'All account types')
+  await accountType.click()
+  await staff.page.getByRole('option', { name: 'Law firms', exact: true }).click()
+  await accountType.click()
+  await staff.page.getByRole('option', { name: 'All account types', exact: true }).click()
+  assert.equal((await accountType.textContent()).trim(), 'All account types')
+  await accountType.click()
+  await staff.page.getByRole('option', { name: 'Law firms', exact: true }).click()
+  const accountSearch = staff.page.getByRole('searchbox')
+  await assertInsetFocus(accountSearch)
+  await accountSearch.fill(`Verification ${run}`)
   await staff.page.getByRole('button', { name: 'Search', exact: true }).click()
   await staff.page.getByRole('link', { name: `Verification ${run}`, exact: true }).click()
   await staff.page.waitForURL(`**/internal/activity/${accountId}`)
   await staff.page.getByRole('heading', { name: 'Activity timeline' }).waitFor()
   await screen(staff, `/internal/activity/${accountId}`, 'super-admin-account-activity')
+  await staff.page.goto(`${origin}/internal/plans`)
+  await hydrated(staff.page)
+  await staff.page.getByRole('button', { name: 'New plan', exact: true }).click()
+  const planType = staff.page.getByRole('combobox', { name: 'Available to', exact: true })
+  await assertInsetFocus(planType)
+  await staff.page.screenshot({ path: `${directory}/licence-plan-selection-focus.png` })
+  await planType.press('ArrowDown')
+  await staff.page.getByRole('option', { name: 'Organisation accounts', exact: true }).click()
+  assert.equal((await planType.textContent()).trim(), 'Organisation accounts')
+  await assertInsetFocus(staff.page.getByRole('textbox', { name: 'Plan name', exact: true }))
+  await staff.page.getByRole('button', { name: 'Cancel', exact: true }).click()
   note(
     'Super Admin dashboard shows scoped customer activity, support queue and recorded API failures',
   )

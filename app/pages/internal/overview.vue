@@ -11,7 +11,7 @@ const type = computed(() =>
 )
 const page = computed(() => Math.max(1, Math.trunc(Number(route.query.page || 1)) || 1))
 const searchInput = ref(search.value)
-const typeInput = ref(type.value)
+const typeInput = ref<string>(type.value)
 watch([search, type], () => {
   searchInput.value = search.value
   typeInput.value = type.value
@@ -76,13 +76,18 @@ async function refreshDashboard() {
           <h2 id="customer-metrics" class="font-heading text-xl font-semibold">
             Customer activity
           </h2>
-          <label class="flex items-center gap-3 text-sm">
-            Activity period
-            <select v-model="days" class="portal-input w-auto!">
-              <option value="7">Last 7 days</option>
-              <option value="30">Last 30 days</option>
-            </select>
-          </label>
+          <div class="flex items-center gap-3 text-sm">
+            <label for="activity-period">Activity period</label>
+            <StudioSelect
+              id="activity-period"
+              v-model="days"
+              class="portal-input w-auto! normal-case!"
+              :options="[
+                { value: '7', label: 'Last 7 days' },
+                { value: '30', label: 'Last 30 days' },
+              ]"
+            />
+          </div>
         </div>
         <dl class="portal-counts mt-0!" :aria-busy="pending">
           <div class="flex flex-col justify-between">
@@ -187,20 +192,26 @@ async function refreshDashboard() {
           <label class="sr-only" for="activity-search"
             >Search by account name or solo owner's email</label
           >
-          <input
-            id="activity-search"
-            v-model="searchInput"
-            class="portal-input min-w-0 sm:max-w-sm"
-            type="search"
-            maxlength="100"
-            placeholder="Account name or solo email"
-          />
+          <StudioField
+            ><input
+              id="activity-search"
+              v-model="searchInput"
+              class="portal-input min-w-0 sm:max-w-sm"
+              type="search"
+              maxlength="100"
+              placeholder="Account name or solo email"
+          /></StudioField>
           <label class="sr-only" for="activity-type">Account type</label>
-          <select id="activity-type" v-model="typeInput" class="portal-input sm:w-auto!">
-            <option value="">All account types</option>
-            <option value="organisation">Law firms</option>
-            <option value="personal">Solo advocates</option>
-          </select>
+          <StudioSelect
+            id="activity-type"
+            v-model="typeInput"
+            class="portal-input normal-case! sm:w-auto!"
+            :options="[
+              { value: '', label: 'All account types' },
+              { value: 'organisation', label: 'Law firms' },
+              { value: 'personal', label: 'Solo advocates' },
+            ]"
+          />
           <button class="portal-button-secondary">Search</button>
         </form>
 

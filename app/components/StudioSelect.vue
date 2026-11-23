@@ -13,9 +13,9 @@ import {
 } from 'reka-ui'
 import { Check, ChevronDown } from '@lucide/vue'
 defineOptions({ inheritAttrs: false })
-defineProps<{
+const props = defineProps<{
   id: string
-  options: readonly string[]
+  options: readonly (string | { value: string; label: string })[]
   placeholder?: string
   clearable?: boolean
   disabled?: boolean
@@ -23,8 +23,16 @@ defineProps<{
 }>()
 const model = defineModel<string>()
 const clearSelection = '__empty_selection__'
+const choices = computed(() =>
+  props.options.map((option) =>
+    typeof option === 'string' ? { value: option, label: optionLabel(option) } : option,
+  ),
+)
 const selection = computed({
-  get: () => model.value,
+  get: () =>
+    model.value === '' && choices.value.some((option) => option.value === '')
+      ? clearSelection
+      : model.value,
   set: (value: string | undefined) => {
     model.value = value === clearSelection ? '' : value
   },
@@ -47,9 +55,14 @@ function optionLabel(value: string) {
           <SelectItem v-if="clearable && model" :value="clearSelection" class="studio-option">
             <SelectItemText>Clear selection</SelectItemText>
           </SelectItem>
-          <SelectItem v-for="item in options" :key="item" :value="item" class="studio-option">
+          <SelectItem
+            v-for="item in choices"
+            :key="item.value"
+            :value="item.value || clearSelection"
+            class="studio-option"
+          >
             <SelectItemText>
-              {{ optionLabel(item) }}
+              {{ item.label }}
             </SelectItemText>
             <SelectItemIndicator><Check :size="14" /></SelectItemIndicator>
           </SelectItem>

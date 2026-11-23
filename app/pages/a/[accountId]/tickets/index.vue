@@ -121,23 +121,26 @@ async function checkTickets() {
         :options="['question', 'bug', 'billing', 'feedback']"
       />
       <label for="ticket-subject" class="portal-label mt-5">Subject</label
-      ><input
-        id="ticket-subject"
-        v-model="subject"
-        :disabled="busy || uncertain"
-        class="portal-input"
-        required
-        maxlength="120"
-      />
+      ><StudioField
+        ><input
+          id="ticket-subject"
+          v-model="subject"
+          :disabled="busy || uncertain"
+          class="portal-input"
+          required
+          maxlength="120"
+      /></StudioField>
       <label for="ticket-body" class="portal-label mt-5">Description</label
-      ><textarea
-        id="ticket-body"
-        v-model="body"
-        :disabled="busy || uncertain"
-        class="portal-input min-h-36"
-        required
-        maxlength="10000"
-      />
+      ><StudioField>
+        <textarea
+          id="ticket-body"
+          v-model="body"
+          :disabled="busy || uncertain"
+          class="portal-input min-h-36"
+          required
+          maxlength="10000"
+        />
+      </StudioField>
       <p class="mt-1 text-xs text-studio-muted">
         Up to 10,000 characters. Do not include documents or private matter content.
       </p>

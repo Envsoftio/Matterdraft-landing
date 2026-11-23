@@ -150,15 +150,17 @@ async function changeStatus() {
       @submit.prevent="reply"
     >
       <label class="portal-label" for="ticket-reply">Reply</label
-      ><textarea
-        id="ticket-reply"
-        v-model="body"
-        :readonly="busy || uncertain"
-        class="portal-input min-h-36"
-        aria-describedby="reply-privacy"
-        required
-        maxlength="10000"
-      />
+      ><StudioField>
+        <textarea
+          id="ticket-reply"
+          v-model="body"
+          :readonly="busy || uncertain"
+          class="portal-input min-h-36"
+          aria-describedby="reply-privacy"
+          required
+          maxlength="10000"
+        />
+      </StudioField>
       <p id="reply-privacy" class="mt-1 text-xs text-studio-muted">
         Replies are visible to the ticket creator and support staff. Keep case files and
         confidential matter details out of replies.
