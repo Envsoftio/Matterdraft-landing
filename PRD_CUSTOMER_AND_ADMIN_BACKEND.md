@@ -5,6 +5,8 @@
 **Status:** Product scope; account and administration foundation in development  
 **Related:** [Device licensing and pricing](PRD_DEVICE_LICENSING_AND_PRICING.md) · [Billing, licensing and invoice architecture](ARCHITECTURE_BILLING_AND_LICENSING.md) · [UI/UX design prompt](PROMPT_BACKEND_PORTAL_UI_UX.md)
 
+The [desktop onboarding and Apple Silicon pilot PRD](PRD_DESKTOP_ONBOARDING.md) covers signup through the first desktop export. Track its delivery in the [onboarding task list](TASKS_DESKTOP_ONBOARDING.md).
+
 ## 1. Product boundary
 
 The customer portal provides user login, subscription management, device licensing, and support tickets. The desktop application owns document preparation and local matter files. Customer matter and document content stays in the desktop application.
