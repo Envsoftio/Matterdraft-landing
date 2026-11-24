@@ -39,6 +39,20 @@ export function discoveryHeaders({ facts, indexable, siteUrl }) {
     headers[homepage.markdownPath].Link = `<${canonical}>; rel="canonical"`
     headers['/llms-full.txt'] = { Link: `<${canonical}>; rel="canonical"` }
     headers['/llms.txt'] = { 'X-Robots-Tag': NO_INDEX_FOLLOW }
+
+    // Policy markdown alternates for AI agents
+    for (const doc of facts.legalDocuments) {
+      const policyPath = '/' + doc.slug
+      const policyCanonical = new URL(policyPath, siteUrl).href
+      const policyMarkdown = '/' + doc.slug + '.md'
+      headers[policyPath] = {
+        Link: `<${policyMarkdown}>; rel="alternate"; type="text/markdown"`,
+      }
+      headers[policyMarkdown] = {
+        'Content-Type': 'text/markdown; charset=utf-8',
+        Link: `<${policyCanonical}>; rel="canonical"`,
+      }
+    }
   } else {
     headers['/**'] = { 'X-Robots-Tag': NO_INDEX }
   }

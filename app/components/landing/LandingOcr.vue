@@ -21,7 +21,7 @@ onBeforeUnmount(() => clearTimeout(timer))
       <div class="two-col ocr-grid" data-enter>
         <article class="panel ocr-card">
           <header>
-            01 / Scanned page (source)
+            Original scan
             <span class="code-tag">Original preserved</span>
           </header>
           <div class="scan-sheet" :class="{ scanning: state === 'scanning' }">
@@ -35,9 +35,9 @@ onBeforeUnmount(() => clearTimeout(timer))
         </article>
         <article class="panel ocr-card recognized">
           <header>
-            02 / Searchable working copy
+            Searchable working copy
             <span v-animate-change="state" class="status-tag">
-              {{ state === 'scanning' ? 'Scanning…' : 'OCR Ready' }}
+              {{ state === 'scanning' ? 'Reading scan…' : 'Sample text' }}
             </span>
           </header>
           <div v-animate-change="state === 'done'" class="ocr-result" aria-live="polite">
@@ -47,8 +47,8 @@ onBeforeUnmount(() => clearTimeout(timer))
               <BadgeCheck :size="13" />
               {{
                 state === 'done'
-                  ? 'Sample text recognised. Ready for review.'
-                  : 'Searchable text in this local example'
+                  ? 'Text recognised. Review it against the scan.'
+                  : 'Text from the sample scan'
               }}
             </small>
           </div>

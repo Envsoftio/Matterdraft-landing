@@ -74,15 +74,15 @@ function apply(tool: string) {
             <article>
               <h4>Bring different source formats together</h4>
               <p>
-                Work with PDFs, Word documents and images. Convert images and documents to PDF
-                within the preparation workflow.
+                Import PDFs and images. Save a Word document as a PDF before adding it to the
+                matter.
               </p>
             </article>
             <article>
               <h4>Prepare the output you need</h4>
               <p>
-                Compress PDFs and use PDF conversion where supported. Review conversion results
-                before including them in the bundle.
+                Compare PDF sizes before and after compression and review the working copy before
+                including it in the bundle.
               </p>
             </article>
           </div>

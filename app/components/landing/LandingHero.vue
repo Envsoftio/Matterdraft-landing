@@ -13,6 +13,7 @@ import {
 } from 'reka-ui'
 import {
   ArrowDown,
+  ArrowUpRight,
   BadgeCheck,
   Check,
   Crop,
@@ -26,13 +27,23 @@ import {
   PencilLine,
   RefreshCw,
   ScanSearch,
-  SlidersHorizontal,
   X,
   Zap,
 } from '@lucide/vue'
 import { matterName, matterReference, numberedDocuments } from '~/data/example-matter'
 import { vAnimateChange } from '~/utils/landing/animate-change'
+import site from '~~/content/site.json'
 const selected = ref('Agreement')
+const steps = [
+  ['Import', '#matter-workspace'],
+  ['OCR', '#ocr'],
+  ['Organise', '#matter-workspace'],
+  ['Collate', '#collation'],
+  ['Paginate', '#automation'],
+  ['Index', '#automation'],
+  ['Validate', '#validation'],
+  ['Export', '#export'],
+] as const
 const compact = ref(false)
 const workspace = useTemplateRef('workspace')
 let mobileQuery: MediaQueryList | undefined
@@ -73,73 +84,66 @@ function finishGesture(event: PointerEvent) {
   const next = numberedDocuments[index + (dx < 0 ? 1 : -1)]
   if (next) selected.value = next.name
 }
-const steps = [
-  ['Import', '#matter-workspace'],
-  ['OCR', '#ocr'],
-  ['Organise', '#matter-workspace'],
-  ['Collate', '#collation'],
-  ['Paginate', '#automation'],
-  ['Index', '#automation'],
-  ['Validate', '#validation'],
-  ['Export', '#export'],
-]
 </script>
 
 <template>
-  <section class="studio-hero" aria-labelledby="hero-title">
-    <div class="hero-intro">
-      <p class="hero-eyebrow">
-        <i />
-        Desktop document preparation · For advocates &amp; chambers
-      </p>
-      <h1 id="hero-title">From case documents to organised bundles.</h1>
+  <section class="studio-hero" id="landing-hero" aria-labelledby="hero-title">
+    <div class="frame hero-intro">
+      <p class="hero-eyebrow">Desktop document preparation for advocates and chambers</p>
+      <h1 id="hero-title">From case papers to an indexed court bundle</h1>
       <p class="hero-description">
-        Edit PDFs, recognise text in scans, and prepare indexed court bundles. Your case files and
-        finished bundles stay on your device.
+        Bring your PDFs and scans into one matter, edit working copies and choose which papers go in
+        the bundle. Add a late annexure or change the order, then rebuild to update the page
+        numbers, linked index and bookmarks together. Review the result and export one PDF or
+        separate volumes.
       </p>
       <div class="hero-actions">
         <a href="#early-access" class="action primary">
-          <Zap />
+          <Zap aria-hidden="true" />
           Early access
         </a>
         <a href="#workflow" class="action secondary">
           Explore the workflow
-          <ArrowDown />
+          <ArrowDown aria-hidden="true" />
         </a>
       </div>
-      <p class="offer-pill">
-        <BadgeCheck :size="15" />
-        <span>
-          Early access signups get
-          <strong>one month free after launch.</strong>
-        </span>
+      <p class="hero-offer">
+        <BadgeCheck :size="16" aria-hidden="true" />
+        <span>Early access signups get <strong>one month free after launch.</strong></span>
+      </p>
+      <p class="hero-survey">
+        <a
+          class="survey-link text-action"
+          :href="site.advocateSurveyUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Advocate survey on Google Forms
+          <ArrowUpRight :size="14" aria-hidden="true" />
+        </a>
       </p>
     </div>
     <figure
+      id="workspace-preview"
       ref="workspace"
       class="workspace-window"
       aria-label="Fictional matter workspace preview"
     >
       <figcaption class="window-bar">
-        <span class="traffic-lights" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-        </span>
+        <span class="traffic-lights" aria-hidden="true"><i /><i /><i /></span>
         <span class="window-caption">
           <Monitor :size="14" />
-          MatterDraft Studio —
+          <span class="window-product">MatterDraft Studio ·</span>
           <b>{{ matterName }}</b>
-          ({{ matterReference }})
+          <span class="window-reference">({{ matterReference }})</span>
         </span>
-        <span class="local-state">● Fictional matter</span>
-        <span class="window-version">Preview</span>
+        <span class="local-state">Fictional matter</span>
       </figcaption>
       <div class="workspace-columns">
         <aside class="workspace-side">
           <div class="workspace-label">
-            Matter documents (06)
-            <span class="code-tag">196 Pages</span>
+            Matter documents ({{ numberedDocuments.length }})
+            <span class="code-tag">196 pages</span>
           </div>
           <ToggleGroupRoot
             type="single"
@@ -168,7 +172,7 @@ const steps = [
           <a class="preflight" href="#validation">
             <span>
               <ListChecks :size="15" />
-              Pre-flight checks
+              Bundle checks
               <b>3 items to review</b>
             </span>
             <i />
@@ -187,7 +191,7 @@ const steps = [
             <i />
             <span class="positive">
               <ScanSearch :size="12" />
-              OCR Searchable
+              Searchable text
             </span>
             <span class="reading-icons" aria-hidden="true">
               <RefreshCw />
@@ -228,8 +232,8 @@ const steps = [
         </div>
         <aside class="workspace-side references">
           <div class="workspace-label">
-            Live reference index
-            <small class="positive">↻ Auto-synced</small>
+            Bundle index
+            <small>Page references</small>
           </div>
           <div class="index-list">
             <button
@@ -244,7 +248,7 @@ const steps = [
             </button>
           </div>
           <div class="workspace-label">
-            Bookmark preview
+            Bookmarks
             <small>Parts and documents</small>
           </div>
           <div
@@ -303,15 +307,14 @@ const steps = [
       </div>
     </figure>
   </section>
-  <nav class="production-ribbon" aria-labelledby="workflow-ribbon-title">
+  <nav class="bundle-shortcuts" aria-labelledby="bundle-shortcuts-title">
     <div class="frame">
-      <strong id="workflow-ribbon-title">
-        <SlidersHorizontal :size="18" aria-hidden="true" />
-        From source files to structured output
-      </strong>
-      <ol>
-        <li v-for="([name, href], index) in steps" :key="name">
-          <a :href="href">{{ index + 1 }} {{ name }}</a>
+      <strong id="bundle-shortcuts-title">Explore the bundle workflow</strong>
+      <ol role="list">
+        <li v-for="([label, href], index) in steps" :key="label">
+          <a :href="href"
+            ><span aria-hidden="true">{{ index + 1 }}.</span> {{ label }}</a
+          >
         </li>
       </ol>
     </div>

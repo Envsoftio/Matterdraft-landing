@@ -66,11 +66,14 @@ export function renderSitemap(
     config.facts.homepage.path,
     ...config.facts.legalDocuments.map(({ slug }) => '/' + slug),
   ],
+  legalDocs = config.facts.legalDocuments,
 ) {
   const entries = config.indexable
-    ? [...new Set(paths)].map(
-        (path) => '  <url><loc>' + escapeXml(canonicalUrl(path, config.siteUrl)) + '</loc></url>',
-      )
+    ? [...new Set(paths)].map((path) => {
+        const doc = legalDocs.find((d) => '/' + d.slug === path)
+        const lastmod = doc?.lastModified ? '  <lastmod>' + escapeXml(doc.lastModified) + '</lastmod>\n' : ''
+        return '  <url>\n    <loc>' + escapeXml(canonicalUrl(path, config.siteUrl)) + '</loc>\n' + lastmod + '  </url>'
+      })
     : []
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -91,7 +94,7 @@ export function renderProductMarkdown(config) {
     '',
     '[MatterDraft Studio website](' + homepage + ')',
     '',
-    facts.status + ' for ' + facts.platforms.join(' and ') + '.',
+    'Desktop platforms: ' + facts.platforms.join(' and ') + '.',
     '',
     '## Document privacy',
     '',
@@ -105,7 +108,7 @@ export function renderProductMarkdown(config) {
     '',
     ...facts.qualifications.map((qualification) => '- ' + qualification),
     '',
-    '## Intended workflows',
+    '## Product workflows and examples',
     '',
     ...facts.capabilities.flatMap(({ title, description, anchor }) => [
       '### ' + title,
@@ -122,6 +125,15 @@ export function renderProductMarkdown(config) {
       '#early-access) shows whether registration is open. ' +
       'Early access signups receive launch updates and are offered one month free after launch.',
     '',
+    '## Frequently asked questions',
+    '',
+    ...facts.faq.flatMap(({ question, answer, link }) => [
+      '### ' + question,
+      '',
+      answer,
+      '',
+      ...(link ? ['[' + link.label + '](' + new URL(link.path, homepage).href + ')', ''] : []),
+    ]),
     '## Policies',
     '',
     ...facts.legalDocuments.map(
@@ -139,8 +151,7 @@ export function renderLlmsIndex(config) {
     '',
     '> ' + facts.summary,
     '',
-    facts.status +
-      ' for ' +
+    'Desktop platforms: ' +
       facts.platforms.join(' and ') +
       '. Website examples use fictional data. ' +
       'The desktop app processes case files on the user’s device and keeps generated bundles there.',
@@ -149,8 +160,11 @@ export function renderLlmsIndex(config) {
     '',
     '- [Product overview in Markdown](' +
       canonicalUrl(facts.homepage.markdownPath, siteUrl) +
-      '): Scope, intended workflows and limitations.',
+      '): Product workflows, examples and limitations.',
     '- [Product website](' + homepage + '): Public feature descriptions and interactive examples.',
+    '- [Frequently asked questions](' +
+      homepage +
+      '#faq): Bundle exports, OCR, document privacy and early access.',
     '- [Early access](' +
       homepage +
       '#early-access): Current registration availability and terms of the early access offer.',
@@ -160,6 +174,13 @@ export function renderLlmsIndex(config) {
     ...facts.legalDocuments.map(
       ({ slug, title, description }) =>
         '- [' + title + '](' + canonicalUrl('/' + slug, siteUrl) + '): ' + description,
+    ),
+    '',
+    '## Policy Markdown (for AI agents)',
+    '',
+    ...facts.legalDocuments.map(
+      ({ slug, title }) =>
+        '- [' + title + ' Markdown](' + canonicalUrl('/' + slug + '.md', siteUrl) + ')',
     ),
     '',
     '## Optional',
@@ -220,11 +241,23 @@ export async function generateContent({ projectRoot = PROJECT_ROOT, env = proces
   }
 
   const product = renderProductMarkdown(config)
+  const paths = [
+    config.facts.homepage.path,
+    ...config.facts.legalDocuments.map(({ slug }) => '/' + slug),
+  ]
+  const legalDocs = config.facts.legalDocuments
   output.set('public/robots.txt', renderRobots(config))
-  output.set('public/sitemap.xml', renderSitemap(config))
+  output.set('public/sitemap.xml', renderSitemap(config, paths, legalDocs))
   output.set('public/llms.txt', renderLlmsIndex(config))
   output.set('public' + config.facts.homepage.markdownPath, product)
   output.set('public/llms-full.txt', product)
+
+  // Generate per-policy markdown files for AI agent consumption
+  for (const document of documents) {
+    const marker = '---\ntitle: ' + document.title + '\ndescription: ' + document.description + '\n---\n'
+    const body = prepareLegalMarkdown(document.markdown)
+    output.set('public/' + document.slug + '.md', marker + body)
+  }
 
   // Finish validation and parsing before replacing any previously generated file.
   for (const [path, content] of output) {

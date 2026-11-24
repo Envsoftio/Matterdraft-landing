@@ -1,10 +1,10 @@
 # MatterDraft Studio
 
-> MatterDraft Studio is a local-first desktop workspace in development for lawyers, advocates, chambers and legal teams preparing legal documents and indexed court bundles.
+> MatterDraft Studio is a desktop app for lawyers, advocates, chambers and legal teams preparing legal documents and indexed court bundles on their computers.
 
 [MatterDraft Studio website](https://matterdraft.legal/)
 
-In development for Windows and macOS.
+Desktop platforms: Windows and macOS.
 
 ## Document privacy
 
@@ -12,37 +12,36 @@ Case files, working copies, recognised text and finished bundles stay on your de
 
 ## Product scope
 
-- The product is in development. Release timing has not been announced; illustrated features are intended workflows, not evidence of a released production feature.
 - Website demonstrations use fictional documents and sample data. They do not process or upload a real legal matter.
 - Early access registration does not require payment details. The website does not offer checkout or process purchases.
 - The account portal, early access and support use a network connection. The desktop document workflow keeps case files and bundles on your device.
 - OCR output is editable recognised text; it is not a promise of generative legal drafting or error-free recognition.
-- Electronic signature placement is distinct from digital certification. Court acceptance and legal validity require separate review.
+- Review signature indicators and preserve signed originals. Verify signatures and check the applicable filing requirements separately.
 - Users must review document content, ordering, page ranges, indexes, bookmarks and other outputs before use or filing.
 
-## Intended workflows
+## Product workflows and examples
 
 ### Import and organise
 
-Bring PDF, Word and image source material into matter workflows. Organise documents into categories and parts, work across matter tabs, and choose the order of included documents.
+Import PDFs and images into a matter. Group documents into parts, select which papers go into the bundle, and choose their order. Keep other documents in the matter for reference.
 
 [See this workflow on the website](https://matterdraft.legal/#matter-workspace)
 
 ### Recognise text with OCR
 
-OCR turns scanned content into recognised text that users can review and edit in a working copy.
+OCR adds searchable text to a PDF working copy. Review the recognised text against the original scan.
 
 [See this workflow on the website](https://matterdraft.legal/#ocr)
 
-### Prepare documents from templates
+### Explore a document template example
 
-Select a document template and enter the relevant matter details to produce a formatted document for review.
+The website example shows how fictional matter details fill in the names, dates and references in a draft.
 
 [See this workflow on the website](https://matterdraft.legal/#document-generation)
 
 ### Edit and manage pages
 
-Intended document tools cover merging, splitting, extracting, replacing, reordering, cropping, rotating, deleting and inserting pages.
+Merge and split working copies, reorder or extract pages, and review page edits while keeping the imported files intact.
 
 [See this workflow on the website](https://matterdraft.legal/#pdf-engine)
 
@@ -60,7 +59,7 @@ Generate bookmarks from the document structure and review them alongside manual 
 
 ### Plan document-aware volumes
 
-Plan volumes around an approximate 300-page target while considering document boundaries. The target is not an absolute limit; an oversized individual document needs separate review.
+Set a page target for each volume and review where the bundle splits. Check the proposed boundaries for oversized documents.
 
 [See this workflow on the website](https://matterdraft.legal/#volumes)
 
@@ -78,13 +77,53 @@ Prepare a PDF bundle with numbered pages, an index and bookmarks. Use separate v
 
 ### Apply document controls
 
-Intended tools include password protection, redaction, electronic signature placement, watermarks and timestamps. Users remain responsible for checking the resulting documents and applicable requirements.
+Mark redactions, protect exported PDFs with a password, add output marks and review signatures on imported files.
 
 [See this workflow on the website](https://matterdraft.legal/#production-tools)
 
 ## Availability
 
 The [early access section](https://matterdraft.legal/#early-access) shows whether registration is open. Early access signups receive launch updates and are offered one month free after launch.
+
+## Frequently asked questions
+
+### What is MatterDraft Studio?
+
+MatterDraft Studio is a desktop app for advocates, chambers and legal teams. It brings PDF editing, searchable scans and court bundle preparation into one workspace.
+
+### What does an exported court bundle include?
+
+An exported bundle includes numbered pages, a linked index and bookmarks. Save one combined PDF or separate volumes with their own indexes.
+
+[See the bundle export preview](https://matterdraft.legal/#export)
+
+### Can MatterDraft Studio make scanned PDFs searchable?
+
+Yes. OCR adds searchable text to a PDF working copy. Review the recognised text against the original scan.
+
+[Explore the OCR workflow](https://matterdraft.legal/#ocr)
+
+### What happens when I add a late annexure to a bundle?
+
+Add the annexure to the matter, include it in the bundle and place it in the right order. Rebuild to update the page numbers, linked index and bookmarks, then review the new PDF before exporting it.
+
+[Try changing the sample bundle](https://matterdraft.legal/#automation)
+
+### Are case files uploaded to MatterDraft’s servers?
+
+No. Case files, recognised text and finished bundles stay on your computer. Early access, account services and support run through the website.
+
+[Read the Privacy Policy](https://matterdraft.legal/privacy)
+
+### What platforms does MatterDraft Studio run on?
+
+MatterDraft Studio is built for Windows and macOS.
+
+### How can I get early access to MatterDraft Studio?
+
+Check whether early access registration is open. You can sign up without entering payment details. Signups get launch updates and one month free after launch.
+
+[Check early access availability](https://matterdraft.legal/#early-access)
 
 ## Policies
 

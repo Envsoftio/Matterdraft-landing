@@ -5,7 +5,7 @@ import SectionHeading from './SectionHeading.vue'
 const outputs = [
   [FileText, 'Combined PDF', 'Indexed & paginated'],
   [Files, 'Separate PDF volumes', 'Index for each volume'],
-  [FileType, 'Word documents', 'From templates'],
+  [FileType, 'Word draft', 'Editable text for review'],
   [Table2, 'Excel or CSV index', 'Page references in a table'],
 ] as const
 </script>

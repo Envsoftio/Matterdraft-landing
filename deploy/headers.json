@@ -1,6 +1,6 @@
 {
   "commonHeaders": {
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-nwTxsul7HNlNBf5DKqOwkT9VOlHenWIwh+6F4CbGrFw=' 'sha256-p9QQkikoZtR8nocC87e16goe66WTwHA/rgHqIWvZYrY=' 'sha256-mkhZNvQ+TK4anWpQJHTDMzJ7kRkVSggnk7mLoteHN4I=' 'sha256-zmw77QhX46LyHYK9pL3voAIGIIluAK0iUjAuNYiQVfc=' 'sha256-kopPFemVjTPdFfSibAPAHayEuGXp45lgsm3xUPJq9zM='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'sha256-6mxqE0/afau0IF8XLlwX23CuMO9C3DGWri+pj3eArMQ=' 'sha256-bsD1kJOdghxOG3g0rpg1rs1HD4NikSfzn0NNUSP9SSc=' 'sha256-K+esMamx6MfU2cCpO/N6CQQaPacOPDKzV62KI3gN0lc=' 'sha256-WUyQ26AKw4pBXCNeDVtAW5xMBi1W7lOVs2e/Q/kPQgw=' 'sha256-WtyB9ploDsZa8VaFGZXN36FVVg6pFAuMi89nZmsDSsQ=' 'sha256-g7GsivX28mtrCAsJasT9k/JlF2CWXvukWxoA+pn50Jg=' 'sha256-Pc5nx4z/y/vGk/aGBYVL+9y7sXSq8s+8VJplh1C0LNQ=' 'sha256-aG4oYK7BE+XTorVWItA7I34rfn5oRg3340ADxKK1f4I='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "strict-origin-when-cross-origin",
@@ -97,6 +97,27 @@
     },
     "/llms.txt": {
       "X-Robots-Tag": "noindex, follow"
+    },
+    "/privacy": {
+      "Link": "</privacy.md>; rel=\"alternate\"; type=\"text/markdown\""
+    },
+    "/privacy.md": {
+      "Content-Type": "text/markdown; charset=utf-8",
+      "Link": "<https://matterdraft.legal/privacy>; rel=\"canonical\""
+    },
+    "/terms": {
+      "Link": "</terms.md>; rel=\"alternate\"; type=\"text/markdown\""
+    },
+    "/terms.md": {
+      "Content-Type": "text/markdown; charset=utf-8",
+      "Link": "<https://matterdraft.legal/terms>; rel=\"canonical\""
+    },
+    "/refund-policy": {
+      "Link": "</refund-policy.md>; rel=\"alternate\"; type=\"text/markdown\""
+    },
+    "/refund-policy.md": {
+      "Content-Type": "text/markdown; charset=utf-8",
+      "Link": "<https://matterdraft.legal/refund-policy>; rel=\"canonical\""
     }
   }
 }

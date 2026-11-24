@@ -14,6 +14,7 @@ const origin = useRuntimeConfig().public.siteUrl
 const canonical = new URL(homepage.path, origin).href
 const websiteId = `${canonical}#website`
 const softwareId = `${canonical}#software`
+const publisherId = `${canonical}#publisher`
 const schema = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -24,6 +25,7 @@ const schema = {
       name,
       alternateName: site.shortName,
       inLanguage: language,
+      publisher: { '@id': publisherId },
     },
     {
       '@type': 'WebPage',
@@ -51,10 +53,28 @@ const schema = {
       applicationCategory: 'BusinessApplication',
       operatingSystem: site.platforms.join(', '),
       featureList: site.capabilities.map(({ title }) => title),
+      publisher: { '@id': publisherId },
+    },
+    {
+      '@type': 'Organization',
+      '@id': publisherId,
+      name: site.publisher.name,
+      url: site.publisher.url,
     },
   ],
 }
 useHead({
+  bodyAttrs: { class: 'landing-page' },
+  link: [
+    {
+      key: 'body-font',
+      rel: 'preload',
+      href: '/fonts/manrope-latin-variable.woff2',
+      as: 'font',
+      type: 'font/woff2',
+      crossorigin: '',
+    },
+  ],
   script: [
     {
       key: 'matterdraft-structured-data',

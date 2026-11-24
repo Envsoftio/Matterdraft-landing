@@ -1,13 +1,14 @@
 # MatterDraft Studio
 
-> MatterDraft Studio is a local-first desktop workspace in development for lawyers, advocates, chambers and legal teams preparing legal documents and indexed court bundles.
+> MatterDraft Studio is a desktop app for lawyers, advocates, chambers and legal teams preparing legal documents and indexed court bundles on their computers.
 
-In development for Windows and macOS. Website examples use fictional data. The desktop app processes case files on the user’s device and keeps generated bundles there.
+Desktop platforms: Windows and macOS. Website examples use fictional data. The desktop app processes case files on the user’s device and keeps generated bundles there.
 
 ## Product
 
-- [Product overview in Markdown](https://matterdraft.legal/index.md): Scope, intended workflows and limitations.
+- [Product overview in Markdown](https://matterdraft.legal/index.md): Product workflows, examples and limitations.
 - [Product website](https://matterdraft.legal/): Public feature descriptions and interactive examples.
+- [Frequently asked questions](https://matterdraft.legal/#faq): Bundle exports, OCR, document privacy and early access.
 - [Early access](https://matterdraft.legal/#early-access): Current registration availability and terms of the early access offer.
 
 ## Policies

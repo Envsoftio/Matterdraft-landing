@@ -1,70 +1,52 @@
 export const featureHeadings = {
-  overview: {
-    label: 'The whole matter, in view',
-    title: 'A PDF is one file.\nA matter is everything around it.',
-    description:
-      'Keep source documents, working copies, references and final bundles together for each matter.',
-  },
   workspace: {
-    label: 'Matter workspace',
-    title: 'One matter.\nA clear place for everything.',
+    title: 'Choose which case papers go in the bundle',
     description:
-      'Group documents by category and arrange them in the order they should appear in the bundle.',
+      'Group the documents into parts and set their order. Keep research and supporting files in the same matter for reference.',
   },
   pdf: {
-    label: 'PDF tools',
-    title: 'Work on the pages.\nKeep the matter in view.',
-    description: 'Merge and split PDFs, reorder pages, and prepare working copies for the bundle.',
+    title: 'Edit working copies and keep the originals',
+    description:
+      'Merge PDFs, extract pages or change their order while keeping the imported files intact.',
   },
   ocr: {
-    label: 'Scans and OCR',
-    title: 'Turn scanned pages\ninto usable content.',
+    title: 'Make scanned papers searchable',
     description:
-      'Use OCR to make scanned text searchable. Review and correct the recognised text in your working copy.',
+      'Use optical character recognition (OCR) to make text searchable, then check the recognised text against the original scan.',
   },
   tools: {
-    label: 'Document tools',
-    title: 'Prepare your working copies.',
-    description: 'Add review notes, page numbers, and other details before exporting.',
+    title: 'Prepare documents for sharing',
+    description:
+      'Mark redactions, add review notes and choose which watermarks or page marks appear in the exported PDF.',
   },
   templates: {
-    label: 'Document templates',
-    title: 'The matter supplies the fields.\nThe template gives them form.',
-    description: 'Fill in the details a template asks for and preview the formatted document.',
+    title: 'See a document template example',
+    description:
+      'Use the fictional matter details to see how a template fills in names, dates and case references.',
   },
   collation: {
-    label: 'Pagination and indexing',
-    title: 'Stop chasing page numbers.\nWork from one source of order.',
+    title: 'Update page references when case papers change',
     description:
-      'Arrange the bundle once. Page numbers, index entries and bookmarks follow the document order.',
+      'When you rebuild, MatterDraft uses the new document order for page numbers, the linked index and bookmarks. Add two pages below to see where the next document starts.',
   },
   volumes: {
-    label: 'PDF volumes',
-    title: 'A page target.\nA sensible place to split.',
+    title: 'Split a large bundle into volumes',
     description:
-      'Choose a page target for each volume. The example keeps whole documents together.',
+      'Set a page target for each volume and review where the bundle splits. Try a different target to see how whole documents move between volumes.',
   },
   validation: {
-    label: 'Bundle checks',
-    title: 'Find what needs\na second look.',
-    description: 'Find missing dates, categories and numbering issues before you export.',
+    title: 'Check the bundle before export',
+    description:
+      'Review flagged dates, categories and numbering, then open the generated PDF to check the pages and links yourself.',
   },
   local: {
-    label: 'Document privacy',
-    title: 'Your case files stay\non your device.',
+    title: 'Your case files stay on your computer',
     description:
       'MatterDraft processes files, runs OCR and creates bundles on your computer. We do not upload your documents, OCR text or finished bundles to our servers.',
   },
   outputs: {
-    label: 'Bundle export',
-    title: 'Ready for the next step.\nEasy to find your way through.',
+    title: 'Save the bundle in the formats you need',
     description:
-      'Review the index, bookmarks and page numbers before saving the bundle on your device.',
-  },
-  workflow: {
-    label: 'Bundle workflow',
-    title: 'From the first file to the final output.',
-    description:
-      'See how each step fits together, from organising case files to exporting the bundle.',
+      'Save one combined PDF or separate volumes with their own indexes. Export a spreadsheet index when you need page references in a table.',
   },
 } as const

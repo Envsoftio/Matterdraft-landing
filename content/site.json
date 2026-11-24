@@ -3,10 +3,15 @@
   "shortName": "MatterDraft",
   "defaultOrigin": "https://matterdraft.legal",
   "language": "en-IN",
+  "advocateSurveyUrl": "https://forms.gle/oZ4ziNTZoQ3QWEoh6",
+  "publisher": {
+    "name": "Envsoft Solutions LLP",
+    "url": "https://envsoft.io/"
+  },
   "homepage": {
     "path": "/",
-    "title": "Legal Document and Court Bundle Software | MatterDraft Studio",
-    "description": "Prepare indexed court bundles with MatterDraft Studio, a desktop workspace in early preview. Your case files, OCR text and finished bundles stay on your device.",
+    "title": "Court Bundle Software for Advocates | MatterDraft Studio",
+    "description": "Build court bundles on your computer. Select and order case papers, make scans searchable, and rebuild page numbers, linked indexes and bookmarks when papers change.",
     "markdownPath": "/index.md"
   },
   "socialImage": {
@@ -15,38 +20,72 @@
     "height": 630,
     "alt": "MatterDraft Studio legal document workspace"
   },
-  "summary": "MatterDraft Studio is a local-first desktop workspace in development for lawyers, advocates, chambers and legal teams preparing legal documents and indexed court bundles.",
-  "status": "In development",
+  "summary": "MatterDraft Studio is a desktop app for lawyers, advocates, chambers and legal teams preparing legal documents and indexed court bundles on their computers.",
+  "status": "Production",
   "platforms": ["Windows", "macOS"],
+  "faq": [
+    {
+      "question": "What is MatterDraft Studio?",
+      "answer": "MatterDraft Studio is a desktop app for advocates, chambers and legal teams. It brings PDF editing, searchable scans and court bundle preparation into one workspace."
+    },
+    {
+      "question": "What does an exported court bundle include?",
+      "answer": "An exported bundle includes numbered pages, a linked index and bookmarks. Save one combined PDF or separate volumes with their own indexes.",
+      "link": { "label": "See the bundle export preview", "path": "/#export" }
+    },
+    {
+      "question": "Can MatterDraft Studio make scanned PDFs searchable?",
+      "answer": "Yes. OCR adds searchable text to a PDF working copy. Review the recognised text against the original scan.",
+      "link": { "label": "Explore the OCR workflow", "path": "/#ocr" }
+    },
+    {
+      "question": "What happens when I add a late annexure to a bundle?",
+      "answer": "Add the annexure to the matter, include it in the bundle and place it in the right order. Rebuild to update the page numbers, linked index and bookmarks, then review the new PDF before exporting it.",
+      "link": { "label": "Try changing the sample bundle", "path": "/#automation" }
+    },
+    {
+      "question": "Are case files uploaded to MatterDraft’s servers?",
+      "answer": "No. Case files, recognised text and finished bundles stay on your computer. Early access, account services and support run through the website.",
+      "link": { "label": "Read the Privacy Policy", "path": "/privacy" }
+    },
+    {
+      "question": "What platforms does MatterDraft Studio run on?",
+      "answer": "MatterDraft Studio is built for Windows and macOS."
+    },
+    {
+      "question": "How can I get early access to MatterDraft Studio?",
+      "answer": "Check whether early access registration is open. You can sign up without entering payment details. Signups get launch updates and one month free after launch.",
+      "link": { "label": "Check early access availability", "path": "/#early-access" }
+    }
+  ],
   "qualifications": [
-    "The product is in development. Release timing has not been announced; illustrated features are intended workflows, not evidence of a released production feature.",
     "Website demonstrations use fictional documents and sample data. They do not process or upload a real legal matter.",
     "Early access registration does not require payment details. The website does not offer checkout or process purchases.",
     "The account portal, early access and support use a network connection. The desktop document workflow keeps case files and bundles on your device.",
     "OCR output is editable recognised text; it is not a promise of generative legal drafting or error-free recognition.",
-    "Electronic signature placement is distinct from digital certification. Court acceptance and legal validity require separate review.",
+    "Review signature indicators and preserve signed originals. Verify signatures and check the applicable filing requirements separately.",
     "Users must review document content, ordering, page ranges, indexes, bookmarks and other outputs before use or filing."
   ],
   "capabilities": [
     {
       "title": "Import and organise",
       "anchor": "matter-workspace",
-      "description": "Bring PDF, Word and image source material into matter workflows. Organise documents into categories and parts, work across matter tabs, and choose the order of included documents."
+      "description": "Import PDFs and images into a matter. Group documents into parts, select which papers go into the bundle, and choose their order. Keep other documents in the matter for reference."
     },
     {
       "title": "Recognise text with OCR",
       "anchor": "ocr",
-      "description": "OCR turns scanned content into recognised text that users can review and edit in a working copy."
+      "description": "OCR adds searchable text to a PDF working copy. Review the recognised text against the original scan."
     },
     {
-      "title": "Prepare documents from templates",
+      "title": "Explore a document template example",
       "anchor": "document-generation",
-      "description": "Select a document template and enter the relevant matter details to produce a formatted document for review."
+      "description": "The website example shows how fictional matter details fill in the names, dates and references in a draft."
     },
     {
       "title": "Edit and manage pages",
       "anchor": "pdf-engine",
-      "description": "Intended document tools cover merging, splitting, extracting, replacing, reordering, cropping, rotating, deleting and inserting pages."
+      "description": "Merge and split working copies, reorder or extract pages, and review page edits while keeping the imported files intact."
     },
     {
       "title": "Collate, paginate and index",
@@ -61,7 +100,7 @@
     {
       "title": "Plan document-aware volumes",
       "anchor": "volumes",
-      "description": "Plan volumes around an approximate 300-page target while considering document boundaries. The target is not an absolute limit; an oversized individual document needs separate review."
+      "description": "Set a page target for each volume and review where the bundle splits. Check the proposed boundaries for oversized documents."
     },
     {
       "title": "Validate the bundle",
@@ -76,24 +115,30 @@
     {
       "title": "Apply document controls",
       "anchor": "production-tools",
-      "description": "Intended tools include password protection, redaction, electronic signature placement, watermarks and timestamps. Users remain responsible for checking the resulting documents and applicable requirements."
+      "description": "Mark redactions, protect exported PDFs with a password, add output marks and review signatures on imported files."
     }
   ],
   "legalDocuments": [
     {
       "slug": "privacy",
       "title": "Privacy Policy",
-      "description": "How MatterDraft Studio keeps legal files on your device and handles account, early access and support information."
+      "description": "How MatterDraft Studio keeps legal files on your device and handles account, early access and support information.",
+      "lastModified": "2026-01-15",
+      "markdownPath": "/privacy.md"
     },
     {
       "slug": "terms",
       "title": "Terms and Conditions",
-      "description": "Terms for using the MatterDraft website, account portal and desktop app."
+      "description": "Terms for using the MatterDraft website, account portal and desktop app.",
+      "lastModified": "2026-01-15",
+      "markdownPath": "/terms.md"
     },
     {
       "slug": "refund-policy",
       "title": "Refund and Cancellation Policy",
-      "description": "How to cancel a subscription, report a billing error or request a refund you are entitled to."
+      "description": "How to cancel a subscription, report a billing error or request a refund you are entitled to.",
+      "lastModified": "2026-01-15",
+      "markdownPath": "/refund-policy.md"
     }
   ]
 }

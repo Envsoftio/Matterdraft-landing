@@ -7,17 +7,26 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from 'reka-ui'
-import { ArrowUpRight, Menu, UserRound, Zap } from '@lucide/vue'
+import { ArrowUpRight, Menu, UserRound, X, Zap } from '@lucide/vue'
+import site from '~~/content/site.json'
+
 const links = [
   ['Product', '#product'],
   ['PDF Tools', '#pdf-engine'],
   ['Workflow', '#workflow'],
   ['Automation', '#automation'],
   ['Document Privacy', '#local-processing'],
+  ['FAQ', '#faq'],
 ] as const
-const current = ref('#product')
+const current = ref('')
+const heroPassed = ref(false)
+let navigationObserver: IntersectionObserver | undefined
+let heroObserver: IntersectionObserver | undefined
+
 onMounted(() => {
-  const observer = new IntersectionObserver(
+  if (!('IntersectionObserver' in window)) return
+
+  navigationObserver = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) if (entry.isIntersecting) current.value = '#' + entry.target.id
     },
@@ -25,9 +34,21 @@ onMounted(() => {
   )
   for (const [, href] of links) {
     const element = document.querySelector(href)
-    if (element) observer.observe(element)
+    if (element) navigationObserver.observe(element)
   }
-  onBeforeUnmount(() => observer.disconnect())
+
+  const hero = document.getElementById('landing-hero')
+  if (hero) {
+    heroObserver = new IntersectionObserver(([entry]) => {
+      if (entry) heroPassed.value = !entry.isIntersecting && entry.boundingClientRect.bottom <= 0
+    })
+    heroObserver.observe(hero)
+  }
+})
+
+onBeforeUnmount(() => {
+  navigationObserver?.disconnect()
+  heroObserver?.disconnect()
 })
 </script>
 
@@ -42,33 +63,56 @@ onMounted(() => {
           :key="href"
           :href="href"
           :class="{ current: current === href }"
+          :aria-current="current === href ? 'location' : undefined"
           @click="current = href"
         >
           {{ name }}
         </a>
       </nav>
       <div class="header-actions">
-        <ThemeToggle />
-        <a class="action primary small" href="#early-access">
-          <Zap />
-          Early Access
+        <a
+          class="action primary header-access"
+          :class="{ 'header-access-hidden': !heroPassed }"
+          href="#early-access"
+        >
+          <Zap aria-hidden="true" />
+          Early access
         </a>
+        <ThemeToggle />
         <NuxtLink to="/portal" class="header-portal-link" aria-label="Account portal">
           <UserRound :size="17" aria-hidden="true" />
         </NuxtLink>
         <DropdownMenuRoot>
-          <DropdownMenuTrigger class="mobile-links-trigger" aria-label="Open navigation">
-            <Menu :size="20" />
+          <DropdownMenuTrigger class="mobile-links-trigger" aria-label="Navigation">
+            <Menu :size="20" aria-hidden="true" />
+            <X :size="20" aria-hidden="true" />
           </DropdownMenuTrigger>
           <DropdownMenuPortal>
-            <DropdownMenuContent align="end" :side-offset="8" class="studio-options">
-              <DropdownMenuItem v-for="[name, href] in links" :key="href" as-child>
-                <a class="studio-option" :href="href" @click="current = href">{{ name }}</a>
+            <DropdownMenuContent
+              align="end"
+              :side-offset="8"
+              :collision-padding="16"
+              class="studio-options landing-mobile-nav"
+            >
+              <DropdownMenuItem
+                v-for="([name, href], index) in links"
+                :key="href"
+                :style="{ '--nav-delay': `${index * 60}ms` }"
+                as-child
+              >
+                <a
+                  class="studio-option"
+                  :href="href"
+                  :aria-current="current === href ? 'location' : undefined"
+                  @click="current = href"
+                >
+                  {{ name }}
+                </a>
               </DropdownMenuItem>
               <DropdownMenuSeparator class="menu-divider" />
               <DropdownMenuItem as-child>
                 <NuxtLink to="/portal" class="studio-option">
-                  Open portal
+                  Account portal
                   <ArrowUpRight :size="14" />
                 </NuxtLink>
               </DropdownMenuItem>
@@ -78,14 +122,7 @@ onMounted(() => {
       </div>
     </div>
   </header>
-  <div class="preview-banner">
-    <div>
-      <span class="preview-pill">Early preview</span>
-      <span>For Windows and macOS</span>
-    </div>
-    <a href="https://forms.gle/oZ4ziNTZoQ3QWEoh6" target="_blank" rel="noopener noreferrer">
-      Advocate survey on Google Forms
-      <ArrowUpRight :size="14" />
-    </a>
+  <div class="frame landing-utility">
+    <span>Desktop app for {{ site.platforms.join(' and ') }}</span>
   </div>
 </template>

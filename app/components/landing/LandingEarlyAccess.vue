@@ -54,7 +54,7 @@ async function submitEarlyAccess() {
     await nextTick()
     submissionStatus.value?.focus()
   } catch {
-    errorMessage.value = 'We could not save your request. Please try again later.'
+    errorMessage.value = 'We couldn’t save your signup. Please try again.'
   } finally {
     pending.value = false
   }
@@ -70,12 +70,12 @@ async function submitEarlyAccess() {
     <div class="signup-inner">
       <div class="signup-copy" data-enter>
         <h2 id="early-access-title">Get early access to MatterDraft</h2>
-        <p>Join the list for launch updates and an invitation when access becomes available.</p>
+        <p>Join the list for launch updates and an invitation when access opens.</p>
         <div class="signup-benefit">
           <span class="icon-tile" aria-hidden="true"><Star /></span>
           <div>
             <h3>One month free after launch</h3>
-            <p>Sign up during the preview. No payment details required.</p>
+            <p>You can join the list without entering payment details.</p>
           </div>
         </div>
       </div>
@@ -95,11 +95,7 @@ async function submitEarlyAccess() {
         <template v-else>
           <header>
             <h3 id="early-access-form-title">Early access registration</h3>
-            <p v-animate-change="enabled">
-              {{
-                enabled ? 'Share your details to join the list.' : 'Registration isn’t open yet.'
-              }}
-            </p>
+            <p v-if="!enabled" role="status">Registration isn’t open yet.</p>
           </header>
           <FormRoot
             v-if="enabled"
@@ -172,7 +168,6 @@ async function submitEarlyAccess() {
                   I agree to receive emails about MatterDraft early access and launch.
                 </FieldLabel>
                 <FieldDescription class="signup-privacy">
-                  We store your registration details in Google Sheets.
                   <NuxtLink to="/privacy">Privacy policy</NuxtLink>
                 </FieldDescription>
                 <FieldError class="signup-field-error"

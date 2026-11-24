@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { ArrowUpRight } from '@lucide/vue'
+import site from '~~/content/site.json'
+
 defineProps<{ policy?: boolean }>()
 </script>
 <template>
@@ -10,9 +13,19 @@ defineProps<{ policy?: boolean }>()
             ><BrandLogo
           /></NuxtLink>
           <p>Prepare case files and indexed court bundles on your own computer.</p>
-          <div class="footer-badges">
-            <span>On-device processing</span>
-          </div>
+          <p class="footer-survey">
+            <a
+              id="advocate-survey-footer"
+              class="survey-link text-action"
+              :href="site.advocateSurveyUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Advocate survey on Google Forms
+              <ArrowUpRight :size="14" aria-hidden="true" />
+            </a>
+          </p>
+          <span class="footer-privacy-note">On-device processing</span>
         </div>
         <nav aria-label="Product links">
           <strong>Product</strong>
@@ -20,9 +33,10 @@ defineProps<{ policy?: boolean }>()
           <NuxtLink to="/#ocr">Scanned pages &amp; OCR</NuxtLink>
           <NuxtLink to="/#automation">Bundle indexing</NuxtLink>
           <NuxtLink to="/#workflow">Bundle workflow</NuxtLink>
+          <NuxtLink to="/#faq">Frequently asked questions</NuxtLink>
         </nav>
         <nav aria-label="Legal and account links">
-          <strong>Legal &amp; account</strong>
+          <strong>Help and policies</strong>
           <NuxtLink to="/privacy">Privacy</NuxtLink>
           <NuxtLink to="/terms">Terms</NuxtLink>
           <NuxtLink to="/refund-policy">Refund policy</NuxtLink>
@@ -33,10 +47,13 @@ defineProps<{ policy?: boolean }>()
       <div class="footer-baseline">
         <span>Built in India for legal teams</span>
         <span>
-          MatterDraft Studio · An
-          <a href="https://envsoft.io/" rel="noopener noreferrer" target="_blank">
-            Envsoft Solutions LLP
-          </a>
+          MatterDraft Studio{{ ' ' }}
+          <span aria-hidden="true" class="mx-2 align-middle text-2xl leading-none font-bold"
+            >·</span
+          >
+          {{ ' ' }}An{{ ' ' }}
+          <a :href="site.publisher.url" class="mx-1" rel="noopener noreferrer" target="_blank">
+            {{ site.publisher.name }} </a>{{ ' ' }}
           venture
         </span>
       </div>

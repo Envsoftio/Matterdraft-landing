@@ -145,7 +145,14 @@ test('discovery headers scope public links, private pages and preview indexing',
   assert.equal(headers['/index.md']['Content-Type'], 'text/markdown; charset=utf-8')
   assert.equal(headers['/llms-full.txt'].Link, headers['/index.md'].Link)
   assert.equal(headers['/llms.txt']['X-Robots-Tag'], NO_INDEX_FOLLOW)
-  assert.equal(headers['/privacy'], undefined)
+
+  // Policy pages now have markdown alternate headers
+  assert.match(headers['/privacy'].Link, /<\/privacy\.md>/)
+  assert.match(headers['/privacy.md'].Link, /<https:\/\/example.com\/privacy>/)
+  assert.equal(headers['/privacy.md']['Content-Type'], 'text/markdown; charset=utf-8')
+  assert.match(headers['/terms'].Link, /<\/terms\.md>/)
+  assert.match(headers['/refund-policy'].Link, /<\/refund-policy\.md>/)
+
   for (const path of [
     '/sign-in',
     '/reset-password',
@@ -167,8 +174,13 @@ test('discovery headers scope public links, private pages and preview indexing',
 test('sitemap paths use the configured origin and escape XML', () => {
   const config = resolveSiteConfig({ NUXT_PUBLIC_SITE_URL: 'https://example.com' })
   assert.match(renderSitemap(config, ['/a&b']), /\/a&amp;b<\/loc>/)
-  assert.equal(escapeXml('&<>"\''), '&amp;&lt;&gt;&quot;&apos;')
-  assert.doesNotMatch(renderSitemap(config), /lastmod|changefreq|priority/)
+  assert.equal(escapeXml('&<>\"\''), '&amp;&lt;&gt;&quot;&apos;')
+  // Sitemap now includes lastmod for policy pages
+  const sitemap = renderSitemap(config)
+  assert.match(sitemap, /<lastmod>2026-01-15<\/lastmod>/)
+  assert.match(sitemap, /https:\/\/example.com\/privacy/)
+  assert.match(sitemap, /https:\/\/example.com\/terms/)
+  assert.match(sitemap, /https:\/\/example.com\/refund-policy/)
 })
 
 test('legal preparation removes the duplicated title and rejects unpublished material', () => {
@@ -216,7 +228,7 @@ test('generation prepares policy HTML and keeps the Markdown source intact', asy
   const sourcePath = join(projectRoot, 'content/legal/privacy.md')
   const before = await readFile(sourcePath, 'utf8')
   const result = await generateContent({ projectRoot, env: {} })
-  assert.equal(result.written.length, 8)
+  assert.equal(result.written.length, 11)
   const module = await readFile(join(projectRoot, 'app/data/legal/privacy.ts'), 'utf8')
   const data = JSON.parse(
     module.slice(module.indexOf('export default ') + 'export default '.length),

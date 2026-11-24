@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import LandingFooter from '~/components/landing/LandingFooter.vue'
+import site from '~~/content/site.json'
 
 const props = defineProps<{ title: string; description: string; slug: string; html: string }>()
+
+// Find the markdown path from site config
+const legalDoc = site.legalDocuments.find((d) => d.slug === props.slug)
+const markdownPath = legalDoc?.markdownPath || ('/' + props.slug + '.md')
+
 useSiteSeo({
   title: `${props.title} | MatterDraft Studio`,
   description: props.description,
-  path: `/${props.slug}`,
+  path: '/' + props.slug,
+  markdownPath: markdownPath,
+  legalSlug: props.slug,
 })
 </script>
 

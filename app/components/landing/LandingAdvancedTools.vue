@@ -15,7 +15,12 @@ import SectionHeading from './SectionHeading.vue'
 const tools = [
   [RectangleEllipsis, 'Password', 'Access protection', 'Set a password for the prepared output.'],
   [Eraser, 'Redaction', 'Review marked text', 'Check the redacted copy before sharing it.'],
-  [Signature, 'Signature fields', 'Place a signature', 'Place a signature on the working copy.'],
+  [
+    Signature,
+    'Signature review',
+    'Review signed originals',
+    'Check signature indicators or mark a visible signature for review before changing the working copy.',
+  ],
   [PanelsTopLeft, 'Watermark', 'Custom opacity', 'Apply a visible mark across selected pages.'],
   [Clock, 'Timestamp', 'Date and time', 'Add a time reference to the prepared document.'],
   [

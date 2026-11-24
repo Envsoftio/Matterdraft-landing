@@ -11,7 +11,7 @@ import { loadSiteConfig } from './site-config.mjs'
 const root = dirname(dirname(fileURLToPath(import.meta.url))),
   dist = join(root, 'dist')
 const settings = loadSiteConfig({ projectRoot: root })
-const { homepage, legalDocuments, socialImage } = settings.facts
+const { homepage, faq, legalDocuments, publisher, socialImage } = settings.facts
 const pages = ['', ...legalDocuments.map(({ slug }) => slug)]
 const pageReports = []
 for (const route of pages) {
@@ -68,6 +68,69 @@ for (const route of pages) {
   })
 }
 const home = await readFile(join(dist, 'index.html'), 'utf8')
+for (const id of [
+  'early-access',
+  'product',
+  'matter-workspace',
+  'pdf-engine',
+  'ocr',
+  'production-tools',
+  'document-generation',
+  'automation',
+  'volumes',
+  'validation',
+  'local-processing',
+  'export',
+  'workflow',
+  'product-overview',
+])
+  assert(home.includes(`<section id="${id}"`), `Missing landing page section: ${id}`)
+
+const header = home.match(/<header class="studio-header"[\s\S]*?<\/header>/)?.[0]
+assert.match(header ?? '', /class="[^"]*\bheader-access-hidden\b[^"]*" href="#early-access"/)
+for (const href of [
+  '#product',
+  '#pdf-engine',
+  '#workflow',
+  '#automation',
+  '#local-processing',
+  '#faq',
+])
+  assert(header.includes(`href="${href}"`), `Missing toolbar link to ${href}`)
+assert.match(home, /<h1 id="hero-title">From case papers to an indexed court bundle<\/h1>/)
+const hero = home.match(/<section class="studio-hero"[\s\S]*?<\/section>/)?.[0]
+assert(hero?.includes('Desktop document preparation for advocates and chambers'))
+assert(hero?.includes('rebuild to update the page numbers, linked index and bookmarks together'))
+assert(hero.includes('href="#early-access"') && hero.includes('href="#workflow"'))
+assert(hero.includes('one month free after launch'))
+const footer = home.match(/<footer class="studio-footer"[\s\S]*?<\/footer>/)?.[0]
+for (const section of [hero, footer]) {
+  assert(section?.includes(`href="${settings.facts.advocateSurveyUrl}"`))
+  assert(section.includes('Advocate survey on Google Forms'))
+}
+const shortcuts = home.match(/<nav class="bundle-shortcuts"[\s\S]*?<\/nav>/)?.[0]
+assert.deepEqual(
+  [...(shortcuts?.matchAll(/<a href="(#[^"]+)"/g) ?? [])].map((match) => match[1]),
+  [
+    '#matter-workspace',
+    '#ocr',
+    '#matter-workspace',
+    '#collation',
+    '#automation',
+    '#automation',
+    '#validation',
+    '#export',
+  ],
+)
+const signup = home.match(/<section id="early-access"[\s\S]*?<\/section>/)?.[0]
+assert(signup?.includes('<h3>One month free after launch</h3>'))
+const closing = home.match(/<section id="product-overview"[\s\S]*?<\/section>/)?.[0]
+assert(closing?.includes('href="#early-access"'))
+assert(home.indexOf('id="workspace-preview"') < home.indexOf('id="early-access"'))
+assert(home.indexOf('id="early-access"') < home.indexOf('id="workflow"'))
+assert(home.indexOf('id="workflow"') < home.indexOf('id="matter-workspace"'))
+const collation = home.match(/<section id="automation"[\s\S]*?<\/section>/)?.[0]
+assert(collation?.includes('Agreement.pdf starts on page <strong>43</strong>'))
 assert(
   home.includes(`<title>${homepage.title}</title>`),
   'Homepage title does not match the site configuration',
@@ -77,22 +140,15 @@ assert.equal(
   settings.indexable,
   'Unexpected Markdown alternate on homepage',
 )
-for (const required of [
-  'From case documents',
-  'to organised bundles.',
-  '196',
-  'Fictional',
-  'matterdraft-structured-data',
-])
+for (const required of ['196', 'Fictional', 'matterdraft-structured-data'])
   assert(home.includes(required), `Missing server-rendered content: ${required}`)
 assert(
   home.includes('We do not upload your documents, OCR text or finished bundles to our servers.'),
 )
 for (const required of [
-  'https://forms.gle/oZ4ziNTZoQ3QWEoh6',
   'Early access registration',
   'one month free after launch',
-  settings.earlyAccessEnabled ? 'Share your details' : 'Registration isn’t open yet',
+  settings.earlyAccessEnabled ? 'Join early access' : 'Registration isn’t open yet',
 ])
   assert(home.includes(required), `Missing early access content: ${required}`)
 assert(
@@ -106,6 +162,13 @@ assert(structured, 'JSON-LD missing')
 const schema = JSON.parse(structured[2])
 const software = schema['@graph'].find((node) => node['@type'] === 'SoftwareApplication')
 const webPage = schema['@graph'].find((node) => node['@type'] === 'WebPage')
+const website = schema['@graph'].find((node) => node['@type'] === 'WebSite')
+const publisherNode = schema['@graph'].find((node) => node['@type'] === 'Organization')
+assert(publisherNode?.['@id'], 'Publisher structured data is missing')
+assert.equal(publisherNode.name, publisher.name)
+assert.equal(publisherNode.url, publisher.url)
+assert.equal(software?.publisher?.['@id'], publisherNode['@id'])
+assert.equal(website?.publisher?.['@id'], publisherNode['@id'])
 assert.equal(
   software?.creativeWorkStatus,
   settings.facts.status,
@@ -132,6 +195,7 @@ for (const file of [
   'site.webmanifest',
   'og/matterdraft-social.jpg',
   'fonts/plus-jakarta-sans-latin-variable.woff2',
+  'fonts/manrope-latin-variable.woff2',
   'fonts/jetbrains-mono-medium.woff2',
   'brand/studio-wordmark-light.png',
   'brand/studio-wordmark-dark.png',
@@ -158,6 +222,24 @@ const llms = await readFile(join(dist, 'llms.txt'), 'utf8')
 assert(llms.startsWith('# MatterDraft'), 'llms.txt H1 missing')
 assert(llms.includes('/index.md'), 'Markdown product description not discoverable')
 const product = await readFile(join(dist, homepage.markdownPath.slice(1)), 'utf8')
+const faqHtml = home.match(/<section id="faq"[\s\S]*?<\/section>/)?.[0]
+assert(faqHtml, 'FAQ must be rendered in the initial HTML')
+for (const { question, answer, link } of faq) {
+  assert(faqHtml.includes(question) && faqHtml.includes(answer), `Missing visible FAQ: ${question}`)
+  assert(
+    product.includes(question) && product.includes(answer),
+    `Missing Markdown FAQ: ${question}`,
+  )
+  if (link) {
+    assert(faqHtml.includes(`href="${link.path}"`), `Missing visible FAQ link: ${link.path}`)
+    assert(
+      product.includes(new URL(link.path, canonical).href),
+      `Missing Markdown FAQ link: ${link.path}`,
+    )
+    const { hash } = new URL(link.path, canonical)
+    if (hash) assert(home.includes(`id="${hash.slice(1)}"`), `Missing FAQ link target: ${hash}`)
+  }
+}
 for (const anchor of [
   ...settings.facts.capabilities.map((capability) => capability.anchor),
   'early-access',
@@ -183,7 +265,7 @@ for (const name of assetNames) {
     cssGzip += gzipSync(data).length
   }
 }
-const landingFonts = ['plus-jakarta-sans-latin-variable.woff2', 'jetbrains-mono-medium.woff2']
+const landingFonts = ['manrope-latin-variable.woff2', 'jetbrains-mono-medium.woff2']
 const fontBytes = (
   await Promise.all(landingFonts.map((file) => stat(join(dist, 'fonts', file))))
 ).reduce((sum, file) => sum + file.size, 0)

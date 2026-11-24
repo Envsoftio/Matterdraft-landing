@@ -29,6 +29,7 @@ const parts = computed(() =>
     return { name, documents, pages }
   }),
 )
+const agreementStart = computed(() => rows.value.find(({ name }) => name === 'Agreement')?.start)
 function move(name: string, part: number, before?: string) {
   const doc = files.value.find((d) => d.name === name)
   if (!doc || name === before) return
@@ -110,7 +111,10 @@ function reset() {
           bundle</span
         >
       </div>
-      <span class="sr-only" role="status">{{ rows.at(-1)?.end }} pages across four parts</span>
+      <p class="mt-3 text-sm text-studio-muted" role="status">
+        Agreement.pdf starts on page <strong>{{ agreementStart }}</strong>. The sample bundle has
+        <strong>{{ rows.at(-1)?.end }}</strong> pages across four parts.
+      </p>
     </div>
   </section>
 </template>

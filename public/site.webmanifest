@@ -1,10 +1,12 @@
 {
   "name": "MatterDraft Studio",
   "short_name": "MatterDraft",
+  "description": "Legal document and court bundle software",
   "start_url": "/",
-  "display": "browser",
+  "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#071b37",
+  "orientation": "any",
   "icons": [
     {
       "src": "/icon-192.png",
