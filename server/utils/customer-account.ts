@@ -1,7 +1,7 @@
 import type { H3Event } from 'h3'
 import { auth } from '../../lib/auth'
 import { client } from '../../lib/db'
-import { ensurePersonalAccount } from '../../lib/customer-accounts'
+import { ensurePersonalAccount, listCustomerAccounts } from '../../lib/customer-accounts'
 import { getStaffAccess, type StaffRole } from '../../lib/staff-access'
 import { applicationFailure } from './application-error'
 
@@ -20,31 +20,17 @@ export async function requireCustomer(event: H3Event) {
   return session
 }
 
-function listAccounts(userId: string) {
-  return client.execute({
-    sql: `SELECT a.id, a.name, a.account_type, m.role
-      FROM account_membership m JOIN customer_account a ON a.id = m.account_id
-      WHERE m.user_id = ? ORDER BY CASE a.account_type WHEN 'personal' THEN 0 ELSE 1 END, a.name`,
-    args: [userId],
-  })
-}
-
 export async function accountContext(event: H3Event) {
   const { user } = await requireUser(event)
   const staff = await getStaffAccess(user.id)
-  let accounts = staff ? [] : (await listAccounts(user.id)).rows
+  let accounts = staff ? [] : await listCustomerAccounts(user.id)
   if (!staff && accounts.length === 0) {
     await ensurePersonalAccount(user)
-    accounts = (await listAccounts(user.id)).rows
+    accounts = await listCustomerAccounts(user.id)
   }
   return {
     user: { id: user.id, name: user.name, email: user.email },
-    accounts: accounts.map((row) => ({
-      id: String(row.id),
-      name: String(row.name),
-      accountType: String(row.account_type),
-      role: String(row.role) as AccountRole,
-    })),
+    accounts,
     isStaff: staff !== null,
     staffRole: staff?.active ? staff.role : null,
   }

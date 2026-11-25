@@ -160,3 +160,16 @@ export const licenceTrial = sqliteTable('licence_trial', {
   expiresAt: integer('expires_at').notNull(),
 })
 
+export const desktopDownload = sqliteTable(
+  'desktop_download',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    platform: text('platform').notNull(),
+    version: text('version').notNull(),
+    requestedAt: integer('requested_at').notNull(),
+  },
+  (table) => [index('desktop_download_requested_idx').on(table.requestedAt, table.id)],
+)

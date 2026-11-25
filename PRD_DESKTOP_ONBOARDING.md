@@ -1,26 +1,22 @@
 # MatterDraft Studio — Desktop onboarding and Apple Silicon pilot
 
-**Status** · Pilot requirements, implementation pending (ONB-01 dev environment configured)  
-**Updated** · 24 November 2026
+**Status** · Local portal and desktop scaffolding exist. Packaged sign-in against the local backend is the first integration checkpoint.
+
+**Updated** · 25 November 2026
 
 [Implementation task list](TASKS_DESKTOP_ONBOARDING.md) · [Customer and admin PRD](PRD_CUSTOMER_AND_ADMIN_BACKEND.md) · [Trial and licensing policy](PRD_DEVICE_LICENSING_AND_PRICING.md#7-seven-day-trial-and-licensing-security-requirements) · [Desktop licence requirements](../matterdraft_app/docs/PRD_DEVICE_LICENSING_AND_PRICING.md)
 
-### Dev environment note
+### Local development
 
-ONB-01 (HTTPS, database migrations, SMTP, and desktop OAuth client) is already configured in the local development environment (`localhost:3000`). The `.env` file contains all required variables:
-
-- **Database**: Turso (`libsql://matterdraft-vishnuchd.aws-eu-west-1.turso.io`)
-- **Auth**: Better Auth with PKCE S256, callback `legal.matterdraft.studio:/oauth/callback`
-- **SMTP**: Configured for local mail-preview (`.data/mail-preview/`)
-- **Super admin**: `vishnu@envsoft.io` (see `.env`)
-
-All subsequent tasks (ONB-02 through ONB-09) build on this dev environment until pilot deployment.
+Develop and verify the integration against `http://localhost:3000` with the desktop callback `legal.matterdraft.studio:/oauth/callback`. Use mail previews for local account verification and confirm migrations and active OAuth client registration against the intended test database. Use an ad hoc–signed Apple Silicon build for packaged testing.
 
 ## Goal and pilot scope
 
 An invited tester can create a verified account from the landing page, download and install MatterDraft on an Apple Silicon Mac, connect the desktop app to that account, and export a first bundle using synthetic matter files. The installation instructions are part of the download page and also have a standalone URL.
 
 The pilot uses a build without Apple Developer ID signing or notarization. The existing development evidence is for an ad hoc–signed Apple Silicon app on one Mac. The pilot package and supported macOS versions must be verified through the actual browser download on clean machines. Windows, Intel Macs, paid checkout, public distribution, and automatic updates are outside this pilot. Require Developer ID signing and notarization for broader Mac distribution. [Desktop acceptance log](../matterdraft_app/docs/ACCEPTANCE_TESTS.md#current-matterdraft-application-completion--22-november-2026)
+
+The registered-customer workspace has a download page for distribution-approved releases. It requires a verified customer account, issues a short-lived link to a private object, and records link issuance by customer, platform, version, and time. This release list is for builds approved for all verified customers. The invite-only pilot has a separate eligibility requirement for its builds and activation.
 
 ## Customer journey
 

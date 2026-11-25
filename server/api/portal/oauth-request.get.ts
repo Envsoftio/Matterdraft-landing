@@ -1,16 +1,11 @@
 import { applicationRoute, applicationFailure } from '../../utils/application-error'
-import { verifyOAuthQueryParams } from '@better-auth/oauth-provider'
+import { readSignedOAuthRequest } from '../../utils/signed-oauth-request'
 import { auth } from '../../../lib/auth'
 import { requireCustomer } from '../../utils/customer-account'
 
 export default applicationRoute('/api/portal/oauth-request', async (event) => {
   await requireCustomer(event)
-  const params = new URL(getRequestURL(event)).searchParams
-  const signed = new Set(['sig', 'ba_param', ...params.getAll('ba_param')])
-  const query = new URLSearchParams([...params].filter(([key]) => signed.has(key))).toString()
-  const { secret } = await auth.$context
-  if (!(await verifyOAuthQueryParams(query, secret))) applicationFailure(400)
-  const verified = new URLSearchParams(query)
+  const { params: verified } = await readSignedOAuthRequest(new URL(getRequestURL(event)))
   const clientId = verified.get('client_id')
   if (!clientId) applicationFailure(400)
   const client = await auth.api.getOAuthClientPublic({

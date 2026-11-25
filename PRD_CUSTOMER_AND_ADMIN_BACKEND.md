@@ -36,15 +36,32 @@ Organisation owners and authorised admins can invite, revoke and manage members.
 
 ## 3. Customer application
 
-The selected account is visible throughout Overview, Plans & billing, Computers and Support. Authorised firm users also see Members and account activity. Keep invoices within Plans & billing. The desktop Licence screen links to the same account in the portal. Display timestamps in local time with an explicit timezone on expiry and payment confirmations.
+### Advocate workspace
 
-| Dashboard | What the person can see and do |
+After browser sign-in, open Home in the personal workspace when one exists. An advocate with only organisation memberships lands in their first organisation workspace. A link to a specific workspace or invitation keeps its destination. The header shows the current workspace and provides Home and Support, plus Plans & billing for billing roles. The workspace menu handles switching and opens Manage workspaces, where an advocate can choose to create an organisation.
+
+Home gives the advocate one next step based on their access:
+
+| State | Home |
 |---|---|
-| Independent advocate | See trial or paid status, expiry, own computers out of two and the next action. Start the trial by activating the app, choose a prepaid term, renew, replace a lost computer, update billing details or download the latest invoice. **Add an advocate** previews the move to a firm and the incremental charge. |
+| Eligible while portal trials are enabled | Offer **Start free trial** and explain that the seven days begin immediately. |
+| Trial active | Show when access ends, including the timezone, and tell the advocate to open MatterDraft Studio on their computer and sign in with the same account. |
+| Trial ended | Show that the trial ended and link billing users to available plans. |
+| Trial unavailable or access handled by the firm | Explain where to sign in on desktop. For firm members, identify the organisation administrator as the first contact for access. |
+
+The desktop onboarding target starts new trials at first activation. When that ships, Home directs eligible advocates to the desktop activation flow and continues to show expiry for existing trials.
+
+Home links to **Download and install**, billing and support as permitted. Approved installers and package instructions are available inside the workspace to verified customers. Super Admins can see who requested each installer, its platform and version, and when the link was issued. Organisation owners and admins also see Members and Activity log in their organisation workspace. Documents and matter files are managed in the desktop app. The dashboard can show paid access and computer actions when it has verified access and device data.
+
+### Firm management
+
+| Role | Workspace management |
+|---|---|
 | Firm owner | See purchased, assigned and available licences, named assignments, invited members, shared renewal date and total, scheduled changes and recent invoices. Invite, assign a spare, reassign, buy more or reduce the next renewal quantity. A pending invitation shows separately from an assigned licence. |
 | Organisation admin | See the roster, licence capacity, assignments and registered computers for the selected firm. Manage assignments and replacements. When all licences are in use, identify the owner or billing manager who can buy another. |
 | Billing manager | See payer profile, committed quantity, service dates, renewal total, purchase history, invoices and credits. Can purchase, renew, request a reduction and correct future billing details. Assignment and device administration require the corresponding role. |
-| Firm advocate | See their assigned licence, firm, registered computers and last verification, plus activation, replacement and support actions. For an unassigned or expired licence, identify the responsible firm contact. Keep firm finances and peers’ computers private. |
+
+The desktop Licence screen links to its workspace in the portal. Display timestamps in local time with an explicit timezone on expiry and payment confirmations.
 
 **Plans & billing.** Distinguish trial expiry, paid-through, manual renewal, and any future authorised debit. Show the final payable amount and tax, change in quantity, effective date, today’s amount and the full next renewal price before confirmation. Example for a fourth licence halfway through a three-licence month: **₹249.50 today · ₹1,996 at next renewal**. After checkout show confirmed, confirming or failed status and a safe payment reference. A customer with a pending payment can check its progress. A lapsed customer can retrieve past invoices and renew.
 

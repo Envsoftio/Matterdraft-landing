@@ -39,3 +39,18 @@ export async function ensurePersonalAccount(user: { id: string; name: string; em
     'write',
   )
 }
+
+export async function listCustomerAccounts(userId: string) {
+  const { rows } = await client.execute({
+    sql: `SELECT a.id, a.name, a.account_type, m.role
+      FROM account_membership m JOIN customer_account a ON a.id = m.account_id
+      WHERE m.user_id = ? ORDER BY CASE a.account_type WHEN 'personal' THEN 0 ELSE 1 END, a.name, a.id`,
+    args: [userId],
+  })
+  return rows.map((row) => ({
+    id: String(row.id),
+    name: String(row.name),
+    accountType: String(row.account_type) as 'personal' | 'organisation',
+    role: String(row.role),
+  }))
+}

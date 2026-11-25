@@ -16,6 +16,7 @@ The website examples use fictional documents. Keep client names, case details, a
 - **Accounts and organisations.** We use your name, email address, password hash, verification and session information, and organisation memberships and roles to provide accounts, manage access, and connect the desktop app when you authorise it. Authorised organisation administrators can see membership information and make changes permitted by their role.
 - **Early access.** If you join the list, we collect your name, work email, optional role and preferred platform, and your consent to receive emails about early access and launch. You can withdraw that consent by emailing [hello@matterdraft.legal](mailto:hello@matterdraft.legal).
 - **Support.** We use the account details, messages, and technical information you choose to provide to respond and resolve your request. The support portal accepts text. Keep passwords, verification codes and confidential case information out of your messages.
+- **Desktop installer requests.** We record which customer requested the installer, its platform and version, and when we issued the link to manage software distribution and support downloads.
 - **Website operation and security.** Requests may include your IP address, browser details and request timing. Hosting and application logs help deliver the website, diagnose errors and protect accounts. We may also record security events and changes to organisation access.
 - **Survey.** The optional feedback survey opens in Google Forms. Google and Envsoft receive the information you choose to submit there. We use responses to understand how legal teams prepare bundles.
 
@@ -25,7 +26,7 @@ The account portal uses cookies to keep you signed in, protect your session and 
 
 ## Service providers and disclosures
 
-Netlify hosts the website and its server functions. Turso stores account, organisation, and support records. Google Apps Script and Google Sheets handle early-access registrations, and Google Forms hosts the optional survey. Our email service sends verification and password-reset messages and delivers correspondence. These providers handle the information needed for their service. Account and website information may be processed outside India.
+Netlify hosts the website and its server functions. Turso stores account, organisation, support, and installer request records. When installers are available, Amazon S3 delivers the files. Google Apps Script and Google Sheets handle early-access registrations, and Google Forms hosts the optional survey. Our email service sends verification and password-reset messages and delivers correspondence. These providers handle the information needed for their service. Account and website information may be processed outside India.
 
 We may share relevant information when required by law or to protect legal rights. We do not sell personal information.
 

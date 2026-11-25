@@ -4,10 +4,11 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { jwt } from 'better-auth/plugins'
 import { oauthProvider } from '@better-auth/oauth-provider'
 import { db } from './db'
-import { ensurePersonalAccount } from './customer-accounts'
+import { ensurePersonalAccount, listCustomerAccounts } from './customer-accounts'
 import * as schema from './auth-schema'
 import { sendAccountEmail } from './mail'
 import { getStaffAccess } from './staff-access'
+import { isRegisteredDesktopClient } from './registered-desktop-client'
 
 const baseURL = process.env.BETTER_AUTH_URL || 'http://localhost:3000'
 if (process.env.NODE_ENV === 'production' && !process.env.BETTER_AUTH_SECRET) {
@@ -65,6 +66,17 @@ export const auth = betterAuth({
           if (user && grantType === 'authorization_code') await ensurePersonalAccount(user)
         }
         return {}
+      },
+      customUserInfoClaims: async ({ user, jwt, scopes }) => {
+        const clientId = jwt.client_id ?? jwt.azp
+        if (
+          typeof clientId !== 'string' ||
+          !scopes.includes('profile') ||
+          !(await isRegisteredDesktopClient(clientId))
+        )
+          return {}
+        await requireDesktopCustomer(user)
+        return { matterdraft_accounts: await listCustomerAccounts(user.id) }
       },
       clientPrivileges: async ({ user }) => {
         if (!user || !user.emailVerified) return false

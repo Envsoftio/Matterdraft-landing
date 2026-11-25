@@ -16,22 +16,16 @@ import {
   Menu,
   X,
   Users,
-  ScrollText,
   ContactRound,
   LifeBuoy,
   CreditCard,
+  Download,
 } from '@lucide/vue'
 import { authClient } from '~~/lib/auth-client'
 
-type Context = {
-  user: { id: string; name: string; email: string }
-  accounts: { id: string; name: string; accountType: string; role: string }[]
-  isStaff: boolean
-  staffRole: string | null
-}
 const route = useRoute()
 const isInternal = computed(() => route.path.startsWith('/internal/'))
-const { data: context, error } = await useFetch<Context>('/api/portal/context', {
+const { data: context, error } = await useFetch('/api/portal/context', {
   key: 'portal-context',
 })
 if (error.value && (error.value as { statusCode?: number }).statusCode === 401) {
@@ -65,6 +59,25 @@ const currentAccount = computed(
     context.value?.accounts.find((account) => route.path.startsWith(`/a/${account.id}/`)) ||
     context.value?.accounts[0],
 )
+const accountPath = computed(() => (currentAccount.value ? `/a/${currentAccount.value.id}` : ''))
+const workspaceName = computed(() => {
+  if (currentAccount.value?.accountType === 'personal') return 'Personal workspace'
+  return currentAccount.value?.name || 'Workspaces'
+})
+const customerLinks = computed(() => {
+  if (!currentAccount.value) return []
+  return [
+    { path: 'overview', label: 'Home' },
+    ...(['owner', 'billing_manager'].includes(currentAccount.value.role)
+      ? [{ path: 'billing', label: 'Plans & billing' }]
+      : []),
+    { path: 'tickets', label: 'Support' },
+  ]
+})
+function isCustomerLinkCurrent(path: string) {
+  const destination = `${accountPath.value}/${path}`
+  return route.path === destination || route.path.startsWith(`${destination}/`)
+}
 const initials = computed(
   () =>
     context.value?.user.name
@@ -109,13 +122,18 @@ async function signOut() {
       <p class="mt-3 text-studio-muted">{{ parseApiError(error).text }}</p>
       <NuxtLink class="portal-link mt-5 inline-block" to="/sign-in">Go to sign in</NuxtLink>
     </div>
-    <div v-else class="min-h-screen lg:grid lg:grid-cols-[238px_minmax(0,1fr)]">
+    <div
+      v-else
+      class="min-h-screen"
+      :class="isInternal ? 'lg:grid lg:grid-cols-[238px_minmax(0,1fr)]' : undefined"
+    >
       <div
-        v-if="mobileOpen"
+        v-if="isInternal && mobileOpen"
         class="fixed inset-0 z-30 bg-[#06152b]/50 lg:hidden"
         @click="closeNavigation"
       />
       <FocusScope
+        v-if="isInternal"
         as-child
         :present="mobileOpen"
         :trapped="mobileOpen"
@@ -136,7 +154,7 @@ async function signOut() {
         >
           <div class="flex h-[72px] items-center justify-between border-b border-studio-rule px-5">
             <NuxtLink
-              :to="isInternal ? '/internal/overview' : '/portal'"
+              to="/internal/overview"
               class="flex items-center gap-2.5 font-heading text-[17px] font-bold tracking-tight text-studio-heading"
               ><BrandLogo class="portal-wordmark"
             /></NuxtLink>
@@ -150,7 +168,6 @@ async function signOut() {
           </div>
           <div class="flex h-[calc(100vh-72px)] flex-col overflow-y-auto px-3 py-6">
             <div
-              v-if="isInternal"
               class="mx-2 mb-7 rounded-md bg-studio-chip px-3 py-3 text-xs leading-5 text-studio-heading"
             >
               <strong class="block text-sm">MatterDraft administration</strong>
@@ -160,122 +177,68 @@ async function signOut() {
                   : context.staffRole.replaceAll('_', ' ')
               }}</span>
             </div>
-            <div
-              v-else-if="currentAccount"
-              class="mx-2 mb-6 rounded-md bg-studio-chip px-3 py-3 text-xs leading-5 text-studio-heading"
-            >
-              <strong class="block truncate text-sm text-studio-heading">{{
-                currentAccount?.name
-              }}</strong>{{
-                currentAccount?.accountType === 'personal' ? 'Personal' : 'Organisation'
-              }}
-              ·
-              {{ currentAccount?.role }}
-            </div>
-            <p v-if="isInternal || currentAccount" class="portal-nav-label">Workspace</p>
+            <p class="portal-nav-label">Workspace</p>
             <NuxtLink
-              v-if="isInternal || currentAccount"
-              :to="isInternal ? '/internal/overview' : `/a/${currentAccount?.id}/overview`"
+              to="/internal/overview"
               class="portal-nav-link"
-              :class="
-                (
-                  isInternal
-                    ? route.path === '/internal/overview'
-                    : route.path.endsWith('/overview')
-                )
-                  ? 'portal-nav-active'
-                  : ''
-              "
-              ><LayoutDashboard :size="18" />{{ isInternal ? 'Dashboard' : 'Overview' }}</NuxtLink
+              exact-active-class="portal-nav-active"
             >
+              <LayoutDashboard :size="18" />Dashboard
+            </NuxtLink>
             <NuxtLink
-              v-if="
-                !isInternal &&
-                currentAccount &&
-                ['owner', 'billing_manager'].includes(currentAccount.role)
-              "
-              :to="`/a/${currentAccount.id}/billing`"
-              class="portal-nav-link"
-              :class="route.path.endsWith('/billing') ? 'portal-nav-active' : ''"
-              ><CreditCard :size="18" />Plans &amp; billing</NuxtLink
-            >
-            <NuxtLink
-              v-if="
-                !isInternal &&
-                currentAccount?.accountType === 'organisation' &&
-                ['owner', 'admin'].includes(currentAccount.role)
-              "
-              :to="`/a/${currentAccount.id}/members`"
-              class="portal-nav-link"
-              :class="route.path.endsWith('/members') ? 'portal-nav-active' : ''"
-              ><Users :size="18" />Members</NuxtLink
-            >
-            <NuxtLink
-              v-if="
-                !isInternal &&
-                currentAccount?.accountType === 'organisation' &&
-                ['owner', 'admin'].includes(currentAccount.role)
-              "
-              :to="`/a/${currentAccount.id}/activity`"
-              class="portal-nav-link"
-              :class="route.path.endsWith('/activity') ? 'portal-nav-active' : ''"
-              ><ScrollText :size="18" />Activity log</NuxtLink
-            >
-            <NuxtLink
-              v-if="!isInternal && currentAccount"
-              :to="`/a/${currentAccount.id}/tickets`"
-              class="portal-nav-link"
-              :class="route.path.includes('/tickets') ? 'portal-nav-active' : ''"
-              ><LifeBuoy :size="18" />Support</NuxtLink
-            >
-            <NuxtLink
-              v-if="isInternal && context?.staffRole === 'super_admin'"
+              v-if="context?.staffRole === 'super_admin'"
               to="/internal/organisations"
               class="portal-nav-link"
               :class="route.path.startsWith('/internal/organisations') ? 'portal-nav-active' : ''"
               ><Users :size="18" />Organisations</NuxtLink
             >
             <NuxtLink
-              v-if="isInternal && context?.staffRole === 'super_admin'"
+              v-if="context?.staffRole === 'super_admin'"
               to="/internal/customers"
               class="portal-nav-link"
               :class="route.path.startsWith('/internal/customers') ? 'portal-nav-active' : ''"
               ><ContactRound :size="18" />Customers</NuxtLink
             >
             <NuxtLink
-              v-if="isInternal && context?.staffRole === 'super_admin'"
+              v-if="context?.staffRole === 'super_admin'"
               to="/internal/plans"
               class="portal-nav-link"
               :class="route.path === '/internal/plans' ? 'portal-nav-active' : ''"
               ><CreditCard :size="18" />Licence plans</NuxtLink
             >
             <NuxtLink
-              v-if="isInternal && context?.staffRole === 'super_admin'"
+              v-if="context?.staffRole === 'super_admin'"
+              to="/internal/downloads"
+              class="portal-nav-link"
+              exact-active-class="portal-nav-active"
+            >
+              <Download :size="18" aria-hidden="true" />Installer downloads
+            </NuxtLink>
+            <NuxtLink
+              v-if="context?.staffRole === 'super_admin'"
               to="/internal/tickets"
               class="portal-nav-link"
               :class="route.path.startsWith('/internal/tickets') ? 'portal-nav-active' : ''"
               ><LifeBuoy :size="18" />Support tickets</NuxtLink
             >
-            <div v-if="!isInternal" class="mt-5">
-              <p class="portal-nav-label">Accounts</p>
-              <NuxtLink to="/portal" class="portal-nav-link">All accounts</NuxtLink
-              ><NuxtLink
-                v-for="account in context?.accounts"
-                :key="account.id"
-                :to="`/a/${account.id}/overview`"
-                class="portal-nav-link"
-                ><span class="truncate">{{ account.name }}</span></NuxtLink
-              >
-            </div>
           </div>
         </aside>
       </FocusScope>
 
-      <div class="min-w-0" :inert="mobileOpen">
+      <div
+        class="min-w-0"
+        :class="{ 'flex min-h-screen flex-col': !isInternal }"
+        :inert="mobileOpen"
+      >
         <header
-          class="portal-topbar sticky top-0 z-20 flex h-[72px] items-center justify-between gap-4 border-b border-studio-rule px-5 sm:px-8"
+          class="portal-topbar sticky top-0 z-20 border-b border-studio-rule"
+          :class="
+            isInternal
+              ? 'flex h-[72px] items-center justify-between gap-4 px-5 sm:px-8'
+              : 'customer-header'
+          "
         >
-          <div class="flex min-w-0 items-center gap-3">
+          <div v-if="isInternal" class="flex min-w-0 items-center gap-3">
             <button
               ref="navigationTrigger"
               class="portal-icon-button inline-grid lg:hidden"
@@ -288,52 +251,100 @@ async function signOut() {
             </button>
             <div class="min-w-0">
               <p class="truncate text-xs font-medium uppercase tracking-wider text-studio-muted">
-                {{
-                  isInternal
-                    ? 'MatterDraft'
-                    : currentAccount?.accountType === 'personal'
-                      ? 'Personal account'
-                      : currentAccount
-                        ? 'Organisation account'
-                        : 'Account access'
-                }}
+                MatterDraft
               </p>
               <p class="truncate font-heading text-base font-semibold text-studio-heading">
-                {{ isInternal ? 'Super Admin' : currentAccount?.name || 'Your accounts' }}
+                Super Admin
               </p>
             </div>
           </div>
-          <div class="flex items-center gap-3">
-            <ThemeToggle />
-            <DropdownMenuRoot v-if="!isInternal && (context?.accounts.length || 0) > 1">
-              <DropdownMenuTrigger class="portal-top-action hidden sm:inline-flex"
-                >Switch account <ChevronDown :size="15"
-              /></DropdownMenuTrigger>
-              <DropdownMenuPortal
-                ><DropdownMenuContent class="portal-menu" :side-offset="8" align="end"
-                  ><DropdownMenuItem
+          <template v-else>
+            <NuxtLink
+              :to="accountPath ? `${accountPath}/overview` : '/portal'"
+              class="customer-wordmark"
+            >
+              <BrandLogo />
+            </NuxtLink>
+            <nav v-if="customerLinks.length" class="customer-nav" aria-label="Workspace">
+              <NuxtLink
+                v-for="link in customerLinks"
+                :key="link.path"
+                :to="`${accountPath}/${link.path}`"
+                class="customer-nav-link"
+                :aria-current="isCustomerLinkCurrent(link.path) ? 'page' : undefined"
+              >
+                {{ link.label }}
+              </NuxtLink>
+            </nav>
+          </template>
+          <div
+            class="flex min-w-0 items-center gap-2 sm:gap-3"
+            :class="{ 'customer-header-actions': !isInternal }"
+          >
+            <DropdownMenuRoot v-if="!isInternal">
+              <DropdownMenuTrigger
+                class="workspace-switch"
+                :aria-label="`Switch workspace, current: ${workspaceName}`"
+              >
+                <span v-if="currentAccount?.accountType === 'personal'" class="workspace-short-name"
+                  >Personal</span
+                >
+                <span
+                  :class="[
+                    'truncate',
+                    { 'workspace-full-name': currentAccount?.accountType === 'personal' },
+                  ]"
+                >
+                  {{ workspaceName }}
+                </span>
+                <ChevronDown :size="15" class="shrink-0" aria-hidden="true" />
+              </DropdownMenuTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuContent
+                  class="portal-menu workspace-menu"
+                  :side-offset="8"
+                  align="end"
+                >
+                  <DropdownMenuItem
                     v-for="account in context?.accounts"
                     :key="account.id"
-                    class="portal-menu-item"
+                    class="portal-menu-item workspace-menu-item"
                     @select="navigateTo(`/a/${account.id}/overview`)"
-                    >{{ account.name }}
-                    <span class="ml-auto text-xs text-studio-muted">{{
-                      account.role
-                    }}</span></DropdownMenuItem
-                  ></DropdownMenuContent
-                ></DropdownMenuPortal
-              >
+                  >
+                    <span class="min-w-0 flex-1 break-words">
+                      {{ account.accountType === 'personal' ? 'Personal workspace' : account.name }}
+                    </span>
+                    <span v-if="account.id === currentAccount?.id" class="text-xs text-studio-muted"
+                      >Current</span
+                    >
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator
+                    v-if="context?.accounts.length"
+                    class="my-1 h-px bg-studio-rule"
+                  />
+                  <DropdownMenuItem
+                    class="portal-menu-item"
+                    @select="navigateTo('/portal/accounts')"
+                  >
+                    Manage workspaces
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenuPortal>
             </DropdownMenuRoot>
+            <ThemeToggle />
             <DropdownMenuRoot
               ><DropdownMenuTrigger
                 class="portal-avatar"
                 :aria-label="`Profile for ${context?.user.name}`"
                 >{{ initials }}</DropdownMenuTrigger
               ><DropdownMenuPortal
-                ><DropdownMenuContent class="portal-menu" :side-offset="8" align="end"
+                ><DropdownMenuContent
+                  class="portal-menu workspace-menu"
+                  :side-offset="8"
+                  align="end"
                   ><div class="px-3 py-2">
                     <p class="font-semibold">{{ context?.user.name }}</p>
-                    <p class="text-xs text-studio-muted">{{ context?.user.email }}</p>
+                    <p class="break-words text-xs text-studio-muted">{{ context?.user.email }}</p>
                   </div>
                   <DropdownMenuSeparator class="my-1 h-px bg-studio-rule" /><DropdownMenuItem
                     class="portal-menu-item"
@@ -346,7 +357,13 @@ async function signOut() {
           </div>
         </header>
         <p v-if="signOutError" role="alert" class="portal-error mx-5 mt-4">{{ signOutError }}</p>
-        <main id="main-content" tabindex="-1" class="min-h-[calc(100vh-72px)]"><slot /></main>
+        <main
+          id="main-content"
+          tabindex="-1"
+          :class="isInternal ? 'min-h-[calc(100vh-72px)]' : 'grow'"
+        >
+          <slot />
+        </main>
       </div>
     </div>
   </div>

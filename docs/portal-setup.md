@@ -9,8 +9,19 @@ The customer account area supports verified sign-in, personal and organisation a
 1. Use Node from `package.json`, install with `npm ci`, and set the variables in `.env.example` in local `.env`. Keep `.env` out of Git.
 2. Apply every unapplied migration with `npm run db:migrate` against the intended database.
 3. Run `npm run dev` and open `http://localhost:3000/sign-up`.
-4. Local account emails are saved as JSON in `.data/mail-preview/`. Open the verification URL from the latest preview. Configure `SMTP_HOST`, `SMTP_FROM`, and any needed SMTP credentials before production use; local preview files are not a delivery mechanism.
+4. With both ZeptoMail variables unset, local account emails are saved as JSON in `.data/mail-preview/`. Open the verification URL from the latest preview. To test delivery, configure the server variables below and use an account whose email you control.
 5. Sign in and verify the account email. Grant the initial super-admin capability with `npm run staff:grant-access -- user@example.com "Initial administrator bootstrap"`. This command changes the configured database and records an audit event; check its target before running it. Staff API routes check the active staff role on every request.
+
+## Account email
+
+The Nuxt server uses Nodemailer to send verification, password reset, organisation invitation and ownership transfer emails. It connects to `smtp.zeptomail.com` on port 587, requires STARTTLS, and authenticates as `emailapikey`. Set these variables in the ignored local `.env` for a delivery check or in the hosting server environment for deployment. [ZeptoMail SMTP setup](https://www.zoho.com/cpaas/help/smtp-home.html)
+
+| Variable | Value |
+| --- | --- |
+| `ZEPTOMAIL_SMTP_PASSWORD` | The password from the Agent’s SMTP tab. Enter the raw value without an HTTP authorization prefix. |
+| `ZEPTOMAIL_FROM` | A sender address on a domain verified for that ZeptoMail Agent. Emails use the display name `noreply`. |
+
+The server reads both values at runtime. Deployment requires both. For a delivered-email smoke test, set `BETTER_AUTH_URL` to the browser origin where you will open the verification and reset links. Open and click tracking are disabled for account emails.
 
 ## Super Admin Dashboard
 
@@ -20,34 +31,64 @@ The dashboard at `/internal/overview` shows solo and firm account activity, tick
 
 Apply `0006_licence_plans_and_billing.sql` with `npm run db:migrate`. A super admin can create, edit, publish and archive plans at `/internal/plans`. Set the audience and INR monthly price per device. A published plan keeps its name and price. Create a new draft for a replacement price and archive the old plan when it should leave the catalogue.
 
-Account owners and billing managers see the published plans for their selected account in **Plans & billing**. Owners start the trial explicitly there. The server records a full-access grant for 168 hours and returns the original grant on retries. The trial requires no payment details and ends automatically. Trial activation is on by default in development. Set `LICENCE_TRIALS_ENABLED=true` in production once the desktop app can enforce the grant. Device assignments, signed offline entitlements and feature enforcement require the separate desktop integration.
+Account owners and billing managers see the published plans for their selected account in **Plans & billing**. Owners can start the trial explicitly from Home or Plans & billing. The server records a full-access grant for 168 hours and returns the original grant on retries. The trial requires no payment details and ends automatically. Trial activation is on by default in development. Set `LICENCE_TRIALS_ENABLED=true` in production once the desktop app can enforce the grant. Device assignments, signed offline entitlements and feature enforcement require the separate desktop integration.
 
 Online purchases are currently unavailable. Choose a payment gateway and review merchant, tax, cancellation, and refund terms before implementing checkout.
+
+## Private desktop installers
+
+Home links to **Download and install** inside the signed-in workspace. The release list and download request both require a verified customer with access to that workspace. Configure only release builds that have been approved for registered customers. Pilot-only builds should stay off this release list until they are approved for that audience.
+
+1. Apply the database migrations with `npm run db:migrate`. Migration `0008_desktop_downloads.sql` adds the download history.
+2. Upload the approved package to a private Amazon S3 bucket with Block Public Access enabled. Use versioned object keys and leave old keys unchanged. Grant the portal's credentials `s3:GetObject` only for the installer objects or release prefix. From a signed-out session, confirm the unsigned object URL fails.
+3. Set the server-only `DESKTOP_DOWNLOAD_S3_BUCKET`, `DESKTOP_DOWNLOAD_S3_REGION`, `DESKTOP_DOWNLOAD_S3_ACCESS_KEY_ID`, and `DESKTOP_DOWNLOAD_S3_SECRET_ACCESS_KEY` in the hosting environment. Set `DESKTOP_DOWNLOAD_S3_SESSION_TOKEN` when credentials are temporary. Use a bucket name without dots.
+4. Set `DESKTOP_INSTALLERS` to a JSON object keyed by platform. The example below illustrates the format. Replace the example version, object key, signing status, and requirements with the approved build's values.
+
+```json
+{
+  "macos-arm64": {
+    "objectKey": "desktop/1.2.3/MatterDraft-aarch64.dmg",
+    "version": "1.2.3",
+    "requirements": "macOS 14 or later",
+    "notarized": true
+  }
+}
+```
+
+Available platform keys are `macos-arm64` and `macos-x64` for drag-to-Applications DMGs and `windows-x64` for an MSI. Omit platforms without an approved build. The optional `notarized` field applies only to Mac. Leave the manifest unset to show the unavailable state. The signed-in page presents install steps for the published package type.
+
+The portal checks that the object exists and records the verified user, selected platform, version, and request time before returning an S3 link valid for two minutes. Super Admins can review the records under **Installer downloads**. Records show link issuance. Installer transfers go directly through S3, so the portal cannot confirm completed transfers or installations. Verify a signed-in browser download and a clean-device installation for each published build.
+
+For local verification without AWS, add `--import ./scripts/mock-installer-storage.mjs` immediately after `node` in the isolated Nuxt start command below, then run the browser harness with `PORTAL_CHECK_INSTALLERS=1`. The fixture uses simulated storage and dummy installer contents.
 
 ## Desktop authorization contract
 
 During deployment setup, register the first-party desktop client with `POST /api/internal/desktop-client` from a verified super-admin session on the portal origin. The endpoint returns the public client ID and exact callback URI for the desktop configuration. Repeat the call to retrieve an existing registration for that callback.
 
+When the registered desktop app requests a fresh login, the dashboard sign-in form tells the user that signing in will open the desktop app. The form then completes the signed request and returns directly to the desktop callback. The regular consent page remains available for other OAuth requests.
+
 The desktop app must register and handle `legal.matterdraft.studio:/oauth/callback` as a private-use URL scheme. It opens the system browser to the server's OAuth authorization endpoint and uses Authorization Code with PKCE `S256`. Generate a fresh verifier, challenge, and unpredictable `state` for each attempt. Use the registered public client ID; do not ship a client secret. On callback, verify `state`, exchange the code with the original verifier, and store tokens in the operating system's secure credential store. The portal does not receive local matter or document content.
+
+The desktop build reads current personal and organisation memberships from the `matterdraft_accounts` claim at UserInfo. The claim is scoped to the audited first-party desktop registration. Deploy this portal support before distributing the workspace-aware desktop build.
 
 The authorization server's public metadata and a full native round trip must be checked against the desktop application before release. The web portal alone cannot verify OS scheme registration or token storage.
 
 ## Deployment prerequisites
 
-- Netlify must receive `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `BETTER_AUTH_URL` (the exact HTTPS portal origin), `BETTER_AUTH_SECRET`, and production SMTP settings as server environment variables. Use separate database and secrets for deploy previews. Never use the local development `.env` in Netlify.
+- Netlify must receive `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `BETTER_AUTH_URL` (the exact HTTPS portal origin), `BETTER_AUTH_SECRET`, `ZEPTOMAIL_SMTP_PASSWORD` and `ZEPTOMAIL_FROM` as server environment variables. Use separate database and secrets for deploy previews. Never use the local development `.env` in Netlify.
 - Netlify uses `npm run build` with the Nitro `netlify` preset. The preset writes public files to `dist` and generates the server function for the portal and its API routes.
 - Run migrations against each target database before its release. Arrange database backups and restore verification before accepting production accounts.
 - The callback scheme in `DESKTOP_REDIRECT_URI` must match the desktop handler exactly. Changing it requires a new client registration and desktop release.
-- Review dependency advisories and the remaining manual checks before production launch. Local query, error-contract and opt-in route/browser checks exist; the release still needs the deployment, SMTP and native desktop checks listed below.
+- Review dependency advisories and the remaining manual checks before production launch. Local query, error-contract and opt-in route/browser checks exist. The release still needs the deployment, ZeptoMail delivery and native desktop checks listed below.
 - Rotate the existing early access Google Apps Script shared secret before deployment. Its old value was present in the tracked `.env.example`; the local value has been moved to ignored `.env`.
 
 ## Organisation membership slice (local verification)
 
-Apply `drizzle/0001_eager_luke_cage.sql`, `drizzle/0002_known_eternity.sql` and `drizzle/0003_loose_mastermind.sql` with `npm run db:migrate` against the intended database before using these routes. The first adds invitations; the second renames application-owned records and columns without discarding existing accounts, memberships, invitations, or activity. The third removes the unused two-factor table and user flag after the product decision to use verified individual staff accounts without MFA. These migrations have not been applied to the hosted database by this change. Keep `BETTER_AUTH_URL` set to the browser origin so invitation links work. SMTP is required for invitation delivery in production. In local development, invitation emails are saved under `.data/mail-preview/` with restricted file permissions.
+Apply `drizzle/0001_eager_luke_cage.sql`, `drizzle/0002_known_eternity.sql` and `drizzle/0003_loose_mastermind.sql` with `npm run db:migrate` against the intended database before using these routes. The first adds invitations; the second renames application-owned records and columns without discarding existing accounts, memberships, invitations, or activity. The third removes the unused two-factor table and user flag after the product decision to use verified individual staff accounts without MFA. These migrations have not been applied to the hosted database by this change. Keep `BETTER_AUTH_URL` set to the browser origin so invitation links work. Production invitation delivery uses ZeptoMail. The local preview stores invitation emails under `.data/mail-preview/` with restricted file permissions.
 
 Signed-in verified users can create an organisation from `/portal`. The organisation owner or admin can use `/a/:accountId/members` to invite, revoke, manage roles, or remove members according to their role. Owners can request transfer to an existing verified non-owner member. The recipient opens `/invite/:token`, signs in with the exact verified invited email, and accepts. The recipient must have a session created within ten minutes for ownership acceptance; the initiating owner also needs a recent session. The transfer makes the recipient owner and the initiator admin. Activity is visible at `/a/:accountId/activity`; super admins can see the organisation list at `/internal/organisations`.
 
-Membership acceptance does not create a subscription, entitlement, device assignment, or document permission. Invitation links expire after seven days. Revoke an invitation and submit a new one to reissue it. If email delivery fails after the invitation is saved, the members screen reports that state; revoke and reissue after SMTP recovers.
+Membership acceptance does not create a subscription, entitlement, device assignment, or document permission. Invitation links expire after seven days. Revoke an invitation and submit a new one to reissue it. If email delivery fails after the invitation is saved, the members screen reports that state. Revoke and reissue after delivery recovers.
 
 ### Local browser verification, 18 November 2026
 
@@ -179,6 +220,6 @@ TURSO_DATABASE_URL=https://127.0.0.1:9 TURSO_AUTH_TOKEN=local-only BETTER_AUTH_U
 | --- | --- |
 | Netlify deploy preview, isolated secrets/database | Repeat authenticated login/membership/support and revocation checks over HTTPS; verify secure HttpOnly cookies, origin/CSRF behavior and rate limits through the proxy; inspect SSR HTML/payloads and restricted function logs; correlate all safe error statuses including real dependency/time-out failures. Test static `/maintenance.html` while the function is unavailable and failures before Nitro starts. Check cache isolation, deployed font requests, browser back/forward after sign-out and platform log access/retention. |
 | Hosted preview Turso/libSQL | Apply all unapplied migrations after checking target history, verify foreign keys/data preservation, concurrent writes across independent connections/function instances, transaction/rollback behavior under latency/outage, backup and restore. No hosted schema or data was inspected or changed in this task. |
-| Controlled SMTP/test-delivery environment | Verification/resend, reset and invitation delivery; expired links, provider failures/timeouts, sender configuration and production delivery recovery. Local preview JSON and intercepted browser errors do not prove SMTP delivery or saved-invitation email-failure behavior. |
+| Controlled ZeptoMail delivery | Exercise verification and resend, reset and invitation delivery, expired links, provider failures and timeouts, sender configuration and delivery recovery. Check how the portal reports delivery failure after saving an invitation. |
 | Separate native desktop app, supported operating systems | Register the public OAuth client; verify discovery metadata, external-browser Authorization Code + PKCE S256, state validation, exact private-scheme callback, code exchange/replay rejection, secure OS token storage and refresh/revocation. Portal sessions and local tests prove none of these native behaviors. |
 | Product decisions plus provider/native sandboxes | Exercise test checkout and upgrades against the hosted provider. Confirm the merchant, tax and commercial terms, then verify the native entitlement, expiry, transfer and recovery contract before enabling paid use. |

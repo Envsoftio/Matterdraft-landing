@@ -80,8 +80,8 @@ async function mail(email, subject) {
   }
   throw new Error(`No local ${subject} preview for this run`)
 }
-async function screen(person, path, name, width = 390) {
-  await person.page.setViewportSize({ width, height: 844 })
+async function screen(person, path, name, width = 390, height = 844) {
+  await person.page.setViewportSize({ width, height })
   await person.page.goto(`${origin}${path}`)
   await hydrated(person.page)
   await person.page.locator('.portal, .portal-auth').waitFor()
@@ -105,7 +105,11 @@ async function hydrated(page) {
     () => document.querySelector('#__nuxt')?.__vue_app__?.$nuxt?.isHydrating === false,
   )
 }
-async function signIn(person, destination = '/portal', signInPath = '/sign-in') {
+async function signIn(
+  person,
+  destination = (url) => /^\/a\/[^/]+\/overview$/.test(url.pathname),
+  signInPath = '/sign-in',
+) {
   await person.page.goto(new URL(signInPath, origin).href)
   await hydrated(person.page)
   await person.page.getByLabel('Email address').fill(person.email)
@@ -167,7 +171,11 @@ async function invite(owner, recipient, accountId, role = 'member') {
   return new URL(await mail(recipient.email, 'Invitation')).pathname.split('/').pop()
 }
 
-async function desktopSignIn(person, { clientId, redirectUri }, staffOnly = false) {
+async function desktopSignIn(
+  person,
+  { clientId, redirectUri },
+  { staffOnly = false, combined = false } = {},
+) {
   const verifier = randomUUID() + randomUUID()
   const state = randomUUID()
   const query = new URLSearchParams({
@@ -179,6 +187,7 @@ async function desktopSignIn(person, { clientId, redirectUri }, staffOnly = fals
     code_challenge_method: 'S256',
     state,
   })
+  if (combined) query.set('prompt', 'login consent')
   const response = await person.context.request.get(
     `${origin}/api/auth/oauth2/authorize?${query}`,
     {
@@ -190,18 +199,51 @@ async function desktopSignIn(person, { clientId, redirectUri }, staffOnly = fals
     assert.equal(response.status(), 403)
     return
   }
-  assert.equal(response.status(), 302, 'Desktop authorization opens consent')
-  let consent = new URL(response.headers().location, origin)
-  if (consent.pathname === '/sign-in') {
-    await signIn(person, (url) => url.pathname === '/consent', consent.href)
-    consent = new URL(person.page.url())
+  assert.equal(response.status(), 302, 'Desktop authorization opens the sign-in flow')
+  let next = new URL(response.headers().location, origin)
+  let approval
+  if (combined) {
+    assert.equal(next.pathname, '/sign-in')
+    await person.page.goto(next.href)
+    await hydrated(person.page)
+    await person.page
+      .getByText('Sign in with your dashboard account to open the MatterDraft desktop app.')
+      .waitFor()
+    await person.page.getByLabel('Email address', { exact: true }).fill(person.email)
+    await person.page.getByLabel('Password', { exact: true }).fill(password)
+    const visited = []
+    const record = (frame) => {
+      if (frame === person.page.mainFrame()) visited.push(frame.url())
+    }
+    person.page.on('framenavigated', record)
+    try {
+      const approved = person.page.waitForResponse(
+        (result) => new URL(result.url()).pathname === '/api/auth/oauth2/consent',
+        { timeout: 10_000 },
+      )
+      await person.page.getByRole('button', { name: 'Sign in', exact: true }).click()
+      const result = await approved
+      assert.ok(result.ok())
+      approval = await result.json()
+      assert.equal(
+        visited.some((url) => url.startsWith(origin + '/consent')),
+        false,
+      )
+    } finally {
+      person.page.off('framenavigated', record)
+    }
+  } else {
+    if (next.pathname === '/sign-in') {
+      await signIn(person, (url) => url.pathname === '/consent', next.href)
+      next = new URL(person.page.url())
+    }
+    assert.equal(next.pathname, '/consent')
+    await api(person, '/api/portal/oauth-request' + next.search)
+    approval = await api(person, '/api/auth/oauth2/consent', 'POST', {
+      accept: true,
+      oauth_query: next.search.slice(1),
+    })
   }
-  assert.equal(consent.pathname, '/consent')
-  await api(person, '/api/portal/oauth-request' + consent.search)
-  const approval = await api(person, '/api/auth/oauth2/consent', 'POST', {
-    accept: true,
-    oauth_query: consent.search.slice(1),
-  })
   const callback = new URL(approval.url)
   assert.equal(callback.protocol + callback.pathname, redirectUri)
   assert.equal(callback.searchParams.get('state'), state)
@@ -223,7 +265,23 @@ async function desktopSignIn(person, { clientId, redirectUri }, staffOnly = fals
       headers: { Authorization: 'Bearer ' + body.access_token },
     })
     assert.equal(response.status(), 200)
-    assert.equal((await response.json()).email, person.email)
+    const profile = await response.json()
+    assert.equal(profile.email, person.email)
+    const { rows } = await db.execute({
+      sql: `SELECT a.id, a.name, a.account_type AS accountType, m.role
+        FROM customer_account a JOIN account_membership m ON a.id = m.account_id
+        WHERE m.user_id = ? ORDER BY CASE a.account_type WHEN 'personal' THEN 0 ELSE 1 END, a.name, a.id`,
+      args: [person.id],
+    })
+    assert.deepEqual(
+      profile.matterdraft_accounts,
+      rows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        accountType: row.accountType,
+        role: row.role,
+      })),
+    )
   } finally {
     await desktop.dispose()
   }
@@ -245,7 +303,141 @@ try {
     'UI signup, local verification/resend, verified signin; unverified signin and session denial',
   )
 
-  await screen(owner, '/portal', 'accounts')
+  const personalHome = `/a/${owner.accounts[0].id}/overview`
+  assert.equal(new URL(owner.page.url()).pathname, personalHome)
+  await owner.page.getByRole('heading', { name: 'Your workspace', exact: true }).waitFor()
+  await owner.page.emulateMedia({ colorScheme: 'dark' })
+  await screen(owner, '/portal', 'advocate-home-dark', 1536, 1024)
+  await owner.page.emulateMedia({ colorScheme: 'light' })
+  await screen(owner, '/portal', 'advocate-home-light')
+  assert.equal(
+    await owner.page.getByRole('link', { name: 'Home', exact: true }).getAttribute('aria-current'),
+    'page',
+  )
+  assert.equal(await owner.page.getByText('Create an organisation', { exact: true }).count(), 0)
+  const installerPage = personalHome.replace(/overview$/, 'download')
+  const installerApi = '/api/accounts/' + owner.accounts[0].id + '/download'
+  const signedOut = await browser.newContext()
+  try {
+    const direct = await signedOut.newPage()
+    await direct.goto(origin + installerPage)
+    await direct.waitForURL('**/sign-in?**')
+    assert.equal(new URL(direct.url()).searchParams.get('returnTo'), installerPage)
+    await api({ context: signedOut }, installerApi, 'GET', undefined, 401)
+    await api({ context: signedOut }, installerApi, 'POST', {}, 401)
+    assert.equal((await signedOut.request.get(origin + '/download')).status(), 404)
+  } finally {
+    await signedOut.close()
+  }
+  await api(unverified, installerApi, 'GET', undefined, 403)
+  await api(unverified, installerApi, 'POST', {}, 403)
+  await api(outsider, installerApi, 'GET', undefined, 404)
+  await api(outsider, installerApi, 'POST', {}, 404)
+  await api(owner, '/api/internal/downloads', 'GET', undefined, 403)
+  await api(owner, installerApi, 'POST', { platform: 'unsupported', version: '1.2.3' }, 422)
+  await owner.page.getByRole('link', { name: /Download and install/ }).click()
+  await owner.page.waitForURL('**/download')
+  const catalog = await api(owner, installerApi)
+  if (process.env.PORTAL_CHECK_INSTALLERS === '1') {
+    const sample = { platform: 'macos-arm64', version: '1.2.3' }
+    assert.equal(catalog.installers.length, 3)
+    assert.ok(catalog.installers.every((entry) => !Object.hasOwn(entry, 'objectKey')))
+    await api(owner, installerApi, 'POST', sample, 403, { Origin: 'https://other.example.test' })
+    await api(owner, installerApi, 'POST', { ...sample, version: '0.1.0' }, 409)
+    await api(owner, installerApi, 'POST', { ...sample, platform: 'macos-x64' }, 503)
+    await screen(owner, installerPage, 'installer-mac')
+    await owner.page
+      .getByText('Drag', { exact: false })
+      .filter({ hasText: 'into Applications' })
+      .waitFor()
+    const installerHost = 'https://matterdraft-portal-test.s3.ap-south-1.amazonaws.com/'
+    await owner.page.route(installerHost + '**', async (intercept) => {
+      const downloadUrl = new URL(intercept.request().url())
+      assert.equal(downloadUrl.searchParams.get('X-Amz-Expires'), '120')
+      assert.match(downloadUrl.searchParams.get('X-Amz-Signature'), /^[a-f0-9]{64}$/)
+      assert.ok(!intercept.request().headers().referer)
+      await intercept.fulfill({
+        status: 200,
+        contentType: 'application/octet-stream',
+        headers: {
+          'Content-Disposition': downloadUrl.searchParams.get('response-content-disposition'),
+        },
+        body: 'isolated installer test fixture',
+      })
+    })
+    for (const fixture of [
+      {
+        label: 'Mac with Apple silicon',
+        step: 'Open the downloaded .dmg file.',
+        package: 'macos-arm64.dmg',
+      },
+      {
+        label: 'Windows 64-bit',
+        step: 'Follow the installation wizard.',
+        package: 'windows-x64.msi',
+      },
+    ]) {
+      await owner.page.getByRole('radio', { name: fixture.label }).check()
+      await owner.page.getByText(fixture.step, { exact: true }).waitFor()
+      const [transfer] = await Promise.all([
+        owner.page.waitForEvent('download'),
+        owner.page.getByRole('button', { name: 'Download installer' }).click(),
+      ])
+      assert.equal(transfer.suggestedFilename(), `MatterDraft-Studio-1.2.3-${fixture.package}`)
+      assert.equal(await readFile(await transfer.path(), 'utf8'), 'isolated installer test fixture')
+    }
+    const downloads = await db.execute({
+      sql: 'SELECT platform, version FROM desktop_download WHERE user_id = ? ORDER BY platform',
+      args: [owner.id],
+    })
+    assert.deepEqual(
+      downloads.rows.map(({ platform, version }) => [platform, version]),
+      [
+        ['macos-arm64', '1.2.3'],
+        ['windows-x64', '1.2.3'],
+      ],
+    )
+    await owner.page.unrouteAll()
+    note(
+      'Verified download authorization, storage failure, Mac and Windows package handoff and download records',
+    )
+  } else {
+    assert.deepEqual(catalog.installers, [])
+    await owner.page.getByRole('heading', { name: 'No installer is available right now' }).waitFor()
+    await api(owner, installerApi, 'POST', { platform: 'macos-arm64', version: '1.2.3' }, 404)
+    note('Verified download authorization and the no-release state')
+  }
+  await owner.page.getByRole('link', { name: 'Back to Home' }).click()
+  await owner.page.getByRole('button', { name: 'Start free trial' }).click()
+  await owner.page.getByRole('heading', { name: 'Your trial is active' }).waitFor()
+  await owner.page
+    .getByRole('navigation', { name: 'Workspace' })
+    .getByRole('link', { name: 'Plans & billing' })
+    .click()
+  await owner.page.getByText('Full access ends', { exact: false }).waitFor()
+  await screen(owner, '/portal', 'advocate-active-trial')
+  const expired = await db.execute({
+    sql: 'UPDATE licence_trial SET expires_at = started_at + 1 WHERE account_id = ? RETURNING started_at',
+    args: [owner.accounts[0].id],
+  })
+  try {
+    await screen(owner, personalHome, 'advocate-expired-trial')
+    await owner.page.getByRole('heading', { name: 'Your trial has ended' }).waitFor()
+    await owner.page.getByRole('link', { name: 'View plans', exact: true }).click()
+    await owner.page.waitForURL('**/billing')
+  } finally {
+    await db.execute({
+      sql: 'UPDATE licence_trial SET expires_at = ? WHERE account_id = ?',
+      args: [Number(expired.rows[0].started_at) + 7 * 24 * 60 * 60 * 1000, owner.accounts[0].id],
+    })
+  }
+  note(
+    'Advocate sign-in opens Home. Trial start, expiry and billing links use the personal workspace',
+  )
+  await owner.page.getByRole('button', { name: /Switch workspace/ }).click()
+  await owner.page.getByRole('menuitem', { name: 'Manage workspaces' }).click()
+  await owner.page.waitForURL('**/portal/accounts')
+  await owner.page.getByText('Create an organisation', { exact: true }).click()
   await owner.page.getByLabel('Organisation name').fill(`Verification ${run}`)
   await owner.page.getByRole('button', { name: 'Create organisation' }).click()
   await owner.page.waitForURL('**/members')
@@ -258,6 +450,13 @@ try {
   await associate.page.getByRole('button', { name: 'Accept invitation' }).click()
   await associate.page.getByRole('link', { name: 'Open organisation' }).click()
   await associate.page.waitForURL(`**/a/${accountId}/overview`)
+  await screen(associate, '/portal', 'firm-advocate-home')
+  await associate.page.getByRole('heading', { name: `Verification ${run}`, exact: true }).waitFor()
+  assert.equal(
+    await associate.page.getByRole('link', { name: 'Plans & billing', exact: true }).count(),
+    0,
+  )
+  assert.equal(await associate.page.getByRole('button', { name: 'Start free trial' }).count(), 0)
   const { accounts: associateAccounts } = await api(associate, '/api/portal/context')
   assert.deepEqual(
     associateAccounts.map(({ id, accountType, role }) => [id, accountType, role]),
@@ -474,6 +673,27 @@ try {
     args: [staff.id, Date.now()],
   })
   await signIn(staff, '/internal/overview')
+  await api(staff, installerApi, 'GET', undefined, 403)
+  await api(staff, installerApi, 'POST', {}, 403)
+  const downloadHistory = await api(staff, '/api/internal/downloads')
+  if (process.env.PORTAL_CHECK_INSTALLERS === '1') {
+    const recorded = downloadHistory.downloads.find(
+      (entry) => entry.userId === owner.id && entry.platform === 'windows-x64',
+    )
+    assert.ok(recorded)
+    assert.equal(recorded.email, owner.email)
+    assert.equal(recorded.platform, 'windows-x64')
+    assert.equal(recorded.version, '1.2.3')
+    assert.ok(Math.abs(Date.now() - recorded.requestedAt) < 300000)
+    await screen(staff, '/internal/downloads', 'installer-history')
+    await staff.page
+      .getByRole('row')
+      .filter({ hasText: owner.email })
+      .filter({ hasText: 'Windows' })
+      .waitFor()
+    note('Super Admin download history shows the customer, platform, version and request time')
+  }
+
   const staffContext = await api(staff, '/api/portal/context')
   assert.equal(staffContext.staffRole, 'super_admin')
   assert.deepEqual(staffContext.accounts, [])
@@ -496,8 +716,8 @@ try {
   assert.equal(personalAccounts.rows.length, 0, 'Staff sign-in creates no personal account')
 
   const desktop = await api(staff, '/api/internal/desktop-client', 'POST')
-  await desktopSignIn(staff, desktop, true)
-  await desktopSignIn(associate, desktop)
+  await desktopSignIn(staff, desktop, { staffOnly: true })
+  await desktopSignIn(associate, desktop, { combined: true })
   const solo = await person('Solo', { browserSignIn: false })
   await desktopSignIn(solo, desktop)
   const soloAccount = await db.execute({
@@ -506,7 +726,7 @@ try {
   })
   assert.equal(soloAccount.rows[0]?.account_type, 'personal')
   note(
-    'Staff go straight to internal administration and are denied customer and desktop access; solo and firm customers complete OAuth with PKCE',
+    'Staff go straight to internal administration and are denied customer and desktop access; solo and firm customers complete OAuth with PKCE, including one-screen desktop sign-in',
   )
   await db.execute({ sql: 'UPDATE user SET email_verified = 0 WHERE id = ?', args: [staff.id] })
   await api(staff, '/api/internal/tickets', 'GET', undefined, 403)
@@ -783,22 +1003,22 @@ try {
     'Recovery, verification resend and reset failures show accessible errors and release busy state',
   )
 
-  await screen(owner, '/portal', 'navigation-keyboard')
-  await owner.page.keyboard.press('Tab')
-  assert.equal(await owner.page.locator(':focus').textContent(), 'Skip to content')
-  await owner.page.keyboard.press('Tab')
-  assert.equal(await owner.page.locator(':focus').getAttribute('aria-label'), 'Open navigation')
-  await owner.page.keyboard.press('Enter')
+  await screen(staff, '/internal/overview', 'staff-navigation-keyboard')
+  await staff.page.keyboard.press('Tab')
+  assert.equal(await staff.page.locator(':focus').textContent(), 'Skip to content')
+  await staff.page.keyboard.press('Tab')
+  assert.equal(await staff.page.locator(':focus').getAttribute('aria-label'), 'Open navigation')
+  await staff.page.keyboard.press('Enter')
   for (let i = 0; i < 18; i++) {
-    await owner.page.keyboard.press('Tab')
+    await staff.page.keyboard.press('Tab')
     assert.ok(
-      await owner.page.evaluate(() =>
+      await staff.page.evaluate(() =>
         document.querySelector('#portal-navigation').contains(document.activeElement),
       ),
     )
   }
-  await owner.page.keyboard.press('Escape')
-  assert.equal(await owner.page.locator(':focus').getAttribute('aria-label'), 'Open navigation')
+  await staff.page.keyboard.press('Escape')
+  assert.equal(await staff.page.locator(':focus').getAttribute('aria-label'), 'Open navigation')
   await screen(admin, `/a/${accountId}/members`, 'members')
   const review = admin.page
     .getByRole('row')
@@ -819,8 +1039,8 @@ try {
   await admin.page.keyboard.press('Escape')
   await admin.page.getByRole('dialog').waitFor({ state: 'hidden' })
   assert.equal(await review.evaluate((el) => el === document.activeElement), true)
-  await screen(owner, '/portal', 'account-switch-desktop', 1280)
-  await owner.page.getByRole('button', { name: 'Switch account' }).focus()
+  await screen(owner, '/portal', 'workspace-switch-mobile')
+  await owner.page.getByRole('button', { name: /Switch workspace/ }).focus()
   await owner.page.keyboard.press('Enter')
   await owner.page.keyboard.press('v')
   await owner.page
@@ -831,7 +1051,8 @@ try {
   await owner.page.waitForURL(`**/a/${accountId}/overview`)
   await screen(owner, `/a/${accountId}/tickets`, 'draft-before-switch', 1280)
   await owner.page.getByLabel('Subject', { exact: true }).fill('Draft in organisation')
-  await owner.page.getByRole('link', { name: owner.accounts[0].name, exact: true }).click()
+  await owner.page.getByRole('button', { name: /Switch workspace/ }).click()
+  await owner.page.getByRole('menuitem', { name: 'Personal workspace' }).click()
   await owner.page.waitForURL(`**/a/${owner.accounts[0].id}/overview`)
   await expect(
     async () =>
@@ -992,8 +1213,8 @@ try {
   await screen(owner, '/sign-in', 'sign-in')
   await screen(owner, '/verify-email', 'verify-email')
   await screen(owner, '/reset-password?token=invalid', 'reset-password')
-  await screen(owner, '/portal', 'accounts-desktop', 1280)
-  note('390px reflow screenshots for auth/customer/staff; 1280px accounts')
+  await screen(owner, '/portal/accounts', 'workspaces-desktop', 1280)
+  note('390px reflow screenshots for auth/customer/staff; 1280px workspaces')
   assert.equal((await db.execute('PRAGMA foreign_key_check')).rows.length, 0)
   assert.deepEqual(browserErrors, [], 'Uncaught browser errors')
   console.log(`Artifacts: ${directory}`)
