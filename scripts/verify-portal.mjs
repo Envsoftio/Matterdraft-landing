@@ -310,10 +310,21 @@ try {
   await screen(owner, '/portal', 'advocate-home-dark', 1536, 1024)
   await owner.page.emulateMedia({ colorScheme: 'light' })
   await screen(owner, '/portal', 'advocate-home-light')
+  await owner.page.getByRole('button', { name: 'Open navigation' }).click()
   assert.equal(
     await owner.page.getByRole('link', { name: 'Home', exact: true }).getAttribute('aria-current'),
     'page',
   )
+  for (let index = 0; index < 12; index++) {
+    await owner.page.keyboard.press('Tab')
+    assert.ok(
+      await owner.page.evaluate(() =>
+        document.querySelector('#portal-navigation').contains(document.activeElement),
+      ),
+    )
+  }
+  await owner.page.keyboard.press('Escape')
+  assert.equal(await owner.page.locator(':focus').getAttribute('aria-label'), 'Open navigation')
   assert.equal(await owner.page.getByText('Create an organisation', { exact: true }).count(), 0)
   const installerPage = personalHome.replace(/overview$/, 'download')
   const installerApi = '/api/accounts/' + owner.accounts[0].id + '/download'
@@ -335,8 +346,20 @@ try {
   await api(outsider, installerApi, 'POST', {}, 404)
   await api(owner, '/api/internal/downloads', 'GET', undefined, 403)
   await api(owner, installerApi, 'POST', { platform: 'unsupported', version: '1.2.3' }, 422)
-  await owner.page.getByRole('link', { name: /Download and install/ }).click()
+  await owner.page.getByRole('button', { name: 'Open navigation' }).click()
+  await owner.page.getByRole('link', { name: 'Download app', exact: true }).click()
   await owner.page.waitForURL('**/download')
+  assert.equal(
+    await owner.page.locator('.customer-side-link[aria-current="page"]').getAttribute('href'),
+    installerPage,
+  )
+  await owner.page.waitForFunction(
+    () =>
+      document.activeElement === document.querySelector('main') &&
+      document.querySelector('#portal-navigation').inert,
+    undefined,
+    { timeout: 5000 },
+  )
   const catalog = await api(owner, installerApi)
   if (process.env.PORTAL_CHECK_INSTALLERS === '1') {
     const sample = { platform: 'macos-arm64', version: '1.2.3' }
@@ -410,6 +433,7 @@ try {
   await owner.page.getByRole('link', { name: 'Back to Home' }).click()
   await owner.page.getByRole('button', { name: 'Start free trial' }).click()
   await owner.page.getByRole('heading', { name: 'Your trial is active' }).waitFor()
+  await owner.page.getByRole('button', { name: 'Open navigation' }).click()
   await owner.page
     .getByRole('navigation', { name: 'Workspace' })
     .getByRole('link', { name: 'Plans & billing' })
@@ -715,7 +739,8 @@ try {
   })
   assert.equal(personalAccounts.rows.length, 0, 'Staff sign-in creates no personal account')
 
-  const desktop = await api(staff, '/api/internal/desktop-client', 'POST')
+  const desktop = await api(staff, '/api/internal/desktop-client')
+  assert.equal(desktop.clientId, 'matterdraft-studio-desktop')
   await desktopSignIn(staff, desktop, { staffOnly: true })
   await desktopSignIn(associate, desktop, { combined: true })
   const solo = await person('Solo', { browserSignIn: false })

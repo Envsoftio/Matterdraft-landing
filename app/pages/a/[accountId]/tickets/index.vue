@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
+import { supportCategoryLabel, supportStatusLabel } from '~/utils/support-labels'
 definePageMeta({ layout: 'portal' })
 usePrivatePageSeo('Support', 'Open and manage support tickets for your MatterDraft account.')
 const route = useRoute()
@@ -65,95 +66,140 @@ async function checkTickets() {
 }
 </script>
 <template>
-  <div class="portal-content">
-    <p class="portal-eyebrow">Support</p>
-    <h1 class="portal-page-title mt-2">Your tickets</h1>
-    <p class="mt-3 text-sm text-studio-muted">
-      Tickets you created for this account are visible only to you and support staff.
-    </p>
-    <div v-if="error" role="alert" class="mt-7">
-      <p class="portal-error">{{ parseApiError(error).text }}</p>
-      <button class="portal-button-secondary mt-3" @click="refresh()">Try again</button>
-    </div>
-    <div v-else class="mt-8" aria-live="polite">
-      <p v-if="pending" role="status">Loading tickets…</p>
-      <p v-else-if="!data?.tickets.length" class="text-sm text-studio-muted">
-        You have no tickets for this account.
-      </p>
-      <ul v-else class="divide-y divide-studio-rule border-y border-studio-rule">
-        <li v-for="ticket in data.tickets" :key="ticket.id" class="py-4">
-          <NuxtLink
-            class="portal-link font-semibold"
-            :to="`/a/${accountId}/tickets/${ticket.id}`"
-            >{{ ticket.subject }}</NuxtLink
+  <div class="portal-content customer-content customer-page">
+    <header class="customer-page-heading customer-page-heading-action">
+      <div>
+        <h1 class="heading-4">Support</h1>
+        <p class="body-3">Tickets are visible only to you and support staff.</p>
+      </div>
+      <a href="#contact-support-heading" class="portal-button-secondary button-sm"
+        >Contact support</a
+      >
+    </header>
+    <div class="support-layout">
+      <section class="support-inbox" aria-labelledby="tickets-heading">
+        <h2 id="tickets-heading" class="title-3">Your tickets</h2>
+        <div v-if="error" role="alert" class="customer-section">
+          <p class="portal-error">{{ parseApiError(error).text }}</p>
+          <button class="portal-button-secondary button-sm customer-retry" @click="refresh()">
+            Try again
+          </button>
+        </div>
+        <div v-else class="support-ticket-list" aria-live="polite">
+          <div v-if="pending" class="customer-loading-panel" role="status" aria-busy="true">
+            <span class="sr-only">Loading tickets</span>
+          </div>
+          <div v-else-if="!data?.tickets.length" class="customer-empty">
+            <h3 class="title-3">No tickets yet</h3>
+            <p class="body-6">
+              Send a request using the contact form. Your conversations will appear here.
+            </p>
+          </div>
+          <ul v-else class="support-tickets">
+            <li v-for="ticket in data.tickets" :key="ticket.id" class="support-ticket">
+              <div class="support-ticket-subject">
+                <NuxtLink class="title-4" :to="`/a/${accountId}/tickets/${ticket.id}`">{{
+                  ticket.subject
+                }}</NuxtLink>
+                <span class="body-6">{{ supportCategoryLabel(ticket.category) }}</span>
+              </div>
+              <div class="support-ticket-meta">
+                <span class="customer-status caption-3" :class="`ticket-${ticket.status}`">{{
+                  supportStatusLabel(ticket.status)
+                }}</span>
+                <span class="caption-5"
+                  >Updated
+                  <NuxtTime :datetime="ticket.updatedAt" month="short" day="numeric" year="numeric"
+                /></span>
+              </div>
+            </li>
+          </ul>
+          <nav
+            v-if="data && (page > 1 || data.hasMore)"
+            aria-label="Ticket pages"
+            class="support-pagination body-6"
           >
-          <p class="mt-1 text-sm text-studio-muted">
-            {{ ticket.category }} · {{ ticket.status.replaceAll('_', ' ') }} ·
-            <NuxtTime :datetime="ticket.updatedAt" date-style="short" />
-          </p>
-        </li>
-      </ul>
-      <nav
-        v-if="data && (page > 1 || data.hasMore)"
-        aria-label="Ticket pages"
-        class="mt-5 flex items-center gap-3"
+            <button
+              class="portal-button-secondary button-sm"
+              :disabled="page === 1 || pending"
+              @click="page--"
+            >
+              Previous
+            </button>
+            <span>Page {{ page }}</span>
+            <button
+              class="portal-button-secondary button-sm"
+              :disabled="!data.hasMore || pending"
+              @click="page++"
+            >
+              Next
+            </button>
+          </nav>
+        </div>
+      </section>
+      <form
+        class="support-compose customer-panel"
+        aria-labelledby="contact-support-heading"
+        @submit.prevent="create"
       >
-        <button class="portal-button-secondary" :disabled="page === 1 || pending" @click="page--">
-          Previous</button
-        ><span>Page {{ page }}</span
-        ><button
-          class="portal-button-secondary"
-          :disabled="!data.hasMore || pending"
-          @click="page++"
-        >
-          Next
-        </button>
-      </nav>
+        <header class="customer-panel-heading">
+          <h2 id="contact-support-heading" class="title-3" tabindex="-1">Contact support</h2>
+        </header>
+        <div class="customer-panel-body">
+          <div class="customer-field">
+            <label for="ticket-category" class="title-4">Category</label>
+            <StudioSelect
+              id="ticket-category"
+              v-model="category"
+              :disabled="busy || uncertain"
+              class="portal-input"
+              :options="['question', 'bug', 'billing', 'feedback']"
+            />
+          </div>
+          <div class="customer-field">
+            <label for="ticket-subject" class="title-4">Subject</label>
+            <StudioField
+              ><input
+                id="ticket-subject"
+                v-model="subject"
+                :disabled="busy || uncertain"
+                class="portal-input"
+                required
+                maxlength="120"
+            /></StudioField>
+          </div>
+          <div class="customer-field">
+            <label for="ticket-body" class="title-4">Description</label>
+            <StudioField>
+              <textarea
+                id="ticket-body"
+                v-model="body"
+                :disabled="busy || uncertain"
+                class="portal-input"
+                aria-describedby="ticket-privacy"
+                required
+                maxlength="10000"
+              />
+            </StudioField>
+            <p id="ticket-privacy" class="customer-muted caption-5">
+              Up to 10,000 characters. Do not include documents or private matter content.
+            </p>
+          </div>
+          <p v-if="formError" role="alert" class="portal-error">{{ formError }}</p>
+          <div class="customer-form-actions">
+            <button
+              class="workspace-primary button-sm"
+              :disabled="busy || uncertain"
+              :aria-busy="busy"
+            >
+              {{ busy ? 'Sending…' : 'Send ticket' }}
+            </button>
+            <button v-if="uncertain" type="button" class="portal-link body-6" @click="checkTickets">
+              Check tickets
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
-    <form class="portal-detail mt-12 max-w-2xl" @submit.prevent="create">
-      <h2 class="font-heading text-xl font-semibold">Contact support</h2>
-      <label for="ticket-category" class="portal-label mt-5">Category</label
-      ><StudioSelect
-        id="ticket-category"
-        v-model="category"
-        :disabled="busy || uncertain"
-        class="portal-input"
-        :options="['question', 'bug', 'billing', 'feedback']"
-      />
-      <label for="ticket-subject" class="portal-label mt-5">Subject</label
-      ><StudioField
-        ><input
-          id="ticket-subject"
-          v-model="subject"
-          :disabled="busy || uncertain"
-          class="portal-input"
-          required
-          maxlength="120"
-      /></StudioField>
-      <label for="ticket-body" class="portal-label mt-5">Description</label
-      ><StudioField>
-        <textarea
-          id="ticket-body"
-          v-model="body"
-          :disabled="busy || uncertain"
-          class="portal-input min-h-36"
-          required
-          maxlength="10000"
-        />
-      </StudioField>
-      <p class="mt-1 text-xs text-studio-muted">
-        Up to 10,000 characters. Do not include documents or private matter content.
-      </p>
-      <p v-if="formError" role="alert" class="portal-error mt-4">{{ formError }}</p>
-      <button class="portal-button mt-5" :disabled="busy || uncertain">
-        {{ busy ? 'Sending…' : 'Send ticket' }}</button><button
-        v-if="uncertain"
-        type="button"
-        class="portal-link ml-4"
-        @click="checkTickets"
-      >
-        Check tickets
-      </button>
-    </form>
   </div>
 </template>

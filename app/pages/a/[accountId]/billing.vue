@@ -14,7 +14,7 @@ usePrivatePageSeo('Plans & billing', 'View your MatterDraft Studio trial and dev
 const route = useRoute()
 const accountId = String(route.params.accountId)
 const billingUrl = `/api/accounts/${accountId}/billing` as const
-const { data, error, refresh } = await useFetch(billingUrl)
+const { data, error, pending, refresh } = await useFetch(billingUrl)
 const trial = computed(() => data.value?.trial)
 type Plan = NonNullable<typeof data.value>['plans'][number]
 const quantities = reactive<Record<string, number | ''>>({})
@@ -196,246 +196,292 @@ async function startTrial() {
 </script>
 
 <template>
-  <div class="portal-content">
-    <h1 class="portal-page-title">Plans &amp; billing</h1>
-    <div v-if="error" role="alert" class="portal-error mt-6">
+  <div class="portal-content customer-content customer-page">
+    <header class="customer-page-heading">
+      <h1 class="heading-4">Plans &amp; billing</h1>
+      <p class="body-3">Review your access and choose a prepaid term.</p>
+    </header>
+    <div v-if="error" role="alert" class="portal-error">
       {{ parseApiError(error).text }}
       <button class="portal-link ml-2" type="button" @click="refresh()">Try again</button>
     </div>
+    <div v-else-if="pending && !data" class="customer-loading-panel" role="status" aria-busy="true">
+      <span class="sr-only">Loading plans and billing</span>
+    </div>
     <template v-else-if="data">
-      <p v-if="problem" class="portal-error mt-5" role="alert">{{ problem }}</p>
-      <p v-if="notice" class="portal-notice mt-5" role="status">{{ notice }}</p>
+      <p v-if="problem" class="portal-error customer-message" role="alert">{{ problem }}</p>
+      <p v-if="notice" class="portal-notice customer-message" role="status">{{ notice }}</p>
       <section
         v-if="data.lastPayment || data.pendingPurchase"
-        class="portal-detail mt-7"
+        class="customer-section customer-section-first"
         aria-labelledby="payment-heading"
       >
-        <h2 id="payment-heading" class="font-heading text-xl font-semibold">Payment status</h2>
-        <div v-if="data.lastPayment" class="mt-3 text-sm">
-          <p>
-            {{ data.lastPayment.planName }} · {{ data.lastPayment.quantity }}
-            {{ data.lastPayment.quantity === 1 ? 'device' : 'devices' }} ·
-            {{ accessMonthsLabel(data.lastPayment.accessMonths) }} ·
-            {{ licencePrice(data.lastPayment.total) }} (incl. GST) paid in test mode
-          </p>
-          <p v-if="data.lastPayment.couponCode" class="mt-1 text-studio-muted">
-            Coupon {{ data.lastPayment.couponCode }} saved
-            {{ licencePrice(data.lastPayment.couponDiscount) }}
-          </p>
-          <p class="mt-1 text-studio-muted">
-            Period ends
-            <NuxtTime
-              :datetime="data.lastPayment.paidThrough!"
-              date-style="medium"
-              time-style="short"
-            />
-          </p>
-        </div>
-        <div v-if="data.pendingPurchase" class="mt-3 text-sm">
-          <p>
-            {{ data.pendingPurchase.planName }} · {{ data.pendingPurchase.quantity }}
-            {{ data.pendingPurchase.quantity === 1 ? 'device' : 'devices' }} ·
-            {{ accessMonthsLabel(data.pendingPurchase.accessMonths) }} ·
-            {{ licencePrice(data.pendingPurchase.total) }} (incl. GST) pending
-          </p>
-          <p v-if="data.pendingPurchase.couponCode" class="mt-1 text-studio-muted">
-            Coupon {{ data.pendingPurchase.couponCode }} saved
-            {{ licencePrice(data.pendingPurchase.couponDiscount) }}
-          </p>
-          <div v-if="data.checkoutEnabled" class="mt-4 flex flex-wrap gap-3">
-            <button
-              type="button"
-              class="portal-button"
-              :disabled="busy"
-              @click="checkout('resume')"
-            >
-              Continue test payment
-            </button>
-            <button
-              type="button"
-              class="portal-button-secondary"
-              :disabled="busy"
-              @click="checkout('check')"
-            >
-              Check payment status
-            </button>
-          </div>
-        </div>
-      </section>
-      <section v-if="trial" class="portal-detail mt-7" aria-labelledby="trial-heading">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 id="trial-heading" class="font-heading text-xl font-semibold">7-day free trial</h2>
-            <p v-if="trial.status === 'active'" class="mt-2 text-sm text-studio-muted">
-              Full access ends
-              <NuxtTime :datetime="trial.expiresAt" date-style="medium" time-style="short" />
-            </p>
-            <p v-else-if="trial.status === 'ended'" class="mt-2 text-sm text-studio-muted">
-              Trial ended
-              <NuxtTime :datetime="trial.expiresAt" date-style="medium" time-style="short" />
-            </p>
-            <p v-else class="mt-2 text-sm text-studio-muted">
-              Get full access for seven days from the moment you start. No payment details required.
-            </p>
-          </div>
-          <button
-            v-if="data.canStartTrial"
-            type="button"
-            class="portal-button"
-            :disabled="busy"
-            @click="startTrial()"
-          >
-            Start free trial
-          </button>
-        </div>
-      </section>
-      <section class="mt-9" aria-labelledby="available-plans">
-        <h2 id="available-plans" class="font-heading text-xl font-semibold">Available plans</h2>
-        <p v-if="data.plans.length" class="mt-2 text-sm text-studio-muted">
-          Choose how long you need access. Pay once for the term you choose. Access ends
-          automatically.
-        </p>
-        <p v-if="!data.plans.length" class="mt-3 text-sm text-studio-muted">
-          No paid plans are available for this account yet.
-        </p>
-        <ul v-else class="mt-4 grid max-w-4xl grid-cols-1 gap-5 sm:grid-cols-2">
-          <li v-for="plan in data.plans" :key="plan.id" class="portal-detail flex min-w-0 flex-col">
-            <h3 class="break-words font-heading text-lg font-semibold">{{ plan.name }}</h3>
-            <p class="mt-2 flex-1 break-words whitespace-pre-line text-sm text-studio-muted">
-              {{ plan.description }}
-            </p>
-            <p class="mt-5 text-sm text-studio-muted">
-              <strong
-                class="font-heading text-2xl font-semibold tabular-nums text-studio-heading"
-                >{{ licencePrice(plan.monthlyPrice) }}</strong
-              >
-              {{ plan.accountType === 'personal' ? '/ month' : '/ device / month' }}
-              · incl. GST
-            </p>
-            <p v-if="plan.accountType === 'personal'" class="mt-1 text-sm text-studio-muted">
-              {{ plan.minimumDevices }}
-              {{ plan.minimumDevices === 1 ? 'device' : 'devices' }} included
-            </p>
-            <p v-else-if="plan.minimumDevices > 1" class="mt-1 text-sm text-studio-muted">
-              {{ plan.minimumDevices }} device minimum ·
-              {{ licencePrice(plan.monthlyPrice * plan.minimumDevices) }} / month incl. GST
-            </p>
-            <form
-              v-if="data.canChooseTerm && !data.pendingPurchase"
-              class="mt-5 space-y-4"
-              @submit.prevent="checkout('purchase', plan)"
-            >
-              <div v-if="plan.accountType === 'organisation'">
-                <label :for="`device-count-${plan.id}`" class="portal-label"
-                  >Number of devices</label
+        <h2 id="payment-heading" class="title-3">Payment status</h2>
+        <div class="billing-payments">
+          <template v-for="payment in [data.lastPayment, data.pendingPurchase]" :key="payment?.id">
+            <article v-if="payment" class="customer-panel">
+              <header class="customer-panel-heading">
+                <h3 class="title-3">{{ payment.planName }}</h3>
+                <span
+                  class="customer-status caption-3"
+                  :class="payment.status === 'pending' ? 'status-pending' : 'status-positive'"
+                  >{{
+                    payment.status === 'pending' ? 'Payment pending' : 'Test payment received'
+                  }}</span
                 >
-                <StudioField>
-                  <input
-                    :id="`device-count-${plan.id}`"
-                    :value="quantity(plan)"
-                    class="portal-input"
-                    type="number"
-                    :min="plan.minimumDevices"
-                    :max="data.maxDeviceQuantity"
-                    :disabled="busy"
-                    required
-                    @input="changeQuantity(plan, ($event.target as HTMLInputElement).valueAsNumber)"
-                  />
-                </StudioField>
-              </div>
-              <div>
-                <label :for="`access-term-${plan.id}`" class="portal-label">Access duration</label>
-                <StudioSelect
-                  :id="`access-term-${plan.id}`"
-                  :model-value="accessTerms[plan.id] ?? '1'"
-                  :options="termOptions"
-                  :display-label="
-                    appliedCoupons[plan.id]
-                      ? accessMonthsLabel(Number(accessTerms[plan.id] ?? 1))
-                      : undefined
-                  "
-                  :disabled="busy"
-                  class="portal-input normal-case!"
-                  @update:model-value="changeTerm(plan, $event)"
-                />
-              </div>
-              <div>
-                <label :for="`coupon-code-${plan.id}`" class="portal-label">Coupon code</label>
-                <div class="flex flex-wrap items-end gap-2">
-                  <StudioField class="min-w-0 flex-1">
-                    <input
-                      :id="`coupon-code-${plan.id}`"
-                      v-model="couponCodes[plan.id]"
-                      class="portal-input"
-                      maxlength="32"
-                      autocomplete="off"
-                      :disabled="busy"
-                      @input="clearCoupon(plan)"
-                      @keydown.enter.prevent="applyCoupon(plan)"
-                    />
-                  </StudioField>
+              </header>
+              <div class="customer-panel-body">
+                <dl class="billing-payment-facts body-6">
+                  <div>
+                    <dt>Devices</dt>
+                    <dd>{{ payment.quantity }}</dd>
+                  </div>
+                  <div>
+                    <dt>Access duration</dt>
+                    <dd>{{ accessMonthsLabel(payment.accessMonths) }}</dd>
+                  </div>
+                  <div>
+                    <dt>Total including GST</dt>
+                    <dd>{{ licencePrice(payment.total) }}</dd>
+                  </div>
+                </dl>
+                <p v-if="payment.couponCode" class="customer-muted body-6">
+                  Coupon {{ payment.couponCode }} saved {{ licencePrice(payment.couponDiscount) }}.
+                </p>
+                <p v-if="payment.paidThrough" class="customer-muted body-6">
+                  Period ends
+                  <NuxtTime
+                    :datetime="payment.paidThrough"
+                    date-style="medium"
+                    time-style="short"
+                  />.
+                </p>
+                <div
+                  v-if="payment.status === 'pending' && data.checkoutEnabled"
+                  class="customer-form-actions"
+                >
                   <button
-                    v-if="appliedCoupons[plan.id]"
                     type="button"
-                    class="portal-button-secondary"
+                    class="workspace-primary button-sm"
                     :disabled="busy"
-                    @click="removeCoupon(plan)"
+                    :aria-busy="busy"
+                    @click="checkout('resume')"
                   >
-                    Remove code
+                    Continue test payment
                   </button>
                   <button
-                    v-else
                     type="button"
-                    class="portal-button-secondary"
-                    :disabled="busy || !validQuantity(plan) || !couponCodes[plan.id]?.trim()"
-                    @click="applyCoupon(plan)"
+                    class="portal-button-secondary button-sm"
+                    :disabled="busy"
+                    @click="checkout('check')"
                   >
-                    Apply code
+                    Check payment status
                   </button>
                 </div>
-                <p
-                  v-if="couponMessages[plan.id]"
-                  class="mt-2 text-sm text-studio-muted"
-                  role="status"
-                >
-                  {{ couponMessages[plan.id] }}
-                </p>
               </div>
+            </article>
+          </template>
+        </div>
+      </section>
+      <section v-if="trial" class="billing-trial customer-panel" aria-labelledby="trial-heading">
+        <div>
+          <h2 id="trial-heading" class="title-3">Seven day free trial</h2>
+          <p v-if="trial.status === 'active'" class="body-6">
+            Full access ends
+            <NuxtTime :datetime="trial.expiresAt" date-style="medium" time-style="short" />.
+          </p>
+          <p v-else-if="trial.status === 'ended'" class="body-6">
+            Trial ended
+            <NuxtTime :datetime="trial.expiresAt" date-style="medium" time-style="short" />.
+          </p>
+          <p v-else class="body-6">
+            Your trial begins when you start it. No payment details required.
+          </p>
+        </div>
+        <button
+          v-if="data.canStartTrial"
+          type="button"
+          class="portal-button-secondary button-sm"
+          :disabled="busy"
+          :aria-busy="busy"
+          @click="startTrial()"
+        >
+          Start free trial
+        </button>
+        <span
+          v-else
+          class="customer-status caption-3"
+          :class="trial.status === 'active' ? 'status-positive' : undefined"
+          >{{
+            trial.status === 'active'
+              ? 'Active'
+              : trial.status === 'ended'
+                ? 'Ended'
+                : 'Not started'
+          }}</span
+        >
+      </section>
+      <section class="customer-section" aria-labelledby="available-plans">
+        <div class="customer-section-heading">
+          <h2 id="available-plans" class="title-3">Available plans</h2>
+          <p v-if="data.plans.length" class="body-6">
+            Pay once for the term you choose. Access ends automatically.
+          </p>
+        </div>
+        <div v-if="!data.plans.length" class="customer-empty">
+          <p class="body-6">No paid plans are available for this account yet.</p>
+        </div>
+        <ul v-else class="billing-plans">
+          <li v-for="plan in data.plans" :key="plan.id" class="billing-plan customer-panel">
+            <div class="billing-plan-description">
+              <h3 :id="`plan-${plan.id}`" class="heading-5">{{ plan.name }}</h3>
+              <p class="body-6 billing-description">{{ plan.description }}</p>
+              <p class="billing-rate">
+                <strong class="heading-5">{{ licencePrice(plan.monthlyPrice) }}</strong><span
+                  class="body-6"
+                  >{{ plan.accountType === 'personal' ? '/ month' : '/ device / month' }}</span
+                >
+              </p>
+              <p class="customer-muted body-6">Including GST</p>
+              <p v-if="plan.accountType === 'personal'" class="billing-device-note body-6">
+                {{ plan.minimumDevices }}
+                {{ plan.minimumDevices === 1 ? 'device' : 'devices' }} included
+              </p>
+              <p v-else class="billing-device-note body-6">
+                {{ plan.minimumDevices }} device minimum ·
+                {{ licencePrice(plan.monthlyPrice * plan.minimumDevices) }} / month including GST
+              </p>
+            </div>
+            <form
+              v-if="data.canChooseTerm && !data.pendingPurchase"
+              class="billing-plan-form"
+              :aria-labelledby="`plan-${plan.id}`"
+              @submit.prevent="checkout('purchase', plan)"
+            >
+              <div
+                class="billing-selection"
+                :class="{ 'billing-selection-team': plan.accountType === 'organisation' }"
+              >
+                <div v-if="plan.accountType === 'organisation'" class="customer-field">
+                  <label :for="`device-count-${plan.id}`" class="title-4">Number of devices</label>
+                  <StudioField
+                    ><input
+                      :id="`device-count-${plan.id}`"
+                      :value="quantity(plan)"
+                      class="portal-input"
+                      type="number"
+                      :min="plan.minimumDevices"
+                      :max="data.maxDeviceQuantity"
+                      :disabled="busy"
+                      :aria-invalid="!validQuantity(plan) || undefined"
+                      required
+                      @input="
+                        changeQuantity(plan, ($event.target as HTMLInputElement).valueAsNumber)
+                      "
+                  /></StudioField>
+                </div>
+                <div class="customer-field">
+                  <label :for="`access-term-${plan.id}`" class="title-4">Access duration</label>
+                  <StudioSelect
+                    :id="`access-term-${plan.id}`"
+                    :model-value="accessTerms[plan.id] ?? '1'"
+                    :options="termOptions"
+                    :display-label="
+                      appliedCoupons[plan.id]
+                        ? accessMonthsLabel(Number(accessTerms[plan.id] ?? 1))
+                        : undefined
+                    "
+                    :disabled="busy"
+                    class="portal-input normal-case!"
+                    @update:model-value="changeTerm(plan, $event)"
+                  />
+                </div>
+              </div>
+              <details class="billing-coupon">
+                <summary class="body-6">
+                  {{ appliedCoupons[plan.id] ? 'Coupon applied' : 'Add a coupon code' }}
+                </summary>
+                <div class="customer-field">
+                  <label :for="`coupon-code-${plan.id}`" class="title-4">Coupon code</label>
+                  <div class="billing-coupon-input">
+                    <StudioField
+                      ><input
+                        :id="`coupon-code-${plan.id}`"
+                        v-model="couponCodes[plan.id]"
+                        class="portal-input"
+                        maxlength="32"
+                        autocomplete="off"
+                        :disabled="busy"
+                        @input="clearCoupon(plan)"
+                        @keydown.enter.prevent="applyCoupon(plan)"
+                    /></StudioField>
+                    <button
+                      v-if="appliedCoupons[plan.id]"
+                      type="button"
+                      class="portal-button-secondary button-sm"
+                      :disabled="busy"
+                      @click="removeCoupon(plan)"
+                    >
+                      Remove code
+                    </button>
+                    <button
+                      v-else
+                      type="button"
+                      class="portal-button-secondary button-sm"
+                      :disabled="busy || !validQuantity(plan) || !couponCodes[plan.id]?.trim()"
+                      @click="applyCoupon(plan)"
+                    >
+                      Apply code
+                    </button>
+                  </div>
+                </div>
+              </details>
+              <p v-if="couponMessages[plan.id]" class="customer-muted body-6" role="status">
+                {{ couponMessages[plan.id] }}
+              </p>
               <div
                 v-if="validQuantity(plan) && quotes[plan.id]"
-                class="space-y-1 text-sm tabular-nums"
+                class="billing-summary"
                 aria-live="polite"
               >
-                <p v-if="appliedCoupons[plan.id]" class="text-studio-muted">
-                  {{ appliedCoupons[plan.id]!.code }} applied · Save
-                  {{ licencePrice(appliedCoupons[plan.id]!.savings) }}
-                </p>
-                <p v-else-if="quotes[plan.id]!.savings" class="text-studio-muted">
-                  Save {{ licencePrice(quotes[plan.id]!.savings) }} ({{
-                    quotes[plan.id]!.discountPercent
-                  }}% off {{ licencePrice(quotes[plan.id]!.subtotal) }})
-                </p>
-                <p>
-                  <strong>{{
-                    licencePrice(appliedCoupons[plan.id]?.total ?? quotes[plan.id]!.total)
-                  }}</strong>
-                  total for
-                  {{ accessMonthsLabel(Number(accessTerms[plan.id] ?? 1)) }}
-                  <span class="text-studio-muted">(incl. GST)</span>
-                </p>
+                <dl class="body-6">
+                  <div>
+                    <dt>Subtotal · {{ accessMonthsLabel(Number(accessTerms[plan.id] ?? 1)) }}</dt>
+                    <dd>{{ licencePrice(quotes[plan.id]!.subtotal) }}</dd>
+                  </div>
+                  <div v-if="appliedCoupons[plan.id]" class="billing-saving">
+                    <dt>Coupon {{ appliedCoupons[plan.id]!.code }}</dt>
+                    <dd>−{{ licencePrice(appliedCoupons[plan.id]!.savings) }}</dd>
+                  </div>
+                  <div v-else-if="quotes[plan.id]!.savings" class="billing-saving">
+                    <dt>Prepaid discount ({{ quotes[plan.id]!.discountPercent }}%)</dt>
+                    <dd>−{{ licencePrice(quotes[plan.id]!.savings) }}</dd>
+                  </div>
+                  <div class="billing-total">
+                    <dt>Total including GST</dt>
+                    <dd>
+                      {{ licencePrice(appliedCoupons[plan.id]?.total ?? quotes[plan.id]!.total) }}
+                    </dd>
+                  </div>
+                </dl>
               </div>
+              <p v-else class="portal-error" role="status">
+                Enter between {{ plan.minimumDevices }} and {{ data.maxDeviceQuantity }} devices to
+                calculate your total.
+              </p>
               <button
                 v-if="data.canPurchase"
                 type="submit"
-                class="portal-button"
+                class="workspace-primary button-sm"
                 :disabled="busy || !validQuantity(plan)"
+                :aria-busy="busy"
               >
                 Continue to test checkout
               </button>
             </form>
           </li>
         </ul>
-        <p v-if="data.plans.length" class="mt-4 text-sm text-studio-muted">
+        <p v-if="data.plans.length" class="billing-availability body-6">
           {{
             data.checkoutEnabled
               ? 'Razorpay test mode. Use test payment details.'

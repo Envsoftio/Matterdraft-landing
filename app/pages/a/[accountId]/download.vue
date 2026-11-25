@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, Download, Monitor } from '@lucide/vue'
+import { Download } from '@lucide/vue'
 import {
   desktopDownloadPlatforms,
   type DesktopDownloadPlatform,
@@ -54,107 +54,142 @@ async function download() {
 </script>
 
 <template>
-  <div class="portal-content customer-content">
-    <NuxtLink
-      :to="`${accountPath}/overview`"
-      class="portal-link mb-4 inline-flex items-center gap-2 text-sm"
-    >
-      <ArrowLeft :size="16" aria-hidden="true" /> Back to Home
-    </NuxtLink>
-    <h1 class="portal-page-title">Download and install</h1>
-    <p class="mt-3 text-studio-muted">Get MatterDraft Studio for your computer.</p>
-
-    <div v-if="error" role="alert" class="portal-error mt-6">
+  <div class="portal-content customer-content customer-page">
+    <header class="customer-page-heading">
+      <h1 class="heading-4">Download and install</h1>
+      <p class="body-3">Choose the installer for your computer.</p>
+    </header>
+    <div v-if="error" role="alert" class="portal-error">
       {{ parseApiError(error).text }}
       <button type="button" class="portal-link ml-2" @click="refresh()">Try again</button>
     </div>
-    <div v-else-if="pending" role="status" class="mt-8 h-32 rounded-xl bg-studio-chip">
+    <div v-else-if="pending" class="customer-loading-panel" role="status" aria-busy="true">
       <span class="sr-only">Loading installers</span>
     </div>
     <template v-else-if="installer && data">
-      <section class="workspace-panel mt-8" aria-labelledby="installer-heading">
-        <div class="flex items-start gap-4 sm:gap-6">
-          <span class="workspace-monitor" aria-hidden="true"><Monitor :size="26" /></span>
-          <div class="min-w-0 flex-1">
-            <h2 id="installer-heading" class="text-xl font-semibold sm:text-2xl">
-              Choose your installer
-            </h2>
-            <fieldset v-if="data.installers.length > 1" class="mt-4 grid gap-2" :disabled="busy">
-              <legend class="sr-only">Platform</legend>
-              <label
-                v-for="option in data.installers"
-                :key="option.platform"
-                class="flex items-center gap-2"
-              >
-                <input
-                  type="radio"
-                  name="installer-platform"
-                  :value="option.platform"
-                  :checked="installer.platform === option.platform"
-                  @change="platform = option.platform"
-                />
-                {{ desktopDownloadPlatforms[option.platform].label }}
-              </label>
-            </fieldset>
-            <p v-else class="mt-3 font-semibold">
-              {{ desktopDownloadPlatforms[installer.platform].label }}
-            </p>
-            <p class="workspace-description mt-2 break-words text-sm">
-              Version {{ installer.version }} · {{ installer.requirements }}
-            </p>
-            <p v-if="installer.notarized === false" class="mt-2 text-sm text-studio-muted">
-              This version has not been notarized by Apple.
-            </p>
-            <button type="button" class="workspace-primary mt-4" :disabled="busy" @click="download">
-              <Download :size="18" aria-hidden="true" />
-              {{ busy ? 'Preparing download…' : 'Download installer' }}
-            </button>
-            <p v-if="message" class="portal-error mt-4" role="alert">{{ message }}</p>
-            <p v-if="downloadRequested" role="status" class="mt-4 text-sm text-studio-muted">
-              Check your browser’s downloads for the installer.
-            </p>
-          </div>
+      <div class="customer-page-columns">
+        <div class="customer-page-main">
+          <section class="customer-panel" aria-labelledby="installer-heading">
+            <header class="customer-panel-heading">
+              <h2 id="installer-heading" class="title-3">Choose your installer</h2>
+              <span class="body-6">MatterDraft Studio</span>
+            </header>
+            <div class="customer-panel-body">
+              <fieldset class="installer-options" :disabled="busy">
+                <legend class="sr-only">Platform</legend>
+                <label
+                  v-for="option in data.installers"
+                  :key="option.platform"
+                  class="installer-option"
+                  :class="{ 'is-selected': installer.platform === option.platform }"
+                >
+                  <input
+                    type="radio"
+                    name="installer-platform"
+                    :value="option.platform"
+                    :checked="installer.platform === option.platform"
+                    :aria-label="desktopDownloadPlatforms[option.platform].label"
+                    @change="platform = option.platform"
+                  />
+                  <span class="title-4">{{ desktopDownloadPlatforms[option.platform].label }}</span>
+                  <span class="installer-extension caption-5"
+                    >.{{ desktopDownloadPlatforms[option.platform].extension }}</span
+                  >
+                </label>
+              </fieldset>
+              <div class="installer-selection" aria-live="polite">
+                <dl class="customer-key-values body-6">
+                  <div>
+                    <dt>Version</dt>
+                    <dd>{{ installer.version }}</dd>
+                  </div>
+                  <div>
+                    <dt>Requirements</dt>
+                    <dd>{{ installer.requirements }}</dd>
+                  </div>
+                </dl>
+                <p v-if="installer.notarized === false" class="customer-muted body-6">
+                  This version has not been notarized by Apple.
+                </p>
+              </div>
+              <div class="customer-form-actions">
+                <button
+                  type="button"
+                  class="workspace-primary button-sm"
+                  :disabled="busy"
+                  :aria-busy="busy"
+                  @click="download"
+                >
+                  <Download :size="18" aria-hidden="true" />{{
+                    busy ? 'Preparing download…' : 'Download installer'
+                  }}
+                </button>
+              </div>
+              <p v-if="message" class="portal-error" role="alert">{{ message }}</p>
+              <p v-if="downloadRequested" role="status" class="customer-muted body-6">
+                Check your browser’s downloads for the installer.
+              </p>
+            </div>
+          </section>
+          <section class="customer-section" aria-labelledby="install-heading">
+            <h2 id="install-heading" class="title-3">How to install</h2>
+            <ol v-if="isMac" class="installation-steps body-6">
+              <li><strong>Open the downloaded .dmg file.</strong></li>
+              <li>
+                <strong>Move MatterDraft Studio to Applications.</strong
+                ><span>Drag the app into the Applications folder.</span>
+              </li>
+              <li>
+                <strong>Open the app and sign in.</strong
+                ><span>Use the same email address you used here.</span>
+              </li>
+            </ol>
+            <ol v-else class="installation-steps body-6">
+              <li><strong>Open the downloaded .msi file.</strong></li>
+              <li><strong>Follow the installation wizard.</strong></li>
+              <li>
+                <strong>Open MatterDraft Studio from the Start menu.</strong
+                ><span>Sign in with the same email address you used here.</span>
+              </li>
+            </ol>
+          </section>
         </div>
-      </section>
-
-      <section class="mt-8 sm:mt-10" aria-labelledby="install-heading">
-        <h2 id="install-heading" class="text-xl font-semibold sm:text-2xl">How to install</h2>
-        <ol v-if="isMac" class="workspace-description mt-4 list-decimal space-y-3 pl-6">
-          <li>
-            Open the Apple menu and choose <strong>About This Mac</strong>. A
-            <strong>Chip</strong> field means Apple silicon. A <strong>Processor</strong> field
-            showing Intel means Intel.
-          </li>
-          <li>Open the downloaded <strong>.dmg</strong> file.</li>
-          <li>Drag <strong>MatterDraft Studio</strong> into <strong>Applications</strong>.</li>
-          <li>
-            Open MatterDraft Studio from Applications and sign in with the same email address you
-            used here.
-          </li>
-        </ol>
-        <ol v-else class="workspace-description mt-4 list-decimal space-y-3 pl-6">
-          <li>Open the downloaded <strong>.msi</strong> file.</li>
-          <li>Follow the installation wizard.</li>
-          <li>
-            Open <strong>MatterDraft Studio</strong> from the Start menu and sign in with the same
-            email address you used here.
-          </li>
-        </ol>
-      </section>
+        <aside class="customer-page-aside">
+          <section v-if="isMac" aria-labelledby="mac-help-heading">
+            <h2 id="mac-help-heading" class="title-3">Which Mac installer?</h2>
+            <p class="body-6">Open the Apple menu and choose <strong>About This Mac</strong>.</p>
+            <dl class="installer-chip-help body-6">
+              <div>
+                <dt>Chip</dt>
+                <dd>Choose Apple silicon.</dd>
+              </div>
+              <div>
+                <dt>Processor: Intel</dt>
+                <dd>Choose Mac with Intel.</dd>
+              </div>
+            </dl>
+          </section>
+          <section aria-labelledby="download-help-heading">
+            <h2 id="download-help-heading" class="title-3">Installation help</h2>
+            <p class="body-6">
+              If your platform is missing or your computer blocks installation, contact support.
+            </p>
+            <NuxtLink :to="`${accountPath}/tickets`" class="portal-link body-6"
+              >Contact support</NuxtLink
+            >
+          </section>
+        </aside>
+      </div>
     </template>
-    <section v-else class="workspace-panel mt-8" aria-labelledby="no-installers-heading">
-      <h2 id="no-installers-heading" class="text-xl font-semibold">
-        No installer is available right now
-      </h2>
+    <section v-else class="customer-empty" aria-labelledby="no-installers-heading">
+      <h2 id="no-installers-heading" class="title-3">No installer is available right now</h2>
+      <p class="body-6">Contact support for help getting the app.</p>
+      <NuxtLink :to="`${accountPath}/tickets`" class="portal-button-secondary button-sm"
+        >Contact support</NuxtLink
+      >
     </section>
-
-    <p class="mt-6 text-sm text-studio-muted">
-      <span v-if="installer"
-        >If your platform is missing or your computer blocks installation,
-      </span>
-      <NuxtLink :to="`${accountPath}/tickets`" class="portal-link">{{
-        installer ? 'contact support' : 'Contact support for help getting the app'
-      }}</NuxtLink>.
-    </p>
+    <NuxtLink :to="`${accountPath}/overview`" class="customer-back-link body-6"
+      >Back to Home</NuxtLink
+    >
   </div>
 </template>

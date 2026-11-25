@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import '~/assets/css/customer-dashboard.css'
+import '~/assets/css/customer-pages.css'
 import { parseApiError } from '~/utils/api-error'
 import {
   DropdownMenuRoot,
@@ -20,10 +22,15 @@ import {
   LifeBuoy,
   CreditCard,
   Download,
+  House,
+  ScrollText,
+  Settings2,
 } from '@lucide/vue'
 import { authClient } from '~~/lib/auth-client'
 
 const route = useRoute()
+const router = useRouter()
+const currentPath = computed(() => router.currentRoute.value.path)
 const isInternal = computed(() => route.path.startsWith('/internal/'))
 const { data: context, error } = await useFetch('/api/portal/context', {
   key: 'portal-context',
@@ -56,7 +63,7 @@ async function closeNavigation() {
 }
 const currentAccount = computed(
   () =>
-    context.value?.accounts.find((account) => route.path.startsWith(`/a/${account.id}/`)) ||
+    context.value?.accounts.find((account) => currentPath.value.startsWith(`/a/${account.id}/`)) ||
     context.value?.accounts[0],
 )
 const accountPath = computed(() => (currentAccount.value ? `/a/${currentAccount.value.id}` : ''))
@@ -67,16 +74,27 @@ const workspaceName = computed(() => {
 const customerLinks = computed(() => {
   if (!currentAccount.value) return []
   return [
-    { path: 'overview', label: 'Home' },
+    { path: 'overview', label: 'Home', icon: House },
+    { path: 'download', label: 'Download app', icon: Download },
     ...(['owner', 'billing_manager'].includes(currentAccount.value.role)
-      ? [{ path: 'billing', label: 'Plans & billing' }]
+      ? [{ path: 'billing', label: 'Plans & billing', icon: CreditCard }]
       : []),
-    { path: 'tickets', label: 'Support' },
+    ...(currentAccount.value.accountType === 'organisation' &&
+    ['owner', 'admin'].includes(currentAccount.value.role)
+      ? [
+          { path: 'members', label: 'Members', icon: Users },
+          { path: 'activity', label: 'Activity log', icon: ScrollText },
+        ]
+      : []),
+    { path: 'tickets', label: 'Support', icon: LifeBuoy },
   ]
 })
+const customerPage = computed(
+  () => customerLinks.value.find((link) => isCustomerLinkCurrent(link.path))?.label || 'Workspaces',
+)
 function isCustomerLinkCurrent(path: string) {
   const destination = `${accountPath.value}/${path}`
-  return route.path === destination || route.path.startsWith(`${destination}/`)
+  return currentPath.value === destination || currentPath.value.startsWith(`${destination}/`)
 }
 const initials = computed(
   () =>
@@ -88,7 +106,7 @@ const initials = computed(
       .toUpperCase() || 'MD',
 )
 watch(
-  () => route.fullPath,
+  () => router.currentRoute.value.fullPath,
   async () => {
     if (mobileOpen.value) {
       mobileOpen.value = false
@@ -115,7 +133,10 @@ async function signOut() {
 </script>
 
 <template>
-  <div class="portal min-h-screen bg-studio-canvas text-studio-heading">
+  <div
+    class="portal min-h-screen bg-studio-canvas text-studio-heading"
+    :class="{ 'customer-portal': !isInternal }"
+  >
     <a class="portal-skip" href="#main-content">Skip to content</a>
     <div v-if="error && !context" class="mx-auto max-w-xl px-5 py-20">
       <h1 class="portal-page-title">Workspace unavailable</h1>
@@ -125,15 +146,14 @@ async function signOut() {
     <div
       v-else
       class="min-h-screen"
-      :class="isInternal ? 'lg:grid lg:grid-cols-[238px_minmax(0,1fr)]' : undefined"
+      :class="isInternal ? 'lg:grid lg:grid-cols-[238px_minmax(0,1fr)]' : 'customer-shell'"
     >
       <div
-        v-if="isInternal && mobileOpen"
+        v-if="mobileOpen"
         class="fixed inset-0 z-30 bg-[#06152b]/50 lg:hidden"
         @click="closeNavigation"
       />
       <FocusScope
-        v-if="isInternal"
         as-child
         :present="mobileOpen"
         :trapped="mobileOpen"
@@ -149,12 +169,22 @@ async function signOut() {
           @keydown.esc="closeNavigation"
           :class="[
             'portal-sidebar fixed inset-y-0 left-0 z-40 w-[270px] lg:sticky lg:top-0 lg:h-screen lg:w-auto',
+            { 'customer-sidebar': !isInternal },
             mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
           ]"
         >
-          <div class="flex h-[72px] items-center justify-between border-b border-studio-rule px-5">
+          <div
+            class="flex h-[72px] items-center justify-between border-b border-studio-rule px-5"
+            :class="{ 'customer-sidebar-brand': !isInternal }"
+          >
             <NuxtLink
-              to="/internal/overview"
+              :to="
+                isInternal
+                  ? '/internal/overview'
+                  : accountPath
+                    ? `${accountPath}/overview`
+                    : '/portal'
+              "
               class="flex items-center gap-2.5 font-heading text-[17px] font-bold tracking-tight text-studio-heading"
               ><BrandLogo class="portal-wordmark"
             /></NuxtLink>
@@ -166,7 +196,10 @@ async function signOut() {
               <X :size="20" />
             </button>
           </div>
-          <div class="flex h-[calc(100vh-72px)] flex-col overflow-y-auto px-3 py-6">
+          <div
+            v-if="isInternal"
+            class="flex h-[calc(100vh-72px)] flex-col overflow-y-auto px-3 py-6"
+          >
             <div
               class="mx-2 mb-7 rounded-md bg-studio-chip px-3 py-3 text-xs leading-5 text-studio-heading"
             >
@@ -222,6 +255,30 @@ async function signOut() {
               ><LifeBuoy :size="18" />Support tickets</NuxtLink
             >
           </div>
+          <div v-else class="customer-sidebar-body">
+            <p class="customer-nav-label caption-3">Workspace</p>
+            <nav class="customer-side-nav" aria-label="Workspace">
+              <NuxtLink
+                v-for="link in customerLinks"
+                :key="link.path"
+                :to="`${accountPath}/${link.path}`"
+                class="customer-side-link title-4"
+                :aria-current="isCustomerLinkCurrent(link.path) ? 'page' : undefined"
+              >
+                <component :is="link.icon" :size="20" aria-hidden="true" />
+                {{ link.label }}
+              </NuxtLink>
+            </nav>
+            <div class="customer-sidebar-bottom">
+              <NuxtLink
+                to="/portal/accounts"
+                class="customer-side-link title-4"
+                :aria-current="currentPath === '/portal/accounts' ? 'page' : undefined"
+              >
+                <Settings2 :size="20" aria-hidden="true" />Manage workspaces
+              </NuxtLink>
+            </div>
+          </div>
         </aside>
       </FocusScope>
 
@@ -259,23 +316,19 @@ async function signOut() {
             </div>
           </div>
           <template v-else>
-            <NuxtLink
-              :to="accountPath ? `${accountPath}/overview` : '/portal'"
-              class="customer-wordmark"
-            >
-              <BrandLogo />
-            </NuxtLink>
-            <nav v-if="customerLinks.length" class="customer-nav" aria-label="Workspace">
-              <NuxtLink
-                v-for="link in customerLinks"
-                :key="link.path"
-                :to="`${accountPath}/${link.path}`"
-                class="customer-nav-link"
-                :aria-current="isCustomerLinkCurrent(link.path) ? 'page' : undefined"
+            <div class="customer-location">
+              <button
+                ref="navigationTrigger"
+                class="portal-icon-button inline-grid lg:hidden"
+                aria-label="Open navigation"
+                aria-controls="portal-navigation"
+                :aria-expanded="mobileOpen"
+                @click="mobileOpen = true"
               >
-                {{ link.label }}
-              </NuxtLink>
-            </nav>
+                <Menu :size="20" aria-hidden="true" />
+              </button>
+              <span class="title-4">{{ customerPage }}</span>
+            </div>
           </template>
           <div
             class="flex min-w-0 items-center gap-2 sm:gap-3"
@@ -301,7 +354,7 @@ async function signOut() {
               </DropdownMenuTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuContent
-                  class="portal-menu workspace-menu"
+                  class="portal-menu workspace-menu customer-menu"
                   :side-offset="8"
                   align="end"
                 >
@@ -340,6 +393,7 @@ async function signOut() {
               ><DropdownMenuPortal
                 ><DropdownMenuContent
                   class="portal-menu workspace-menu"
+                  :class="{ 'customer-menu': !isInternal }"
                   :side-offset="8"
                   align="end"
                   ><div class="px-3 py-2">
@@ -364,6 +418,12 @@ async function signOut() {
         >
           <slot />
         </main>
+        <footer v-if="!isInternal" class="customer-footer caption-5">
+          <span>MatterDraft Studio</span>
+          <nav aria-label="Legal">
+            <NuxtLink to="/privacy">Privacy</NuxtLink><NuxtLink to="/terms">Terms</NuxtLink>
+          </nav>
+        </footer>
       </div>
     </div>
   </div>

@@ -1,5 +1,8 @@
 import { client } from './db'
 
+// Keep in sync with desktop_account.rs and migration 0015_builtin_desktop_client.
+export const builtInDesktopClientId = 'matterdraft-studio-desktop'
+
 export function desktopRedirectUri() {
   return process.env.DESKTOP_REDIRECT_URI || 'legal.matterdraft.studio:/oauth/callback'
 }

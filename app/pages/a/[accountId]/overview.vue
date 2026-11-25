@@ -1,14 +1,5 @@
 <script setup lang="ts">
-import {
-  ArrowRight,
-  ChevronRight,
-  CreditCard,
-  Download,
-  LifeBuoy,
-  Monitor,
-  ScrollText,
-  Users,
-} from '@lucide/vue'
+import { Check, ChevronRight, CreditCard, Download, LifeBuoy, ScrollText, Users } from '@lucide/vue'
 import { parseApiError } from '~/utils/api-error'
 
 definePageMeta({ layout: 'portal', key: (route) => String(route.params.accountId) })
@@ -28,6 +19,21 @@ const accessTitle = computed(() => {
   if (trial.value?.status === 'ended') return 'Your trial has ended'
   if (data.value?.canStartTrial) return 'Start your free trial'
   return 'Use the desktop app'
+})
+const accessStatus = computed(() => {
+  if (trial.value?.status === 'active') return 'Trial active'
+  if (trial.value?.status === 'ended') return 'Trial ended'
+  if (data.value?.canStartTrial) return 'Not started'
+  return ''
+})
+const roleLabel = computed(() => {
+  const labels: Record<string, string> = {
+    owner: 'Owner',
+    admin: 'Administrator',
+    billing_manager: 'Billing manager',
+    member: 'Member',
+  }
+  return labels[data.value?.account.role || ''] || data.value?.account.role
 })
 
 const workspaceLinks = computed(() => {
@@ -69,6 +75,7 @@ const workspaceLinks = computed(() => {
 })
 
 async function startTrial() {
+  if (busy.value) return
   busy.value = true
   problem.value = ''
   try {
@@ -90,109 +97,150 @@ async function startTrial() {
 </script>
 
 <template>
-  <div class="portal-content customer-content">
+  <div class="portal-content customer-content dashboard-content">
     <template v-if="data">
-      <h1 class="portal-page-title">
-        {{ data.account.accountType === 'personal' ? 'Your workspace' : data.account.name }}
-      </h1>
-      <p class="mt-3 text-studio-muted">Manage your access to MatterDraft Studio.</p>
-
-      <NuxtLink :to="`${accountPath}/download`" class="workspace-list workspace-row mt-8">
-        <Download :size="21" aria-hidden="true" />
-        <span class="min-w-0 flex-1">
-          <span class="block font-semibold">Download and install</span>
-          <span class="workspace-description mt-1 block text-sm"
-            >Get the desktop app and follow the setup instructions.</span
-          >
-        </span>
-        <ChevronRight :size="18" aria-hidden="true" />
-      </NuxtLink>
-
-      <section class="workspace-panel mt-6 flex gap-4 sm:gap-6" aria-labelledby="workspace-access">
-        <span class="workspace-monitor" aria-hidden="true"><Monitor :size="26" /></span>
-        <div class="min-w-0">
-          <div aria-live="polite">
-            <h2
-              id="workspace-access"
-              ref="accessHeading"
-              tabindex="-1"
-              class="text-xl font-semibold sm:text-2xl"
-            >
-              {{ accessTitle }}
-            </h2>
-            <p v-if="data.canStartTrial" class="workspace-description mt-2">
-              Your seven days begin immediately. Start when you’re ready to use the desktop app.
-            </p>
-            <p v-else-if="trial?.status === 'active'" class="workspace-description mt-2">
-              Open MatterDraft Studio on your computer and sign in with this account. Full access
-              ends
-              <NuxtTime
-                :datetime="trial.expiresAt"
-                year="numeric"
-                month="short"
-                day="numeric"
-                hour="numeric"
-                minute="2-digit"
-                time-zone-name="short"
-              />.
-            </p>
-            <p v-else-if="trial?.status === 'ended'" class="workspace-description mt-2">
-              Review available plans for continued access.
-            </p>
-            <p v-else class="workspace-description mt-2">
-              Open MatterDraft Studio on your computer and sign in with this account.
-              <template
-                v-if="data.account.accountType === 'organisation' && data.account.role === 'member'"
-              >
-                Ask your organisation administrator for help with access.
-              </template>
-            </p>
-          </div>
-          <button
-            v-if="data.canStartTrial"
-            type="button"
-            class="workspace-primary mt-4"
-            :disabled="busy"
-            @click="startTrial"
-          >
-            {{ busy ? 'Starting…' : 'Start free trial' }}
-          </button>
-          <NuxtLink
-            v-else-if="trial?.status === 'ended' && data.canBill"
-            :to="`${accountPath}/billing`"
-            class="workspace-primary mt-4"
-          >
-            View plans <ArrowRight :size="16" aria-hidden="true" />
-          </NuxtLink>
-          <p v-if="problem" class="portal-error mt-4" role="alert">{{ problem }}</p>
+      <header class="dashboard-heading">
+        <div>
+          <h1 class="heading-4">
+            {{ data.account.accountType === 'personal' ? 'Your workspace' : data.account.name }}
+          </h1>
+          <p class="body-3">Manage your access to MatterDraft Studio.</p>
         </div>
-      </section>
+        <NuxtLink :to="`${accountPath}/download`" class="dashboard-download button-sm">
+          <Download :size="18" aria-hidden="true" />Download and install
+        </NuxtLink>
+      </header>
 
-      <section class="mt-8 sm:mt-10" aria-labelledby="workspace-management">
-        <h2 id="workspace-management" class="text-xl font-semibold sm:text-2xl">
-          Manage your workspace
-        </h2>
-        <ul class="workspace-list mt-4 divide-y divide-studio-rule">
-          <li v-for="link in workspaceLinks" :key="link.path">
-            <NuxtLink :to="`${accountPath}/${link.path}`" class="workspace-row">
-              <component :is="link.icon" :size="21" class="shrink-0" aria-hidden="true" />
-              <span class="min-w-0 flex-1">
-                <span class="block font-semibold">{{ link.label }}</span>
-                <span class="workspace-description mt-1 block text-sm">{{ link.description }}</span>
+      <div class="dashboard-overview">
+        <div class="dashboard-main">
+          <section class="dashboard-access" aria-labelledby="desktop-access-heading">
+            <div class="dashboard-access-header">
+              <h2 id="desktop-access-heading" class="title-3">Desktop access</h2>
+              <span
+                v-if="accessStatus"
+                class="dashboard-access-status caption-3"
+                :class="trial?.status"
+              >
+                <Check v-if="trial?.status === 'active'" :size="14" aria-hidden="true" />{{
+                  accessStatus
+                }}
               </span>
-              <ChevronRight :size="18" class="shrink-0" aria-hidden="true" />
-            </NuxtLink>
-          </li>
-        </ul>
-      </section>
-      <p class="mt-6 text-sm text-studio-muted">
-        Documents and matter files are managed in the desktop app.
-      </p>
+            </div>
+            <div class="dashboard-access-body">
+              <div aria-live="polite">
+                <h3 id="workspace-access" ref="accessHeading" tabindex="-1" class="heading-5">
+                  {{ accessTitle }}
+                </h3>
+                <p v-if="data.canStartTrial" class="body-3">
+                  Your seven days begin immediately. Start when you’re ready to use the desktop app.
+                </p>
+                <p v-else-if="trial?.status === 'active'" class="body-3">
+                  Open MatterDraft Studio on your computer and sign in with this account. Full
+                  access ends
+                  <NuxtTime
+                    :datetime="trial.expiresAt"
+                    year="numeric"
+                    month="short"
+                    day="numeric"
+                    hour="numeric"
+                    minute="2-digit"
+                    time-zone-name="short"
+                  />.
+                </p>
+                <p v-else-if="trial?.status === 'ended'" class="body-3">
+                  {{
+                    data.canBill
+                      ? 'Review available plans for continued access.'
+                      : 'Ask your organisation administrator for help with access.'
+                  }}
+                </p>
+                <p v-else class="body-3">
+                  Open MatterDraft Studio on your computer and sign in with this account.
+                  <template
+                    v-if="
+                      data.account.accountType === 'organisation' && data.account.role === 'member'
+                    "
+                  >
+                    Ask your organisation administrator for help with access.
+                  </template>
+                </p>
+              </div>
+              <button
+                v-if="data.canStartTrial"
+                type="button"
+                class="workspace-primary button-sm"
+                :disabled="busy"
+                :aria-busy="busy"
+                @click="startTrial"
+              >
+                {{ busy ? 'Starting…' : 'Start free trial' }}
+              </button>
+              <NuxtLink
+                v-else-if="trial?.status === 'ended' && data.canBill"
+                :to="`${accountPath}/billing`"
+                class="workspace-primary button-sm"
+              >
+                View plans
+              </NuxtLink>
+              <p v-if="problem" class="portal-error" role="alert">{{ problem }}</p>
+            </div>
+          </section>
+
+          <section class="dashboard-management" aria-labelledby="workspace-management">
+            <h2 id="workspace-management" class="title-3">Account management</h2>
+            <ul class="dashboard-links">
+              <li v-for="link in workspaceLinks" :key="link.path">
+                <NuxtLink :to="`${accountPath}/${link.path}`" class="dashboard-link">
+                  <component
+                    :is="link.icon"
+                    :size="20"
+                    class="dashboard-link-icon"
+                    aria-hidden="true"
+                  />
+                  <span class="dashboard-link-copy">
+                    <span class="title-4">{{ link.label }}</span>
+                    <span class="body-6">{{ link.description }}</span>
+                  </span>
+                  <ChevronRight :size="16" class="dashboard-link-chevron" aria-hidden="true" />
+                </NuxtLink>
+              </li>
+            </ul>
+          </section>
+        </div>
+
+        <aside class="dashboard-details" aria-labelledby="workspace-details-heading">
+          <h2 id="workspace-details-heading" class="title-3">Workspace details</h2>
+          <dl class="dashboard-facts body-6">
+            <div>
+              <dt>Type</dt>
+              <dd>{{ data.account.accountType === 'personal' ? 'Personal' : 'Organisation' }}</dd>
+            </div>
+            <div>
+              <dt>Your role</dt>
+              <dd>{{ roleLabel }}</dd>
+            </div>
+            <div v-if="data.memberCount !== null">
+              <dt>Members</dt>
+              <dd>{{ data.memberCount }}</dd>
+            </div>
+          </dl>
+          <div class="dashboard-desktop-note">
+            <h3 class="title-4">Documents and matters</h3>
+            <p class="body-6">Your documents and matter files are managed in the desktop app.</p>
+          </div>
+        </aside>
+      </div>
     </template>
-    <div v-else-if="pending" class="space-y-6" role="status">
+    <div v-else-if="pending" class="dashboard-loading" role="status" aria-busy="true">
       <span class="sr-only">Loading workspace</span>
-      <div class="h-10 w-60 max-w-full rounded-lg bg-studio-chip" aria-hidden="true" />
-      <div class="h-40 rounded-xl bg-studio-chip" aria-hidden="true" />
+      <div class="dashboard-skeleton-title" aria-hidden="true" />
+      <div class="dashboard-overview" aria-hidden="true">
+        <div class="dashboard-main">
+          <div class="dashboard-skeleton-panel" />
+          <div class="dashboard-skeleton-list" />
+        </div>
+        <div class="dashboard-skeleton-details" />
+      </div>
     </div>
     <div v-else role="alert">
       <h1 class="portal-page-title">Workspace unavailable</h1>
@@ -203,9 +251,9 @@ async function startTrial() {
             : parseApiError(error).text
         }}
       </p>
-      <NuxtLink v-if="error?.statusCode === 404" to="/portal" class="portal-link mt-6 inline-block">
-        Go to your workspace
-      </NuxtLink>
+      <NuxtLink v-if="error?.statusCode === 404" to="/portal" class="portal-link mt-6 inline-block"
+        >Go to your workspace</NuxtLink
+      >
       <button v-else class="portal-button mt-6" @click="refresh()">Try again</button>
     </div>
   </div>

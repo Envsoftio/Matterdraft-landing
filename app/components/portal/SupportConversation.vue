@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { parseApiError } from '~/utils/api-error'
+import { supportCategoryLabel, supportStatusLabel } from '~/utils/support-labels'
 const props = defineProps<{ apiPath: string; staff?: boolean }>()
 type Conversation = {
   ticket: {
@@ -100,13 +101,20 @@ async function changeStatus() {
     <button class="portal-button-secondary mt-4" @click="refresh()">Try again</button>
   </div>
   <div v-else-if="pending && !data" role="status">Loading conversation…</div>
-  <div v-else-if="data">
-    <p class="portal-eyebrow">Support ticket</p>
+  <div v-else-if="data" :class="{ 'customer-conversation': !staff }">
+    <p v-if="staff" class="portal-eyebrow">Support ticket</p>
     <h1 class="portal-page-title mt-2 break-words">{{ data.ticket.subject }}</h1>
-    <p class="mt-3 text-sm text-studio-muted">
+    <p v-if="staff" class="mt-3 text-sm text-studio-muted">
       {{ data.ticket.category }} · {{ data.ticket.status.replaceAll('_', ' ') }} · Created
       <NuxtTime :datetime="data.ticket.createdAt" date-style="short" />
     </p>
+    <div v-else class="support-conversation-meta body-6">
+      <span class="customer-status caption-3" :class="`ticket-${data.ticket.status}`">{{
+        supportStatusLabel(data.ticket.status)
+      }}</span>
+      <span>{{ supportCategoryLabel(data.ticket.category) }}</span>
+      <span>Created <NuxtTime :datetime="data.ticket.createdAt" date-style="medium" /></span>
+    </div>
     <p v-if="staff" class="mt-2 text-sm text-studio-muted">
       {{ data.ticket.accountName }} · {{ data.ticket.creatorEmail }}
     </p>
@@ -128,16 +136,22 @@ async function changeStatus() {
         Update status
       </button>
     </form>
-    <section aria-label="Conversation" class="mt-9 max-w-3xl">
+    <section aria-label="Conversation" class="mt-9 max-w-3xl" :class="{ 'support-thread': !staff }">
       <p v-if="data.hasMoreMessages" class="text-sm text-studio-muted">
         Showing the 500 most recent messages.
       </p>
-      <ol class="mt-4 space-y-4">
-        <li v-for="message in data.messages" :key="message.id" class="portal-detail">
+      <ol class="mt-4 space-y-4" :class="{ 'support-messages': !staff }">
+        <li
+          v-for="message in data.messages"
+          :key="message.id"
+          class="portal-detail"
+          :class="{ 'support-message': !staff }"
+        >
           <p class="text-sm font-semibold">
-            {{ message.authorType === 'staff' ? 'Support' : 'Customer' }}
+            {{ message.authorType === 'staff' ? 'Support' : staff ? 'Customer' : 'You' }}
             <span class="font-normal text-studio-muted"
-              >· <NuxtTime :datetime="message.createdAt" date-style="short" time-style="medium"
+              ><template v-if="staff">· </template
+              ><NuxtTime :datetime="message.createdAt" date-style="short" time-style="medium"
             /></span>
           </p>
           <p class="mt-3 whitespace-pre-wrap break-words text-sm">{{ message.body }}</p>
@@ -147,6 +161,7 @@ async function changeStatus() {
     <form
       v-if="!['resolved', 'closed'].includes(data.ticket.status)"
       class="mt-10 max-w-3xl"
+      :class="{ 'support-reply': !staff }"
       @submit.prevent="reply"
     >
       <label class="portal-label" for="ticket-reply">Reply</label

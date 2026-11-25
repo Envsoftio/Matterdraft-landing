@@ -1,0 +1,634 @@
+/* Task pages share the customer shell and Studio palette. */
+.customer-portal .customer-page {
+  max-width: 1184px;
+}
+.customer-page-heading {
+  margin-bottom: 40px;
+}
+.customer-page-heading .body-3 {
+  margin-top: 8px;
+  color: var(--body-text);
+}
+.customer-page-heading-action {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.customer-page-heading-action > a {
+  flex-shrink: 0;
+}
+.customer-page-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  align-items: start;
+  gap: 48px;
+}
+.customer-page-main {
+  min-width: 0;
+}
+.customer-panel {
+  min-width: 0;
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.customer-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  border-bottom: 1px solid var(--rule-soft);
+  padding: 16px 24px;
+}
+.customer-panel-heading > span:not(.customer-status) {
+  color: var(--body-text);
+}
+.customer-panel-body {
+  display: grid;
+  gap: 24px;
+  padding: 24px;
+}
+.customer-section {
+  margin-top: 32px;
+}
+.customer-section-first {
+  margin-top: 0;
+}
+.customer-section-heading {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.customer-section-heading > p,
+.customer-muted {
+  color: var(--body-text);
+}
+.customer-page-aside {
+  display: grid;
+  gap: 32px;
+  padding-top: 16px;
+}
+.customer-page-aside section > p {
+  margin-top: 12px;
+  color: var(--body-text);
+}
+.customer-page-aside .portal-link {
+  display: inline-block;
+  margin-top: 16px;
+}
+.customer-form-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.customer-page .portal-button-secondary {
+  min-height: 44px;
+  padding: 8px 12px;
+  color: var(--heading);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition:
+    opacity 300ms var(--dashboard-ease),
+    transform 500ms var(--dashboard-ease);
+}
+.customer-page .portal-button-secondary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.customer-page .portal-input {
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.customer-page textarea.portal-input {
+  min-height: 160px;
+  resize: vertical;
+  line-height: 1.5rem;
+}
+.customer-page .portal-input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.customer-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.customer-field > label {
+  color: var(--heading);
+}
+.customer-empty {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+  padding: 32px;
+  background: var(--surface);
+}
+.customer-empty p {
+  max-width: 52ch;
+  color: var(--body-text);
+}
+.customer-empty > a {
+  margin-top: 4px;
+}
+.customer-loading-panel {
+  min-height: 248px;
+  border-radius: 8px;
+  background: var(--chip);
+}
+.customer-status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px 8px;
+  background: var(--tint);
+  color: var(--body-text);
+}
+.customer-status:is(.status-positive, .ticket-resolved) {
+  background: var(--positive-bg);
+  color: var(--positive);
+}
+.customer-status:is(.status-pending, .ticket-awaiting_customer) {
+  background: var(--warning-bg);
+  color: var(--warning);
+}
+.customer-status:is(.ticket-open, .ticket-awaiting_support) {
+  background: var(--chip);
+  color: var(--accent);
+}
+.customer-back-link {
+  display: inline-block;
+  margin-top: 32px;
+  color: var(--body-text);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.customer-back-link:hover {
+  color: var(--accent);
+}
+.customer-back-link-top {
+  margin-top: 0;
+  margin-bottom: 24px;
+}
+.customer-message {
+  margin-bottom: 24px;
+}
+.customer-retry {
+  margin-top: 12px;
+}
+.customer-key-values {
+  display: grid;
+  gap: 12px;
+}
+.customer-key-values > div {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 16px;
+}
+.customer-key-values dt {
+  color: var(--body-text);
+}
+.customer-key-values dd {
+  overflow-wrap: anywhere;
+}
+
+/* Installer selection and platform-specific guidance. */
+.installer-options {
+  display: grid;
+  gap: 8px;
+}
+.installer-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+}
+.installer-option:hover {
+  background: var(--tint);
+}
+.installer-option.is-selected {
+  border-color: var(--accent);
+  background: var(--tint);
+}
+.installer-option input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  accent-color: var(--action);
+}
+.installer-option .title-4 {
+  flex: 1;
+}
+.installer-option:has(:disabled) {
+  cursor: wait;
+  opacity: 0.65;
+}
+.installer-extension {
+  color: var(--body-text);
+}
+.installer-selection {
+  display: grid;
+  gap: 16px;
+}
+.installation-steps {
+  display: grid;
+  gap: 24px;
+  margin-top: 24px;
+  padding-left: 24px;
+  list-style: decimal;
+}
+.installation-steps li {
+  padding-left: 8px;
+}
+.installation-steps li::marker {
+  color: var(--body-text);
+}
+.installation-steps strong {
+  font-weight: 500;
+}
+.installation-steps span {
+  display: block;
+  margin-top: 4px;
+  color: var(--body-text);
+}
+.installer-chip-help {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+.installer-chip-help dt {
+  font-weight: 500;
+}
+.installer-chip-help dd {
+  margin-top: 4px;
+  color: var(--body-text);
+}
+
+/* Billing uses a plan description beside its actual purchase configuration. */
+.billing-trial {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 24px;
+}
+.billing-trial p {
+  margin-top: 8px;
+  color: var(--body-text);
+}
+.billing-payments {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+.billing-payment-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.billing-payment-facts dt {
+  color: var(--body-text);
+  margin-bottom: 8px;
+}
+.billing-payment-facts dd {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.billing-plans {
+  display: grid;
+  gap: 24px;
+}
+.billing-plan {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  align-items: start;
+  gap: 48px;
+  padding: 32px;
+}
+.billing-plan:not(:has(.billing-plan-form)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+.billing-plan-description {
+  min-width: 0;
+}
+.billing-description {
+  margin-top: 12px;
+  color: var(--body-text);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.billing-rate {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 24px;
+  margin-bottom: 4px;
+}
+.billing-rate strong {
+  font-variant-numeric: tabular-nums;
+}
+.billing-rate > span {
+  color: var(--body-text);
+}
+.billing-device-note {
+  margin-top: 16px;
+}
+.billing-plan-form {
+  display: grid;
+  min-width: 0;
+  gap: 24px;
+}
+.billing-plan-form > button {
+  justify-self: start;
+}
+.billing-selection-team {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.billing-coupon summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--accent);
+}
+.billing-coupon[open] > .customer-field {
+  margin-top: 16px;
+}
+.billing-coupon-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.billing-coupon-input input {
+  flex: 1;
+  min-width: 0;
+}
+.billing-coupon-input button {
+  flex: 0 0 auto;
+}
+.billing-summary {
+  border-top: 1px solid var(--rule-soft);
+  padding-top: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.billing-summary dl {
+  display: grid;
+  gap: 12px;
+}
+.billing-summary dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.billing-summary dt {
+  color: var(--body-text);
+}
+.billing-summary dd {
+  flex-shrink: 0;
+}
+.billing-summary .billing-saving :is(dt, dd) {
+  color: var(--positive);
+}
+.billing-summary .billing-total :is(dt, dd) {
+  font-weight: 600;
+  color: var(--heading);
+}
+.billing-availability {
+  margin-top: 16px;
+  color: var(--body-text);
+}
+
+/* Support list and composition are distinct work areas. */
+.support-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr);
+  align-items: start;
+  gap: 32px;
+}
+.support-inbox {
+  min-width: 0;
+}
+.support-ticket-list {
+  margin-top: 16px;
+}
+.support-tickets {
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.support-ticket {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px;
+}
+.support-ticket + .support-ticket {
+  border-top: 1px solid var(--rule-soft);
+}
+.support-ticket:hover {
+  background: var(--tint);
+}
+.support-ticket-subject {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+.support-ticket-subject a {
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+  text-underline-offset: 4px;
+}
+.support-ticket-subject a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.support-ticket-subject > span {
+  color: var(--body-text);
+}
+.support-ticket-meta {
+  display: grid;
+  flex-shrink: 0;
+  justify-items: end;
+  gap: 8px;
+  color: var(--body-text);
+}
+.support-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+#contact-support-heading {
+  scroll-margin-top: 96px;
+}
+.customer-portal .customer-conversation .portal-page-title {
+  margin-top: 0;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 600;
+  max-width: 44ch;
+}
+.support-conversation-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 16px;
+  color: var(--body-text);
+}
+.customer-conversation .support-thread {
+  max-width: 896px;
+  margin-top: 32px;
+}
+.customer-conversation .support-messages {
+  overflow: hidden;
+  border: 1px solid var(--rule-soft);
+  border-radius: 8px;
+  background: var(--surface);
+  margin-top: 0;
+}
+.customer-conversation .support-message {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 24px;
+  box-shadow: none;
+}
+.customer-conversation .support-message + .support-message {
+  border-top: 1px solid var(--rule-soft);
+}
+.customer-conversation .support-message > p:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+.customer-conversation .support-message > p:last-child {
+  margin-top: 16px;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  overflow-wrap: anywhere;
+}
+.customer-conversation .support-reply {
+  max-width: 896px;
+  margin-top: 32px;
+}
+.customer-conversation .support-reply .portal-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin-bottom: 12px;
+}
+.customer-conversation .support-reply > button {
+  margin-top: 16px;
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .customer-page-columns {
+    grid-template-columns: minmax(0, 1fr) 192px;
+    gap: 24px;
+  }
+  .billing-plan {
+    gap: 24px;
+    padding: 24px;
+  }
+  .support-layout {
+    gap: 24px;
+  }
+  .support-ticket {
+    flex-direction: column;
+  }
+  .support-ticket-meta {
+    justify-items: start;
+  }
+}
+@media (max-width: 767px) {
+  .customer-page-heading {
+    margin-bottom: 32px;
+  }
+  .customer-page-heading-action {
+    flex-direction: column;
+  }
+  .customer-page-columns,
+  .support-layout,
+  .billing-plan {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .customer-page-aside {
+    padding-top: 0;
+  }
+  .customer-panel-heading,
+  .customer-panel-body,
+  .billing-trial,
+  .billing-plan,
+  .support-ticket,
+  .customer-empty,
+  .customer-conversation .support-message {
+    padding: 16px;
+  }
+  .customer-key-values > div {
+    grid-template-columns: 96px minmax(0, 1fr);
+  }
+  .billing-plan-form {
+    border-top: 1px solid var(--rule-soft);
+    padding-top: 24px;
+  }
+  .billing-payment-facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .billing-payment-facts > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .billing-payment-facts dt {
+    margin-bottom: 0;
+  }
+  .support-ticket {
+    flex-direction: column;
+  }
+  .support-ticket-meta {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+@media (max-width: 420px) {
+  .billing-selection-team {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .billing-coupon-input {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .customer-page .portal-button-secondary {
+    transition: none;
+  }
+  .customer-page .portal-button-secondary:active:not(:disabled) {
+    transform: none;
+  }
+}

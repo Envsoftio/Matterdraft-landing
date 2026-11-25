@@ -61,22 +61,28 @@ For local verification without AWS, add `--import ./scripts/mock-installer-stora
 
 ## Desktop authorization contract
 
-During deployment setup, register the first-party desktop client with `POST /api/internal/desktop-client` from a verified super-admin session on the portal origin. The endpoint returns the public client ID and exact callback URI for the desktop configuration. Repeat the call to retrieve an existing registration for that callback.
+Apply migration `0015_builtin_desktop_client` before distributing the corresponding desktop build. It provisions the public native client `matterdraft-studio-desktop`, its exact callback `legal.matterdraft.studio:/oauth/callback`, authorization-code/refresh grants, PKCE requirement, and audit record. The desktop ships the same public ID; neither GitHub nor local builds need a client-ID environment variable, and no super-admin registration step is required. Every portal environment receives its own registration through its normal database migrations.
+
+The super-admin overview reports the built-in registration's status. `GET /api/internal/desktop-client` returns its ID only when the registration passes the same checks used by sign-in. The former POST route remains as a compatibility lookup; it does not create registrations or re-enable disabled clients. Missing/disabled registrations must be handled through deployment or administration rather than silently bypassed.
+
+Earlier desktop registrations and their tokens remain intact for older builds. When upgrading to the built-in ID, users sign in once again because refresh credentials are scoped to the OAuth client. Local vault/workspace identity is based on the portal, customer and account, so this change does not create a new vault or move existing data.
 
 When the registered desktop app requests a fresh login, the dashboard sign-in form tells the user that signing in will open the desktop app. The form then completes the signed request and returns directly to the desktop callback. The regular consent page remains available for other OAuth requests.
 
-The desktop app must register and handle `legal.matterdraft.studio:/oauth/callback` as a private-use URL scheme. It opens the system browser to the server's OAuth authorization endpoint and uses Authorization Code with PKCE `S256`. Generate a fresh verifier, challenge, and unpredictable `state` for each attempt. Use the registered public client ID; do not ship a client secret. On callback, verify `state`, exchange the code with the original verifier, and store tokens in the operating system's secure credential store. The portal does not receive local matter or document content.
+The desktop app must handle `legal.matterdraft.studio:/oauth/callback` as a private-use URL scheme. It opens the system browser to the server's OAuth authorization endpoint and uses Authorization Code with PKCE `S256`. Generate a fresh verifier, challenge, and unpredictable `state` for each attempt. Use the built-in public client ID; do not ship a client secret. On callback, verify `state`, exchange the code with the original verifier, and store tokens in the operating system's secure credential store. The portal does not receive local matter or document content.
 
 The desktop build reads current personal and organisation memberships from the `matterdraft_accounts` claim at UserInfo. The claim is scoped to the audited first-party desktop registration. Deploy this portal support before distributing the workspace-aware desktop build.
 
 The authorization server's public metadata and a full native round trip must be checked against the desktop application before release. The web portal alone cannot verify OS scheme registration or token storage.
+
+For a focused regression run against an isolated local server, run `PORTAL_CHECK_URL=http://127.0.0.1:3012 PORTAL_CHECK_DATABASE=file:/private/tmp/matterdraft-portal-e2e/check.db node scripts/verify-desktop-auth.mjs`. Use the disposable-server setup below, with ZeptoMail credentials unset. The check creates synthetic customers, verifies sign-in and workspace claims without a registration call, exercises PKCE/callback/code-replay rejection and refresh rotation, and restores the client's enabled state after testing disabled-client rejection. `npm test` also covers fresh and upgraded database migrations, preservation of older registrations, and disabled-client persistence.
 
 ## Deployment prerequisites
 
 - Netlify must receive `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `BETTER_AUTH_URL` (the exact HTTPS portal origin), `BETTER_AUTH_SECRET`, `ZEPTOMAIL_SMTP_PASSWORD` and `ZEPTOMAIL_FROM` as server environment variables. Use separate database and secrets for deploy previews. Never use the local development `.env` in Netlify.
 - Netlify uses `npm run build` with the Nitro `netlify` preset. The preset writes public files to `dist` and generates the server function for the portal and its API routes.
 - Run migrations against each target database before its release. Arrange database backups and restore verification before accepting production accounts.
-- The callback scheme in `DESKTOP_REDIRECT_URI` must match the desktop handler exactly. Changing it requires a new client registration and desktop release.
+- Leave `DESKTOP_REDIRECT_URI` unset for the built-in client, or set it to the exact built-in callback `legal.matterdraft.studio:/oauth/callback`. Changing the callback requires a coordinated portal migration and desktop release.
 - Review dependency advisories and the remaining manual checks before production launch. Local query, error-contract and opt-in route/browser checks exist. The release still needs the deployment, ZeptoMail delivery and native desktop checks listed below.
 - Rotate the existing early access Google Apps Script shared secret before deployment. Its old value was present in the tracked `.env.example`; the local value has been moved to ignored `.env`.
 
