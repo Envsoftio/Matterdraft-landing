@@ -2,22 +2,7 @@
 .customer-portal .customer-page {
   max-width: 1184px;
 }
-.customer-page-heading {
-  margin-bottom: 40px;
-}
-.customer-page-heading .body-3 {
-  margin-top: 8px;
-  color: var(--body-text);
-}
-.customer-page-heading-action {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-}
-.customer-page-heading-action > a {
-  flex-shrink: 0;
-}
+
 .customer-page-columns {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 240px;
@@ -489,8 +474,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px 16px;
-  margin-top: 16px;
+  gap: 8px 16px;
   color: var(--body-text);
 }
 .customer-conversation .support-thread {
@@ -562,12 +546,6 @@
   }
 }
 @media (max-width: 767px) {
-  .customer-page-heading {
-    margin-bottom: 32px;
-  }
-  .customer-page-heading-action {
-    flex-direction: column;
-  }
   .customer-page-columns,
   .support-layout,
   .billing-plan {

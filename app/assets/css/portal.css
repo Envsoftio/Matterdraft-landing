@@ -193,6 +193,20 @@
 .portal-menu-item[data-highlighted] {
   background: var(--tint);
 }
+.portal :is(.portal-error, .portal-notice),
+.portal-menu[data-state='open'] {
+  animation: portal-feedback-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes portal-feedback-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .portal-content {
   max-width: 1300px;
   margin: 0 auto;
@@ -284,6 +298,10 @@
 @media (prefers-reduced-motion: reduce) {
   .portal-sidebar {
     transition: none;
+  }
+  .portal :is(.portal-error, .portal-notice),
+  .portal-menu[data-state='open'] {
+    animation: none;
   }
 }
 
@@ -460,15 +478,87 @@
   text-wrap: balance;
 }
 
+.workspace-manager {
+  display: grid;
+  max-width: 640px;
+  gap: 16px;
+}
+
 .workspace-panel,
 .workspace-list {
   border: 1px solid var(--rule);
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--surface);
 }
 
-.workspace-panel {
+.workspace-list {
+  overflow: hidden;
+}
+
+.workspace-create-toggle {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 7px;
+  padding: 12px 16px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.workspace-create-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.workspace-create-toggle > svg {
+  flex-shrink: 0;
+  color: var(--body-text);
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.workspace-panel[open] > .workspace-create-toggle {
+  border-radius: 7px 7px 0 0;
+}
+
+.workspace-panel[open] > .workspace-create-toggle > svg {
+  transform: rotate(180deg);
+}
+
+.workspace-create-form {
+  display: grid;
+  gap: 16px;
+  border-top: 1px solid var(--rule);
   padding: 16px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.workspace-panel[open] > .workspace-create-form {
+  animation: portal-feedback-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.workspace-field .portal-label {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.workspace-field .portal-input {
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.workspace-create-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
 }
 
 .workspace-monitor {
@@ -515,24 +605,83 @@
 
 .workspace-row {
   display: flex;
-  min-height: 72px;
+  min-height: 56px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 8px 16px;
+  color: var(--heading);
+  font-size: 14px;
+  line-height: 20px;
 }
 
-.workspace-row:hover {
+.workspace-row,
+.workspace-create-toggle {
+  position: relative;
+  isolation: isolate;
+}
+
+.workspace-row::before,
+.workspace-create-toggle::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
   background: var(--tint);
+  content: '';
+  opacity: 0;
+  transition: opacity 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.workspace-row:focus-visible {
+.workspace-row:focus-visible,
+.workspace-create-toggle:focus-visible {
   outline-offset: -3px;
+}
+
+.workspace-row:focus-visible::before,
+.workspace-create-toggle:focus-visible::before {
+  opacity: 1;
+}
+
+.workspace-row-label {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.workspace-row-label > strong {
+  font-weight: 600;
+}
+
+.workspace-row-label > small {
+  color: var(--body-text);
+  font-size: 12px;
+  line-height: 16px;
+  text-transform: capitalize;
 }
 
 .workspace-row > svg {
   flex-shrink: 0;
   color: var(--accent);
+}
+
+@media (hover: hover) {
+  .workspace-row:hover::before,
+  .workspace-create-toggle:hover::before {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-row::before,
+  .workspace-create-toggle::before,
+  .workspace-create-toggle > svg {
+    transition: none;
+  }
+
+  .workspace-panel[open] > .workspace-create-form {
+    animation: none;
+  }
 }
 
 @media (min-width: 640px) {
@@ -554,18 +703,9 @@
     line-height: 1;
   }
 
-  .workspace-panel {
-    padding: 24px;
-  }
-
   .workspace-monitor {
     width: 64px;
     height: 64px;
-  }
-
-  .workspace-row {
-    gap: 24px;
-    padding-inline: 24px;
   }
 }
 
@@ -584,17 +724,9 @@
     padding-top: 80px;
   }
 
-  .workspace-panel {
-    padding: 32px;
-  }
-
   .workspace-monitor {
     width: 80px;
     height: 80px;
-  }
-
-  .workspace-row {
-    min-height: 80px;
   }
 }
 

@@ -4,6 +4,20 @@ The product scope is user login, subscription management, device licensing and s
 
 The customer account area supports verified sign-in, personal and organisation accounts, member invitations, role changes, ownership transfers, and an activity log. Staff access requires a verified account with an active staff role.
 
+## Navigation, loading and motion — 26 November 2026
+
+Dashboard routes use non-blocking `useLazyFetch` on client navigation. The destination heading and shared loading placeholder render before API results; the layout's context request also runs without blocking client navigation. Server rendering still awaits data and checks redirects. Home, Download and Billing use Nuxt's distinct route keys instead of sharing an account-only key. Checkout-return handling waits for billing data before checking payment status.
+
+`PortalAsyncContent` crossfades loading and results over 200–300 ms, preserves mounted content during refresh, and fades refresh feedback without resetting forms. Notices and menus use the same motion curve. Reduced-motion CSS disables these effects. Existing API authorization and mutation guards remain in place.
+
+Verified locally in Chrome: Download and Billing headings appeared 21 and 25 ms after navigation while real API responses took 1.5–1.7 seconds. With an additional two-second response delay, loading placeholders appeared and the frame observer recorded no blank frames. Reviewed the 390 px loading layout, checked that it did not overflow, simulated a failed Download request, and verified inline error/retry recovery. Anonymous SSR checks for the account Download route, workspace management and `/portal` still redirect to sign-in. Type checking, production build, formatting and all 42 existing tests passed. Staff pages received the same loading implementation but were not interactively exercised with a staff account in this check; reduced motion was checked in CSS, not through an OS setting. API latency itself is not eliminated by this navigation change.
+
+## Workspace manager sizing and hover — 26 November 2026
+
+Manage workspaces uses one 640 px maximum-width column, 56 px minimum-height workspace rows, and a 48 px creation disclosure. The expanded form has 16 px padding and 44 px controls. Long workspace names wrap while the chevron retains its size. Hover feedback fades inside the rounded list border without changing row geometry; keyboard focus remains visible. Disclosure and hover animations respect reduced motion.
+
+Verified in Chrome at desktop and 390 px mobile widths, including the expanded form and a temporary long-name preview with an organisation role. Neither mobile case overflowed. Forced hover in light and dark themes stayed inside the border; measured row bounds were identical with hover on and off. Keyboard disclosure activation and focus were checked. Temporary preview data was removed, and no organisation was created. Type checking, the production build and formatting passed.
+
 ## Local setup
 
 1. Use Node from `package.json`, install with `npm ci`, and set the variables in `.env.example` in local `.env`. Keep `.env` out of Git.

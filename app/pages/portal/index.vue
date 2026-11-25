@@ -1,9 +1,11 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'portal' })
+definePageMeta({ layout: false, pageTransition: false })
 usePrivatePageSeo('Workspace', 'Open your MatterDraft Studio workspace.')
 
-const { data } = await useFetch('/api/portal/context', { key: 'portal-context' })
-if (data.value) {
+const request = useLazyFetch('/api/portal/context', { key: 'portal-context' })
+const { data } = request
+async function openWorkspace() {
+  if (!data.value) return
   const account = data.value.accounts[0]
   const destination = data.value.isStaff
     ? '/internal/overview'
@@ -12,8 +14,12 @@ if (data.value) {
       : '/portal/accounts'
   await navigateTo(destination, { replace: true })
 }
+if (import.meta.server) {
+  await request
+  await openWorkspace()
+} else watch(data, openWorkspace, { immediate: true })
 </script>
 
 <template>
-  <div />
+  <NuxtLayout name="portal" title="Opening workspace" loading><div /></NuxtLayout>
 </template>

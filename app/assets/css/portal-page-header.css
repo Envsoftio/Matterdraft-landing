@@ -1,0 +1,79 @@
+/* Page-owned titles render through the layout on both the server and client. */
+.portal-page-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'navigation heading controls';
+  align-items: center;
+  gap: 16px;
+  min-height: 96px;
+  padding: 16px 32px;
+}
+.customer-portal .portal-page-header {
+  padding-inline: 40px;
+}
+.portal-navigation-trigger {
+  grid-area: navigation;
+}
+.portal-header-heading {
+  grid-area: heading;
+  min-width: 0;
+}
+.portal-header-heading .heading-5 {
+  margin: 0;
+  color: var(--heading);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.portal-header-description.body-6 {
+  margin-top: 4px;
+  color: var(--body-text);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.portal-header-controls {
+  grid-area: controls;
+  justify-self: end;
+}
+.portal-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (min-width: 1024px) {
+  .portal-page-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'heading controls';
+  }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .customer-portal .portal-page-header {
+    padding-inline: 24px;
+  }
+}
+@media (max-width: 767px) {
+  .portal .portal-page-header {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: 'navigation controls' 'heading heading';
+    gap: 12px 16px;
+    padding: 12px 16px 16px;
+  }
+  .portal .portal-header-heading .heading-5 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+  .portal-page-actions {
+    justify-content: flex-start;
+  }
+  .portal #main-content [id] {
+    scroll-margin-top: 192px;
+  }
+}

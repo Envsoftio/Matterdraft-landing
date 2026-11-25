@@ -106,6 +106,45 @@ try {
     .join('; ')
   assert.ok(cookie)
 
+  // The dev app requests a fresh login even when the browser has a portal session.
+  // Exercise the combined sign-in form's signed continuation through consent.
+  const fresh = authorization({ prompt: 'login consent' })
+  const freshAuthorization = await call(`/api/auth/oauth2/authorize?${fresh.query}`)
+  assert.equal(freshAuthorization.status, 200)
+  const signInUrl = new URL((await freshAuthorization.json()).url, origin)
+  assert.equal(signInUrl.origin, origin)
+  assert.equal(signInUrl.pathname, '/sign-in')
+  const started = await call('/api/portal/desktop-sign-in' + signInUrl.search)
+  assert.equal(started.status, 200)
+  const start = (await started.json()).desktop
+  assert.equal(start.freshLogin, true)
+  assert.equal(start.state, fresh.state)
+  const freshLogin = await call('/api/auth/sign-in/email', {
+    method: 'POST',
+    body: { email, password, oauth_query: start.signed },
+  })
+  assert.equal(freshLogin.status, 200)
+  cookie = freshLogin.headers
+    .getSetCookie()
+    .map((item) => item.split(';')[0])
+    .join('; ')
+  const continuation = new URL((await freshLogin.json()).url, origin)
+  assert.equal(continuation.origin, origin)
+  assert.equal(continuation.pathname, '/consent')
+  const continuedResponse = await call('/api/portal/desktop-sign-in' + continuation.search)
+  const continued = (await continuedResponse.json()).desktop
+  for (const key of ['clientId', 'state', 'redirectUri']) assert.equal(continued[key], start[key])
+  const approval = await call('/api/auth/oauth2/consent', {
+    method: 'POST',
+    body: { accept: true, oauth_query: continued.signed },
+  })
+  assert.equal(approval.status, 200)
+  const callback = new URL((await approval.json()).url)
+  assert.equal(callback.protocol + callback.pathname, redirectUri)
+  assert.equal(callback.searchParams.get('state'), fresh.state)
+  assert.equal((await exchange({ ...fresh, code: callback.searchParams.get('code') })).status, 200)
+  console.log('PASS fresh desktop sign-in continues through consent to a valid PKCE callback')
+
   // No super-admin registration call precedes the first authorization.
   const attempt = await codeFor()
   const tokenResponse = await exchange(attempt)

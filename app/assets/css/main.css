@@ -133,6 +133,9 @@ button:not(:disabled),
 .brand-logo {
   width: 220px;
   height: auto;
+  /* Preserve the previous PNG layout box without stretching the SVG artwork. */
+  aspect-ratio: 661 / 139;
+  object-fit: contain;
 }
 .brand-logo-dark,
 html[data-theme='dark'] .brand-logo-light,

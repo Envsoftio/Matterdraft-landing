@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import '~/assets/css/customer-dashboard.css'
 import '~/assets/css/customer-pages.css'
+import '~/assets/css/portal-page-header.css'
 import { parseApiError } from '~/utils/api-error'
 import {
   DropdownMenuRoot,
@@ -28,19 +29,30 @@ import {
 } from '@lucide/vue'
 import { authClient } from '~~/lib/auth-client'
 
+withDefaults(
+  defineProps<{ title?: string; description?: string; loading?: boolean; pending?: boolean }>(),
+  { title: 'Workspace' },
+)
+const slots = useSlots()
 const route = useRoute()
 const router = useRouter()
 const currentPath = computed(() => router.currentRoute.value.path)
 const isInternal = computed(() => route.path.startsWith('/internal/'))
-const { data: context, error } = await useFetch('/api/portal/context', {
+const contextRequest = useLazyFetch('/api/portal/context', {
   key: 'portal-context',
 })
-if (error.value && (error.value as { statusCode?: number }).statusCode === 401) {
-  await navigateTo({ path: '/sign-in', query: { returnTo: route.fullPath } })
+const { data: context, error, refresh: refreshContext, pending: loadingContext } = contextRequest
+async function checkAccess() {
+  if (error.value && (error.value as { statusCode?: number }).statusCode === 401) {
+    await navigateTo({ path: '/sign-in', query: { returnTo: route.fullPath } })
+  } else if (context.value?.isStaff && !isInternal.value && route.path !== '/portal') {
+    await navigateTo('/internal/overview', { replace: true })
+  }
 }
-if (context.value?.isStaff && !isInternal.value && route.path !== '/portal') {
-  await navigateTo('/internal/overview', { replace: true })
-}
+if (import.meta.server) {
+  await contextRequest
+  await checkAccess()
+} else watch([context, error, () => route.path], checkAccess, { immediate: true })
 const mobileOpen = ref(false)
 const desktopNavigation = ref(false)
 const navigationTrigger = ref<HTMLButtonElement | null>(null)
@@ -89,9 +101,6 @@ const customerLinks = computed(() => {
     { path: 'tickets', label: 'Support', icon: LifeBuoy },
   ]
 })
-const customerPage = computed(
-  () => customerLinks.value.find((link) => isCustomerLinkCurrent(link.path))?.label || 'Workspaces',
-)
 function isCustomerLinkCurrent(path: string) {
   const destination = `${accountPath.value}/${path}`
   return currentPath.value === destination || currentPath.value.startsWith(`${destination}/`)
@@ -141,6 +150,9 @@ async function signOut() {
     <div v-if="error && !context" class="mx-auto max-w-xl px-5 py-20">
       <h1 class="portal-page-title">Workspace unavailable</h1>
       <p class="mt-3 text-studio-muted">{{ parseApiError(error).text }}</p>
+      <button class="portal-button mt-5 mr-4" :disabled="loadingContext" @click="refreshContext()">
+        Try again
+      </button>
       <NuxtLink class="portal-link mt-5 inline-block" to="/sign-in">Go to sign in</NuxtLink>
     </div>
     <div
@@ -288,52 +300,25 @@ async function signOut() {
         :inert="mobileOpen"
       >
         <header
-          class="portal-topbar sticky top-0 z-20 border-b border-studio-rule"
-          :class="
-            isInternal
-              ? 'flex h-[72px] items-center justify-between gap-4 px-5 sm:px-8'
-              : 'customer-header'
-          "
+          class="portal-topbar portal-page-header sticky top-0 z-20 border-b border-studio-rule"
         >
-          <div v-if="isInternal" class="flex min-w-0 items-center gap-3">
-            <button
-              ref="navigationTrigger"
-              class="portal-icon-button inline-grid lg:hidden"
-              aria-label="Open navigation"
-              aria-controls="portal-navigation"
-              :aria-expanded="mobileOpen"
-              @click="mobileOpen = true"
-            >
-              <Menu :size="20" />
-            </button>
-            <div class="min-w-0">
-              <p class="truncate text-xs font-medium uppercase tracking-wider text-studio-muted">
-                MatterDraft
-              </p>
-              <p class="truncate font-heading text-base font-semibold text-studio-heading">
-                Super Admin
-              </p>
+          <button
+            ref="navigationTrigger"
+            class="portal-icon-button portal-navigation-trigger inline-grid lg:hidden"
+            aria-label="Open navigation"
+            aria-controls="portal-navigation"
+            :aria-expanded="mobileOpen"
+            @click="mobileOpen = true"
+          >
+            <Menu :size="20" aria-hidden="true" />
+          </button>
+          <div class="portal-header-heading">
+            <h1 id="portal-page-heading" class="heading-5">{{ title }}</h1>
+            <div v-if="description || slots.description" class="portal-header-description body-6">
+              <slot name="description">{{ description }}</slot>
             </div>
           </div>
-          <template v-else>
-            <div class="customer-location">
-              <button
-                ref="navigationTrigger"
-                class="portal-icon-button inline-grid lg:hidden"
-                aria-label="Open navigation"
-                aria-controls="portal-navigation"
-                :aria-expanded="mobileOpen"
-                @click="mobileOpen = true"
-              >
-                <Menu :size="20" aria-hidden="true" />
-              </button>
-              <span class="title-4">{{ customerPage }}</span>
-            </div>
-          </template>
-          <div
-            class="flex min-w-0 items-center gap-2 sm:gap-3"
-            :class="{ 'customer-header-actions': !isInternal }"
-          >
+          <div class="portal-header-controls flex min-w-0 items-center gap-2 sm:gap-3">
             <DropdownMenuRoot v-if="!isInternal">
               <DropdownMenuTrigger
                 class="workspace-switch"
@@ -414,9 +399,16 @@ async function signOut() {
         <main
           id="main-content"
           tabindex="-1"
+          aria-labelledby="portal-page-heading"
           :class="isInternal ? 'min-h-[calc(100vh-72px)]' : 'grow'"
         >
-          <slot />
+          <PortalAsyncContent
+            :loading="loading || (!context && !error)"
+            :pending="pending"
+            :customer="!isInternal"
+          >
+            <slot />
+          </PortalAsyncContent>
         </main>
         <footer v-if="!isInternal" class="customer-footer caption-5">
           <span>MatterDraft Studio</span>

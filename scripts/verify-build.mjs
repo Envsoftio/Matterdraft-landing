@@ -197,8 +197,8 @@ for (const file of [
   'fonts/plus-jakarta-sans-latin-variable.woff2',
   'fonts/manrope-latin-variable.woff2',
   'fonts/jetbrains-mono-medium.woff2',
-  'brand/studio-wordmark-light.png',
-  'brand/studio-wordmark-dark.png',
+  'brand/studio-wordmark-light.svg',
+  'brand/studio-wordmark-dark.svg',
   '_headers',
   '404.html',
 ])
