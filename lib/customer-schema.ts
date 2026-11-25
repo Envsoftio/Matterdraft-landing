@@ -240,6 +240,31 @@ export const licenceTrial = sqliteTable('licence_trial', {
   expiresAt: integer('expires_at').notNull(),
 })
 
+export const trialInstallation = sqliteTable('trial_installation', {
+  accountId: text('account_id')
+    .primaryKey()
+    .references(() => licenceTrial.accountId),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id),
+  publicKey: text('public_key').notNull(),
+  registeredAt: integer('registered_at').notNull(),
+})
+
+export const trialChallenge = sqliteTable('trial_challenge', {
+  accountId: text('account_id')
+    .primaryKey()
+    .references(() => customerAccount.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  publicKey: text('public_key').notNull(),
+  nonce: text('nonce').notNull(),
+  issuedAt: integer('issued_at').notNull(),
+  expiresAt: integer('expires_at').notNull(),
+  consumedAt: integer('consumed_at'),
+})
+
 export const desktopDownload = sqliteTable(
   'desktop_download',
   {

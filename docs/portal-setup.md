@@ -91,6 +91,13 @@ The authorization server's public metadata and a full native round trip must be 
 
 For a focused regression run against an isolated local server, run `PORTAL_CHECK_URL=http://127.0.0.1:3012 PORTAL_CHECK_DATABASE=file:/private/tmp/matterdraft-portal-e2e/check.db node scripts/verify-desktop-auth.mjs`. Use the disposable-server setup below, with ZeptoMail credentials unset. The check creates synthetic customers, verifies sign-in and workspace claims without a registration call, exercises PKCE/callback/code-replay rejection and refresh rotation, and restores the client's enabled state after testing disabled-client rejection. `npm test` also covers fresh and upgraded database migrations, preservation of older registrations, and disabled-client persistence.
 
+### Desktop trial activation
+
+Apply migration `0016_desktop_trial_activation.sql` before enabling activation. Set `DESKTOP_TRIAL_SIGNING_KEY_ID` and provide the Ed25519 PKCS#8 PEM in the server secret `DESKTOP_TRIAL_SIGNING_KEY`. Set `LICENCE_TRIALS_ENABLED=true` to allow desktop owners to start new trials. An existing portal trial keeps its original expiry.
+
+Build the macOS app with `MATTERDRAFT_TRIAL_VERIFY_KEYS` set to the matching key ID and unpadded base64url encoding of the raw 32-byte Ed25519 public key, in the form `key-id:public-key`. The build accepts a comma-separated list for overlapping key rotations. Keep the private key on the server. For the isolated OAuth smoke test, set `PORTAL_CHECK_TRIAL_PUBLIC_KEY` to the matching public PEM to exercise challenge, activation and replay rejection.
+
+
 ## Deployment prerequisites
 
 - Netlify must receive `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `BETTER_AUTH_URL` (the exact HTTPS portal origin), `BETTER_AUTH_SECRET`, `ZEPTOMAIL_SMTP_PASSWORD` and `ZEPTOMAIL_FROM` as server environment variables. Use separate database and secrets for deploy previews. Never use the local development `.env` in Netlify.

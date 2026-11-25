@@ -113,6 +113,13 @@
       "when": 1795629600000,
       "tag": "0015_builtin_desktop_client",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "6",
+      "when": 1795636267314,
+      "tag": "0016_desktop_trial_activation",
+      "breakpoints": true
     }
   ]
 }

@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import type { Client, Row } from '@libsql/client'
 import { applicationFailure } from './application-error.ts'
 
-const trialDuration = 7 * 24 * 60 * 60 * 1000
+export const trialDuration = 7 * 24 * 60 * 60 * 1000
 
 export function licenceTrialsEnabled() {
   const setting = process.env.LICENCE_TRIALS_ENABLED
@@ -39,6 +39,7 @@ export async function listDesktopTrialExpiries(db: Client, userId: string) {
   })
   return {
     serverTime: Date.now(),
+    canStart: licenceTrialsEnabled(),
     expiries: Object.fromEntries(
       rows.map((row) => [String(row.account_id), Number(row.expires_at)]),
     ),
