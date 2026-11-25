@@ -64,6 +64,48 @@
       "when": 1795551741404,
       "tag": "0008_desktop_downloads",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1795607002933,
+      "tag": "0009_licence_checkout",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1795607583231,
+      "tag": "0010_solo_two_devices",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1795608340329,
+      "tag": "0011_prepaid_access_terms",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1795608546055,
+      "tag": "0012_managed_prepaid_discounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1795608889028,
+      "tag": "0013_coupon_offers",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "6",
+      "when": 1795609421342,
+      "tag": "0014_solo_monthly_price",
+      "breakpoints": true
     }
   ]
 }

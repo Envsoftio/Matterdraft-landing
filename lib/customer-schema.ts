@@ -1,4 +1,13 @@
-import { sqliteTable, text, integer, primaryKey, index } from 'drizzle-orm/sqlite-core'
+import { sql } from 'drizzle-orm'
+import {
+  sqliteTable,
+  text,
+  integer,
+  primaryKey,
+  index,
+  uniqueIndex,
+  check,
+} from 'drizzle-orm/sqlite-core'
 import { user } from './auth-schema'
 
 export const customerAccount = sqliteTable('customer_account', {
@@ -143,11 +152,82 @@ export const licencePlan = sqliteTable('licence_plan', {
   name: text('name').notNull(),
   description: text('description').notNull(),
   accountType: text('account_type', { enum: ['personal', 'organisation'] }).notNull(),
-  monthlyDevicePrice: integer('monthly_device_price').notNull(),
+  monthlyPrice: integer('monthly_device_price').notNull(),
+  minimumDevices: integer('minimum_devices').notNull().default(1),
   status: text('status', { enum: ['draft', 'published', 'archived'] }).notNull(),
   revision: integer('revision').notNull().default(1),
   createdAt: integer('created_at').notNull(),
 })
+
+export const prepaidDiscount = sqliteTable(
+  'prepaid_discount',
+  {
+    id: text('id').primaryKey(),
+    minimumMonths: integer('minimum_months').notNull().unique(),
+    discountPercent: integer('discount_percent').notNull(),
+    revision: integer('revision').notNull().default(1),
+  },
+  (table) => [
+    check('prepaid_discount_months_range', sql`${table.minimumMonths} BETWEEN 1 AND 12`),
+    check('prepaid_discount_percent_range', sql`${table.discountPercent} BETWEEN 1 AND 99`),
+  ],
+)
+
+export const couponOffer = sqliteTable('coupon_offer', {
+  id: text('id').primaryKey(),
+  code: text('code').notNull().unique(),
+  discountAmount: integer('discount_amount').notNull(),
+  status: text('status', { enum: ['draft', 'published', 'paused'] }).notNull(),
+  planId: text('plan_id').references(() => licencePlan.id),
+  audience: text('audience', { enum: ['personal', 'organisation'] }),
+  accessMonths: integer('access_months'),
+  purchaseKind: text('purchase_kind', { enum: ['first', 'renewal'] }),
+  startsAt: integer('starts_at'),
+  endsAt: integer('ends_at'),
+  redemptionLimit: integer('redemption_limit'),
+  revision: integer('revision').notNull().default(1),
+})
+
+export const licencePurchase = sqliteTable(
+  'licence_purchase',
+  {
+    id: text('id').primaryKey(),
+    accountId: text('account_id')
+      .notNull()
+      .references(() => customerAccount.id),
+    buyerId: text('buyer_id')
+      .notNull()
+      .references(() => user.id),
+    planId: text('plan_id')
+      .notNull()
+      .references(() => licencePlan.id),
+    planRevision: integer('plan_revision').notNull(),
+    planName: text('plan_name').notNull(),
+    unitPrice: integer('unit_price').notNull(),
+    totalAmount: integer('total_amount'),
+    quantity: integer('quantity').notNull(),
+    accessMonths: integer('access_months').notNull().default(1),
+    discountPercent: integer('discount_percent').notNull().default(0),
+    couponOfferId: text('coupon_offer_id').references(() => couponOffer.id),
+    couponOfferRevision: integer('coupon_offer_revision'),
+    couponCode: text('coupon_code'),
+    couponDiscount: integer('coupon_discount').notNull().default(0),
+    status: text('status', { enum: ['pending', 'paid', 'expired'] }).notNull(),
+    linkId: text('link_id').unique(),
+    paymentId: text('payment_id').unique(),
+    createdAt: integer('created_at').notNull(),
+    expiresAt: integer('expires_at').notNull(),
+    paidFrom: integer('paid_from'),
+    paidThrough: integer('paid_through'),
+  },
+  (table) => [
+    uniqueIndex('licence_purchase_pending_idx')
+      .on(table.accountId)
+      .where(sql`${table.status} = 'pending'`),
+    index('licence_purchase_account_idx').on(table.accountId, table.paidThrough),
+    index('licence_purchase_coupon_idx').on(table.couponOfferId, table.status),
+  ],
+)
 
 export const licenceTrial = sqliteTable('licence_trial', {
   accountId: text('account_id')

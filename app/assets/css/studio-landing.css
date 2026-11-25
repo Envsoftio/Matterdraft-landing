@@ -458,6 +458,26 @@
   min-height: 48px;
   padding: 0 24px;
 }
+.hero-privacy {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 20px;
+  text-wrap: pretty;
+}
+.hero-privacy a {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--accent);
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.hero-privacy svg {
+  flex: none;
+  margin-top: 2px;
+}
 .hero-offer {
   display: inline-flex;
   align-items: center;
@@ -886,7 +906,6 @@
   }
 }
 
-.shortcut-panel > strong,
 .target-row > strong {
   display: flex;
   align-items: center;
@@ -1196,7 +1215,7 @@
 .template-form,
 .volume-card,
 .inspector,
-.shortcut-panel {
+.privacy-panel {
   padding: 24px;
 }
 .pdf-toolbar {
@@ -1662,29 +1681,20 @@
 .local-grid .section-heading {
   margin: 0;
 }
-.studio-landing .shortcut-panel {
+.studio-landing .privacy-panel {
   background: var(--tint);
-}
-.shortcut-panel dl {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 16px;
+  gap: 16px;
 }
-.shortcut-panel dl div {
-  padding: 8px 4px;
-  border-radius: 8px;
-  background: var(--surface);
-  border: 1px solid var(--rule-soft);
-  text-align: center;
-  font-size: 12px;
+.privacy-panel dt {
+  color: var(--heading);
+  font-weight: 700;
 }
-.shortcut-panel kbd {
-  font: 500 12px/16px var(--code);
-  color: var(--accent);
-}
-.shortcut-panel dd {
+.privacy-panel dd {
   margin-top: 4px;
+  font-size: 14px;
+  line-height: 20px;
+  text-wrap: pretty;
 }
 .outputs {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2340,7 +2350,7 @@ html[data-theme='dark'] .landing-page .studio-footer {
   .court-paper,
   .volume-card,
   .inspector,
-  .shortcut-panel {
+  .privacy-panel {
     padding: 17px;
   }
   .pdf-toolbar {
@@ -2402,9 +2412,6 @@ html[data-theme='dark'] .landing-page .studio-footer {
   }
   .check-row svg {
     flex-shrink: 0;
-  }
-  .shortcut-panel dl {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .footer-columns {
     grid-template-columns: 1fr 1fr;

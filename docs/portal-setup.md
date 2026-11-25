@@ -29,11 +29,9 @@ The dashboard at `/internal/overview` shows solo and firm account activity, tick
 
 ## Licence plans and trials
 
-Apply `0006_licence_plans_and_billing.sql` with `npm run db:migrate`. A super admin can create, edit, publish and archive plans at `/internal/plans`. Set the audience and INR monthly price per device. A published plan keeps its name and price. Create a new draft for a replacement price and archive the old plan when it should leave the catalogue.
+See [Licence catalogue and test checkout](#licence-catalogue-and-test-checkout) for setup and plan management.
 
-Account owners and billing managers see the published plans for their selected account in **Plans & billing**. Owners can start the trial explicitly from Home or Plans & billing. The server records a full-access grant for 168 hours and returns the original grant on retries. The trial requires no payment details and ends automatically. Trial activation is on by default in development. Set `LICENCE_TRIALS_ENABLED=true` in production once the desktop app can enforce the grant. Device assignments, signed offline entitlements and feature enforcement require the separate desktop integration.
-
-Online purchases are currently unavailable. Choose a payment gateway and review merchant, tax, cancellation, and refund terms before implementing checkout.
+Account owners and billing managers see the published plans for their selected account in **Plans & billing**. Owners can start the trial from Home or Plans & billing. The server records a 168 hour trial and returns the original grant on retries. The trial requires no payment details and ends automatically. Device assignments, signed offline entitlements and feature enforcement require the separate desktop integration.
 
 ## Private desktop installers
 
@@ -223,3 +221,27 @@ TURSO_DATABASE_URL=https://127.0.0.1:9 TURSO_AUTH_TOKEN=local-only BETTER_AUTH_U
 | Controlled ZeptoMail delivery | Exercise verification and resend, reset and invitation delivery, expired links, provider failures and timeouts, sender configuration and delivery recovery. Check how the portal reports delivery failure after saving an invitation. |
 | Separate native desktop app, supported operating systems | Register the public OAuth client; verify discovery metadata, external-browser Authorization Code + PKCE S256, state validation, exact private-scheme callback, code exchange/replay rejection, secure OS token storage and refresh/revocation. Portal sessions and local tests prove none of these native behaviors. |
 | Product decisions plus provider/native sandboxes | Exercise test checkout and upgrades against the hosted provider. Confirm the merchant, tax and commercial terms, then verify the native entitlement, expiry, transfer and recovery contract before enabling paid use. |
+
+## Licence catalogue and test checkout
+
+Apply `npm run db:migrate` before deploying the updated portal. Solo includes two devices for ₹499 per month including GST. Chamber is ₹349 per device per month including GST with a three device minimum. The existing seven day trial is enabled in development by default. Set `LICENCE_TRIALS_ENABLED=true` to offer it in a hosted environment.
+
+Super admins can add drafts, publish them, edit current plans, archive plans from sale and permanently delete unused plans in **Licence plans**. Purchase records retain the plan name, rate, device count, selected term, discount and total accepted at checkout.
+
+Enter catalogue prices including GST. The portal calculates prepaid or coupon discounts from those prices and sends the displayed final total to Razorpay.
+
+Set `RAZORPAY_KEY_ID` to a test key and supply its secret in `RAZORPAY_KEY_SECRET`. Register `/api/webhooks/razorpay` on the HTTPS portal for `payment_link.paid` in the Razorpay test dashboard and set the matching `RAZORPAY_WEBHOOK_SECRET`. Use the portal origin in `BETTER_AUTH_URL`. Use a separate database for payment testing and keep the same Razorpay test account while it has outstanding checkout links.
+
+A customer account owner or billing manager can select 1 to 12 months of prepaid access in **Plans & billing**. The customer reviews the total and savings before paying once through Razorpay's hosted test page.
+
+Super admins manage the tiers under **Licence plans → Prepaid discounts**. The initial tiers are 5% from 4 months, 10% from 6 months and 15% from 12 months. The discount from the longest qualifying threshold applies to the full term on all plans. Updates take effect for new checkouts. A payment link already issued retains its accepted total.
+
+The portal can recover the same payment link after an interrupted request. Confirmed payments appear in **Payment status** with the purchased term and expiry. Access runs from the payment date through the selected number of calendar months. Customers can buy a new term after expiry.
+
+Checkout accepts test credentials only. Live collection requires desktop grant enforcement, the merchant invoice and tax configuration, refund handling and successful end to end provider verification.
+
+### Coupon offers
+
+Under **Licence plans → Coupon offers**, a super admin can save a draft, publish its code, edit its terms, or pause it. Each offer has a fixed rupee discount. Optional restrictions cover the plan, account type, exact access duration, first purchase or returning customers, dates and maximum redemptions.
+
+Customers enter the code in **Plans & billing**. The portal applies the larger of the coupon and prepaid discounts to the term. The payable amount stays at or above ₹1. An accepted checkout reserves a redemption until its payment is confirmed or its payment link is reconciled as expired or cancelled. Pausing an offer blocks new applications and keeps the amounts on existing payment links.

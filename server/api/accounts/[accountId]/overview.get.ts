@@ -30,6 +30,6 @@ export default applicationRoute('/api/accounts/[accountId]/overview', async (eve
     plans: plans
       .slice(0, 3)
       .map(publicPlan)
-      .map(({ id, name, monthlyDevicePrice }) => ({ id, name, monthlyDevicePrice })),
+      .map(({ id, name, monthlyPrice }) => ({ id, name, monthlyPrice })),
   }
 })

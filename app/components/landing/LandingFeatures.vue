@@ -1,4 +1,5 @@
 <template>
+  <LandingLocalProcessing />
   <LandingOverview />
   <LandingWorkflow />
   <LandingMatterWorkspace />
@@ -11,7 +12,6 @@
   <LandingVolumes />
   <LandingValidation />
   <LandingExport />
-  <LandingLocalProcessing />
   <LandingFaq />
   <LandingClosing />
 </template>

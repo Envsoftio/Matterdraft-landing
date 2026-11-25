@@ -22,6 +22,7 @@ const passwordVisible = ref(false)
       <slot />
     </div>
     <div class="relative">
+      <span v-if="$slots.icon" class="field-icon" aria-hidden="true"><slot name="icon" /></span>
       <FieldControl
         :id="id"
         v-model="model"
@@ -29,7 +30,7 @@ const passwordVisible = ref(false)
         :type="isPassword && passwordVisible ? 'text' : type"
         :disabled="disabled"
         class="portal-input"
-        :class="{ 'password-input': isPassword }"
+        :class="{ 'password-input': isPassword, 'input-with-icon': $slots.icon }"
       />
       <Toggle
         v-if="isPassword"
@@ -51,6 +52,20 @@ const passwordVisible = ref(false)
 </template>
 
 <style scoped>
+.field-icon {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 13px;
+  display: grid;
+  place-items: center;
+  color: var(--input-icon-color, var(--body-text));
+  pointer-events: none;
+}
+
+.input-with-icon {
+  padding-inline-start: 41px;
+}
+
 .password-input {
   padding-inline-end: 48px;
 }

@@ -16,11 +16,11 @@
 
 | Customer | Offer to test |
 |---|---|
-| Independent advocate | One licence at ₹499 for one month or ₹4,999 for one year. An office computer and a laptop are included. |
+| Independent advocate | Solo includes an office computer and a laptop for ₹499 per month including GST. ₹4,999 for one year was an earlier pilot proposal. |
 | Chamber or firm | One account, bill and renewal date for all purchased licences. A firm with twenty advocates can start with two licences when two advocates use the app. Portal-only administration is free. |
 | Large firm | Quote a committed annual licence count, unit price and renewal terms. Itemise any agreed onboarding or priority support separately. Validate support cost and retention before offering volume discounts. |
 
-Test ₹499 and ₹4,999 as the amounts the customer pays. Confirm tax treatment and provider fees before publication. As an illustration, if 18% GST applies and the provider charges 2% plus GST on that fee, ₹499 leaves about ₹411 per paid month and ₹4,999 leaves about ₹343 per month before support, hosting, refunds and acquisition. The proposed annual price is about 16.5% below twelve monthly payments. [CBIC IT services FAQ](https://cbic-gst.gov.in/hindi/sectoral-faq.html) · [Razorpay gateway pricing](https://razorpay.com/pricing/)
+The portal uses ₹499 per month as the Solo base price for prepaid terms. At the default 15% discount, twelve months cost ₹5,089.80 including GST. Confirm provider fees before live collection. As an illustration, if 18% GST applies and the provider charges 2% plus GST on that fee, ₹499 leaves about ₹411 per paid month and ₹4,999 leaves about ₹343 per month before support, hosting, refunds and acquisition. The earlier ₹4,999 annual proposal was about 16.5% below twelve monthly payments. [CBIC IT services FAQ](https://cbic-gst.gov.in/hindi/sectoral-faq.html) · [Razorpay gateway pricing](https://razorpay.com/pricing/)
 
 As a reference for the pilot, Adobe India listed Acrobat Standard at ₹477.90/month and Pro at ₹638.38/month, including GST, on annual commitments billed monthly when checked for this discussion. Validate MatterDraft's price against the time it saves in the court-bundle workflow. [Adobe India pricing](https://www.adobe.com/in/acrobat/pricing.html)
 

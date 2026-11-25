@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import CouponOfferEditor from '~/components/portal/CouponOfferEditor.vue'
+import PrepaidDiscountEditor from '~/components/portal/PrepaidDiscountEditor.vue'
 import { parseApiError } from '~/utils/api-error'
 import { licencePrice } from '~/utils/licence-price'
 
@@ -11,31 +13,35 @@ type Plan = NonNullable<typeof data.value>['plans'][number]
 const editor = ref<{
   id?: string
   revision?: number
+  status?: Plan['status']
   name: string
   description: string
   accountType: string
   price: string
+  minimumDevices: number
 }>()
 const busy = ref(false)
 const editingError = ref('')
 const notice = ref('')
-const pendingArchive = ref<Plan>()
+const pendingRemoval = ref<{ plan: Plan; action: 'archive' | 'delete' }>()
 const formTitle = ref<HTMLElement>()
 
 async function edit(plan?: Plan) {
-  pendingArchive.value = undefined
+  pendingRemoval.value = undefined
   editingError.value = ''
   notice.value = ''
   editor.value = plan
     ? {
         id: plan.id,
         revision: plan.revision,
+        status: plan.status,
         name: plan.name,
         description: plan.description,
         accountType: plan.accountType,
-        price: String(plan.monthlyDevicePrice / 100),
+        price: String(plan.monthlyPrice / 100),
+        minimumDevices: plan.minimumDevices,
       }
-    : { name: '', description: '', accountType: 'personal', price: '' }
+    : { name: '', description: '', accountType: 'personal', price: '', minimumDevices: 1 }
   await nextTick()
   formTitle.value?.focus()
 }
@@ -47,7 +53,7 @@ async function update(body: Record<string, unknown>, message: string) {
   try {
     await $fetch('/api/internal/plans', { method: 'POST', body })
     editor.value = undefined
-    pendingArchive.value = undefined
+    pendingRemoval.value = undefined
     notice.value = message
     await refresh()
   } catch (problem) {
@@ -60,8 +66,8 @@ async function update(body: Record<string, unknown>, message: string) {
 function save() {
   const plan = editor.value
   if (!plan) return
-  if (!/^\d{1,6}(?:\.\d{1,2})?$/.test(plan.price.trim()) || Number(plan.price) <= 0) {
-    editingError.value = 'Enter a monthly price in rupees, with up to two decimal places.'
+  if (!/^\d{1,6}(?:\.\d{1,2})?$/.test(plan.price.trim()) || Number(plan.price) < 1) {
+    editingError.value = 'Enter a monthly price of at least ₹1, with up to two decimal places.'
     return
   }
   return update(
@@ -72,9 +78,10 @@ function save() {
       name: plan.name,
       description: plan.description,
       accountType: plan.accountType,
-      monthlyDevicePrice: Math.round(Number(plan.price) * 100),
+      monthlyPrice: Math.round(Number(plan.price) * 100),
+      minimumDevices: plan.minimumDevices,
     },
-    'Draft saved.',
+    plan.status === 'published' ? 'Plan updated.' : 'Draft saved.',
   )
 }
 </script>
@@ -109,7 +116,7 @@ function save() {
             tabindex="-1"
             class="font-heading text-xl font-semibold"
           >
-            {{ editor.id ? 'Edit draft' : 'New licence plan' }}
+            {{ editor.id ? 'Edit licence plan' : 'New licence plan' }}
           </h2>
           <form class="mt-5 space-y-4" @submit.prevent="save">
             <div>
@@ -149,20 +156,48 @@ function save() {
               />
             </div>
             <div>
-              <label for="plan-price" class="portal-label">Price per device per month (₹)</label>
+              <label for="plan-price" class="portal-label">
+                {{
+                  editor.accountType === 'personal'
+                    ? 'Monthly plan price (₹)'
+                    : 'Price per device per month (₹)'
+                }}
+              </label>
               <StudioField
                 ><input
                   id="plan-price"
                   v-model="editor.price"
                   class="portal-input"
                   inputmode="decimal"
+                  aria-describedby="plan-price-help"
                   maxlength="9"
                   required
               /></StudioField>
+              <p id="plan-price-help" class="mt-1 text-sm text-studio-muted">
+                Enter the price including GST.
+              </p>
+            </div>
+            <div>
+              <label for="plan-minimum" class="portal-label">
+                {{ editor.accountType === 'personal' ? 'Devices included' : 'Minimum devices' }}
+              </label>
+              <StudioField>
+                <input
+                  id="plan-minimum"
+                  v-model.number="editor.minimumDevices"
+                  class="portal-input"
+                  type="number"
+                  min="1"
+                  max="100"
+                  required
+                />
+              </StudioField>
             </div>
             <p v-if="editingError" role="alert" class="portal-error">{{ editingError }}</p>
             <div class="flex flex-wrap gap-3">
-              <button type="submit" class="portal-button" :disabled="busy">Save draft</button>
+              <button type="submit" class="portal-button" :disabled="busy">
+                {{ editor.status === 'published' ? 'Save changes' : 'Save draft' }}
+              </button>
               <button
                 type="button"
                 class="portal-button-secondary"
@@ -184,55 +219,82 @@ function save() {
                 </p>
                 <h2 class="mt-1 break-words font-heading text-lg font-semibold">{{ plan.name }}</h2>
                 <p class="mt-1 text-sm tabular-nums">
-                  {{ licencePrice(plan.monthlyDevicePrice) }} / device / month
+                  {{ licencePrice(plan.monthlyPrice) }}
+                  <template v-if="plan.accountType === 'personal'">
+                    / month · {{ plan.minimumDevices }}
+                    {{ plan.minimumDevices === 1 ? 'device' : 'devices' }} included
+                  </template>
+                  <template v-else>
+                    / device / month
+                    <span v-if="plan.minimumDevices > 1">
+                      · {{ plan.minimumDevices }} device minimum</span
+                    >
+                  </template>
+                  · incl. GST
                 </p>
                 <p class="mt-2 text-sm break-words whitespace-pre-line text-studio-muted">
                   {{ plan.description }}
                 </p>
               </div>
               <div class="flex flex-wrap items-center gap-3">
-                <template v-if="plan.status === 'draft'">
-                  <button
-                    type="button"
-                    class="portal-button-secondary"
-                    :disabled="busy"
-                    :aria-label="`Edit ${plan.name}`"
-                    @click="edit(plan)"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    class="portal-button"
-                    :disabled="busy || Boolean(editor)"
-                    :aria-label="`Publish ${plan.name}`"
-                    @click="
-                      update(
-                        { action: 'publish', id: plan.id, revision: plan.revision },
-                        'Plan published.',
-                      )
-                    "
-                  >
-                    Publish
-                  </button>
-                </template>
                 <button
-                  v-else-if="plan.status === 'published' && pendingArchive?.id !== plan.id"
+                  v-if="plan.status !== 'archived'"
+                  type="button"
+                  class="portal-button-secondary"
+                  :disabled="busy"
+                  :aria-label="`Edit ${plan.name}`"
+                  @click="edit(plan)"
+                >
+                  Edit
+                </button>
+                <button
+                  v-if="plan.status === 'draft'"
+                  type="button"
+                  class="portal-button"
+                  :disabled="busy || Boolean(editor)"
+                  :aria-label="`Publish ${plan.name}`"
+                  @click="
+                    update(
+                      { action: 'publish', id: plan.id, revision: plan.revision },
+                      'Plan published.',
+                    )
+                  "
+                >
+                  Publish
+                </button>
+                <button
+                  v-if="plan.status === 'published'"
                   type="button"
                   class="portal-button-secondary"
                   :disabled="busy || Boolean(editor)"
                   :aria-label="`Archive ${plan.name}`"
-                  @click="pendingArchive = plan"
+                  @click="pendingRemoval = { plan, action: 'archive' }"
                 >
                   Archive
+                </button>
+                <button
+                  v-if="plan.canDelete"
+                  type="button"
+                  class="portal-button-secondary"
+                  :disabled="busy || Boolean(editor)"
+                  :aria-label="`Delete ${plan.name}`"
+                  @click="pendingRemoval = { plan, action: 'delete' }"
+                >
+                  Delete
                 </button>
               </div>
             </div>
             <div
-              v-if="pendingArchive?.id === plan.id"
+              v-if="pendingRemoval?.plan.id === plan.id"
               class="mt-4 rounded-lg border border-studio-rule p-4"
             >
-              <p class="text-sm">Archive this plan to remove it from the available plans.</p>
+              <p class="text-sm">
+                {{
+                  pendingRemoval.action === 'delete'
+                    ? 'Permanently delete this plan?'
+                    : 'Archive this plan to remove it from the available plans.'
+                }}
+              </p>
               <div class="mt-3 flex flex-wrap gap-3">
                 <button
                   type="button"
@@ -240,18 +302,18 @@ function save() {
                   :disabled="busy"
                   @click="
                     update(
-                      { action: 'archive', id: plan.id, revision: plan.revision },
-                      'Plan archived.',
+                      { action: pendingRemoval.action, id: plan.id, revision: plan.revision },
+                      pendingRemoval.action === 'delete' ? 'Plan deleted.' : 'Plan archived.',
                     )
                   "
                 >
-                  Confirm archive
+                  {{ pendingRemoval.action === 'delete' ? 'Confirm delete' : 'Confirm archive' }}
                 </button>
                 <button
                   type="button"
                   class="portal-button-secondary"
                   :disabled="busy"
-                  @click="pendingArchive = undefined"
+                  @click="pendingRemoval = undefined"
                 >
                   Cancel
                 </button>
@@ -263,6 +325,12 @@ function save() {
           No licence plans yet. Create a draft to get started.
         </p>
       </div>
+      <PrepaidDiscountEditor :discounts="data.discounts" :refresh-discounts="() => refresh()" />
+      <CouponOfferEditor
+        :offers="data.offers"
+        :plans="data.plans"
+        :refresh-offers="() => refresh()"
+      />
     </template>
   </div>
 </template>

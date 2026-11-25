@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArrowRight, LockKeyhole, Mail, PanelsTopLeft } from '@lucide/vue'
 import { FormRoot } from 'reka-ui'
 import { authClient, desktopSignInClient } from '~~/lib/auth-client'
 import { authReturnTo } from '~/utils/auth-return-to'
@@ -93,49 +94,91 @@ async function submit() {
 </script>
 
 <template>
-  <PortalAuthShell>
-    <p class="portal-eyebrow">Account access</p>
-    <h2 class="portal-auth-title">Sign in</h2>
-    <p class="portal-auth-intro">
-      {{
-        desktop
-          ? 'Sign in with your dashboard account to open the MatterDraft desktop app.'
-          : 'Enter your email and password to continue.'
-      }}
-    </p>
-    <FormRoot class="mt-9 space-y-5" method="post" @submit.prevent="submit">
-      <PortalAuthField
-        id="email"
-        v-model="email"
-        label="Email address"
-        type="email"
-        autocomplete="email"
-        required
-      />
-      <PortalAuthField
-        id="password"
-        v-model="password"
-        label="Password"
-        type="password"
-        autocomplete="current-password"
-        required
-      >
-        <NuxtLink class="portal-link text-sm" to="/forgot-password">Forgot password?</NuxtLink>
-      </PortalAuthField>
-      <p v-if="error" role="alert" class="portal-error">{{ error }}</p>
-      <button
-        class="portal-button w-full"
-        type="submit"
-        :disabled="busy || (Boolean(route.query.sig) && checkingDesktop)"
-      >
-        {{ busy ? 'Signing in…' : 'Sign in' }}
-      </button>
-    </FormRoot>
-    <p class="mt-7 text-center text-sm text-studio-muted">
-      New to MatterDraft?
-      <NuxtLink class="portal-link" :to="{ path: '/sign-up', query: signUpQuery }">
-        Create an account
-      </NuxtLink>
-    </p>
-  </PortalAuthShell>
+  <main class="sign-in">
+    <section class="sign-in-panel" aria-labelledby="sign-in-heading">
+      <header class="sign-in-toolbar">
+        <NuxtLink to="/" class="sign-in-brand mobile-brand"><BrandLogo /></NuxtLink>
+        <ThemeToggle />
+      </header>
+      <div class="sign-in-content">
+        <span class="sign-in-mark" aria-hidden="true"><PanelsTopLeft :size="23" /></span>
+        <p class="sign-in-eyebrow">Your legal workspace</p>
+        <h1 id="sign-in-heading">Welcome back.</h1>
+        <p class="sign-in-description">
+          {{
+            desktop
+              ? 'Sign in with your dashboard account to open the MatterDraft desktop app.'
+              : 'Sign in to continue preparing, organizing, and managing your legal documents.'
+          }}
+        </p>
+        <FormRoot class="sign-in-form" method="post" @submit.prevent="submit">
+          <PortalAuthField
+            id="email"
+            v-model="email"
+            label="Email address"
+            name="email"
+            type="email"
+            autocomplete="username"
+            inputmode="email"
+            spellcheck="false"
+            placeholder="name@lawfirm.com"
+            required
+          >
+            <template #icon><Mail :size="18" /></template>
+          </PortalAuthField>
+          <PortalAuthField
+            id="password"
+            v-model="password"
+            label="Password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required
+          >
+            <NuxtLink class="portal-link" to="/forgot-password">Forgot password?</NuxtLink>
+            <template #icon><LockKeyhole :size="18" /></template>
+          </PortalAuthField>
+          <p v-if="error" role="alert" class="portal-error">{{ error }}</p>
+          <button
+            class="portal-button sign-in-button"
+            type="submit"
+            :disabled="busy || (Boolean(route.query.sig) && checkingDesktop)"
+            :aria-busy="busy"
+          >
+            {{ busy ? 'Signing in…' : 'Sign in' }}
+            <ArrowRight v-if="!busy" :size="17" aria-hidden="true" />
+          </button>
+        </FormRoot>
+        <p class="sign-in-register">
+          New to MatterDraft?
+          <NuxtLink class="portal-link" :to="{ path: '/sign-up', query: signUpQuery }">
+            Create an account
+          </NuxtLink>
+        </p>
+      </div>
+      <footer class="sign-in-footer">
+        <strong>MatterDraft Studio</strong><span aria-hidden="true">·</span>
+        <span>Legal document workspace</span>
+      </footer>
+    </section>
+    <section class="sign-in-intro" aria-labelledby="sign-in-product-heading">
+      <div class="sign-in-intro-inner">
+        <NuxtLink to="/" class="sign-in-brand"><BrandLogo /></NuxtLink>
+        <div>
+          <p class="sign-in-eyebrow">The modern legal workspace</p>
+          <h2 id="sign-in-product-heading">
+            From scattered documents to <span>court-ready bundles.</span>
+          </h2>
+          <p class="sign-in-product-description">
+            Organize case documents, build structured legal bundles, and automate pagination,
+            indexing, and bookmarks in one workspace.
+          </p>
+        </div>
+        <PortalSignInWorkflow />
+      </div>
+    </section>
+  </main>
 </template>
+
+<style scoped src="../assets/css/sign-in.css"></style>

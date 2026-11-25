@@ -21,6 +21,12 @@ Case files, working copies, recognised text and finished bundles stay on your de
 
 ## Product workflows and examples
 
+### Keep case files on your computer
+
+Process documents on your computer and save encrypted matter backups. MatterDraft encrypts case files and working copies in the local vault.
+
+[See this workflow on the website](https://matterdraft.legal/#local-processing)
+
 ### Import and organise
 
 Import PDFs and images into a matter. Group documents into parts, select which papers go into the bundle, and choose their order. Keep other documents in the matter for reference.
@@ -114,6 +120,12 @@ Add the annexure to the matter, include it in the bundle and place it in the rig
 No. Case files, recognised text and finished bundles stay on your computer. Early access, account services and support run through the website.
 
 [Read the Privacy Policy](https://matterdraft.legal/privacy)
+
+### Which files does MatterDraft Studio encrypt?
+
+MatterDraft encrypts files in your local workspace and the .matterdraft backups you save. For a PDF you export separately, choose password protection when you need an encrypted copy. Standard PDF and ZIP exports can be opened without a password.
+
+[See how MatterDraft protects your files](https://matterdraft.legal/#local-processing)
 
 ### What platforms does MatterDraft Studio run on?
 

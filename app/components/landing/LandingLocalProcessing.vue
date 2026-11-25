@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { featureHeadings } from '~/data/feature-headings'
 import SectionHeading from './SectionHeading.vue'
-const shortcuts = [
-  ['O', 'Open Matter'],
-  ['S', 'Save Local'],
-  ['F', 'Search Bundle'],
-  ['P', 'Print / Export'],
+const protections = [
+  [
+    'Encrypted workspace',
+    'MatterDraft encrypts case files and working copies stored in your local vault.',
+  ],
+  [
+    'Encrypted matter backups',
+    'Save a .matterdraft backup and restore it with the PIN or recovery key used to protect it.',
+  ],
+  ['Originals stay intact', 'Edit working copies while keeping the files you imported intact.'],
 ]
-const modifier = ref('Ctrl')
-onMounted(() => {
-  if (/Mac|iPhone|iPad/.test(navigator.platform)) modifier.value = '⌘'
-})
 </script>
 <template>
   <section id="local-processing" class="studio-section">
@@ -24,17 +25,12 @@ onMounted(() => {
           Read the Privacy Policy
         </NuxtLink>
       </div>
-      <div class="panel shortcut-panel" data-enter>
-        <strong>Everyday desktop essentials</strong>
-        <dl>
-          <div v-for="[key, name] in shortcuts" :key="key">
-            <dt>
-              <kbd>{{ modifier }} + {{ key }}</kbd>
-            </dt>
-            <dd>{{ name }}</dd>
-          </div>
-        </dl>
-      </div>
+      <dl class="panel privacy-panel" data-enter>
+        <div v-for="[title, description] in protections" :key="title">
+          <dt>{{ title }}</dt>
+          <dd>{{ description }}</dd>
+        </div>
+      </dl>
     </div>
   </section>
 </template>

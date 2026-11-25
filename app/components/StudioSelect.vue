@@ -17,6 +17,7 @@ const props = defineProps<{
   id: string
   options: readonly (string | { value: string; label: string })[]
   placeholder?: string
+  displayLabel?: string
   clearable?: boolean
   disabled?: boolean
   name?: string
@@ -46,7 +47,8 @@ function optionLabel(value: string) {
 <template>
   <SelectRoot v-model="selection" :disabled="disabled" :name="name">
     <SelectTrigger :id="id" v-bind="$attrs" class="studio-select">
-      <SelectValue class="studio-select-value" :placeholder="placeholder" />
+      <SelectValue v-if="displayLabel" class="studio-select-value">{{ displayLabel }}</SelectValue>
+      <SelectValue v-else class="studio-select-value" :placeholder="placeholder" />
       <SelectIcon class="studio-select-icon"><ChevronDown :size="14" /></SelectIcon>
     </SelectTrigger>
     <SelectPortal>

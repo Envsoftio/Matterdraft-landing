@@ -49,6 +49,11 @@
       "link": { "label": "Read the Privacy Policy", "path": "/privacy" }
     },
     {
+      "question": "Which files does MatterDraft Studio encrypt?",
+      "answer": "MatterDraft encrypts files in your local workspace and the .matterdraft backups you save. For a PDF you export separately, choose password protection when you need an encrypted copy. Standard PDF and ZIP exports can be opened without a password.",
+      "link": { "label": "See how MatterDraft protects your files", "path": "/#local-processing" }
+    },
+    {
       "question": "What platforms does MatterDraft Studio run on?",
       "answer": "MatterDraft Studio is built for Windows and macOS."
     },
@@ -67,6 +72,11 @@
     "Users must review document content, ordering, page ranges, indexes, bookmarks and other outputs before use or filing."
   ],
   "capabilities": [
+    {
+      "title": "Keep case files on your computer",
+      "anchor": "local-processing",
+      "description": "Process documents on your computer and save encrypted matter backups. MatterDraft encrypts case files and working copies in the local vault."
+    },
     {
       "title": "Import and organise",
       "anchor": "matter-workspace",

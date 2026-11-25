@@ -42,7 +42,7 @@ export const featureHeadings = {
   local: {
     title: 'Your case files stay on your computer',
     description:
-      'MatterDraft processes files, runs OCR and creates bundles on your computer. We do not upload your documents, OCR text or finished bundles to our servers.',
+      'MatterDraft runs OCR, edits PDFs and builds bundles on your computer without uploading your documents, recognised text or finished bundles to our servers.',
   },
   outputs: {
     title: 'Save the bundle in the formats you need',

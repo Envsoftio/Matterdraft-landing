@@ -27,6 +27,7 @@ import {
   PencilLine,
   RefreshCw,
   ScanSearch,
+  ShieldCheck,
   X,
   Zap,
 } from '@lucide/vue'
@@ -107,6 +108,15 @@ function finishGesture(event: PointerEvent) {
           <ArrowDown aria-hidden="true" />
         </a>
       </div>
+      <p class="hero-privacy">
+        <a href="#local-processing">
+          <ShieldCheck :size="16" aria-hidden="true" />
+          <span
+            >Case files stay on your computer. Your workspace and matter backups are
+            encrypted.</span
+          >
+        </a>
+      </p>
       <p class="hero-offer">
         <BadgeCheck :size="16" aria-hidden="true" />
         <span>Early access signups get <strong>one month free after launch.</strong></span>
