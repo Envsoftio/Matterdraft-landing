@@ -30,6 +30,21 @@ export async function getLicenceTrial(db: Client, accountId: string, now = Date.
   return trialView(rows[0], now)
 }
 
+export async function listDesktopTrialExpiries(db: Client, userId: string) {
+  const { rows } = await db.execute({
+    sql: `SELECT t.account_id, t.expires_at
+      FROM licence_trial t JOIN account_membership m ON m.account_id = t.account_id
+      WHERE m.user_id = ? AND m.role IN ('owner', 'billing_manager')`,
+    args: [userId],
+  })
+  return {
+    serverTime: Date.now(),
+    expiries: Object.fromEntries(
+      rows.map((row) => [String(row.account_id), Number(row.expires_at)]),
+    ),
+  }
+}
+
 export async function startLicenceTrial(db: Client, accountId: string, actorId: string) {
   const now = Date.now()
   const expiresAt = now + trialDuration

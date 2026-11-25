@@ -158,8 +158,27 @@ try {
   assert.equal(profileResponse.status, 200)
   const profile = await profileResponse.json()
   assert.equal(profile.email, email)
-  assert.ok(profile.matterdraft_accounts.some((account) => account.accountType === 'personal'))
-  console.log('PASS migrated public client: sign-in, PKCE, and workspace claims')
+  const personal = profile.matterdraft_accounts.find(
+    (account) => account.accountType === 'personal',
+  )
+  assert.ok(personal)
+  assert.deepEqual(profile.matterdraft_trials.expiries, {})
+  const trialResponse = await call(`/api/accounts/${personal.id}/trial`, {
+    method: 'POST',
+    body: {},
+  })
+  assert.equal(trialResponse.status, 200)
+  const { trial } = await trialResponse.json()
+  const trialProfileResponse = await fetch(`${origin}/api/auth/oauth2/userinfo`, {
+    headers: { Authorization: `Bearer ${tokens.access_token}` },
+  })
+  assert.equal(trialProfileResponse.status, 200)
+  const trialProfile = await trialProfileResponse.json()
+  assert.deepEqual(trialProfile.matterdraft_trials.expiries, { [personal.id]: trial.expiresAt })
+  assert.ok(trialProfile.matterdraft_trials.serverTime >= trial.startedAt)
+  console.log(
+    'PASS migrated public client: sign-in, PKCE, workspace claims, and portal trial expiry',
+  )
 
   const wrongVerifier = await exchange(await codeFor(), {
     code_verifier: randomBytes(32).toString('base64url'),

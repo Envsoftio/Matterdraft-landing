@@ -3,7 +3,8 @@ import { APIError } from 'better-auth/api'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { jwt } from 'better-auth/plugins'
 import { oauthProvider } from '@better-auth/oauth-provider'
-import { db } from './db'
+import { client, db } from './db'
+import { listDesktopTrialExpiries } from '../server/utils/licence-trials'
 import { ensurePersonalAccount, listCustomerAccounts } from './customer-accounts'
 import * as schema from './auth-schema'
 import { sendAccountEmail } from './mail'
@@ -76,7 +77,11 @@ export const auth = betterAuth({
         )
           return {}
         await requireDesktopCustomer(user)
-        return { matterdraft_accounts: await listCustomerAccounts(user.id) }
+        const [accounts, trials] = await Promise.all([
+          listCustomerAccounts(user.id),
+          listDesktopTrialExpiries(client, user.id),
+        ])
+        return { matterdraft_accounts: accounts, matterdraft_trials: trials }
       },
       clientPrivileges: async ({ user }) => {
         if (!user || !user.emailVerified) return false
