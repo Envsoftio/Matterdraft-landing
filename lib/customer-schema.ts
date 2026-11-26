@@ -47,6 +47,14 @@ export const staffAccess = sqliteTable('staff_access', {
   createdAt: integer('created_at').notNull(),
 })
 
+export const accountWelcomeEmail = sqliteTable('account_welcome_email', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  attemptedAt: integer('attempted_at').notNull(),
+  sentAt: integer('sent_at'),
+})
+
 export const auditEvent = sqliteTable(
   'audit_event',
   {

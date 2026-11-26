@@ -127,6 +127,13 @@
       "when": 1795685201678,
       "tag": "0017_vault_recovery",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1795721952026,
+      "tag": "0018_account_welcome_email",
+      "breakpoints": true
     }
   ]
 }

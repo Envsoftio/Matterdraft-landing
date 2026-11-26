@@ -4,6 +4,7 @@
   "semi": false,
   "overrides": [
     { "files": "*.gs", "options": { "parser": "babel" } },
-    { "files": "*.webmanifest", "options": { "parser": "json" } }
+    { "files": "*.webmanifest", "options": { "parser": "json" } },
+    { "files": "server/assets/email/*.hbs", "options": { "parser": "html" } }
   ]
 }

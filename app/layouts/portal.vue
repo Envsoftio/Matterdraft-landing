@@ -24,6 +24,7 @@ import {
   CreditCard,
   Download,
   House,
+  LockKeyhole,
   ScrollText,
   Settings2,
 } from '@lucide/vue'
@@ -38,11 +39,15 @@ const slots = useSlots()
 const route = useRoute()
 const router = useRouter()
 const currentPath = computed(() => router.currentRoute.value.path)
-const isInternal = computed(() => route.path.startsWith('/internal/'))
 const contextRequest = useDashboardFetch('/api/portal/context', {
   key: 'portal-context',
 })
 const { data: context, error, refresh: refreshContext, pending: loadingContext } = contextRequest
+const isInternal = computed(
+  () =>
+    route.path.startsWith('/internal/') ||
+    (route.path === '/portal/security' && context.value?.isStaff === true),
+)
 async function checkAccess() {
   if (error.value && (error.value as { statusCode?: number }).statusCode === 401) {
     clearDashboardData()
@@ -392,9 +397,15 @@ async function signOut() {
                     <p class="font-semibold">{{ context?.user.name }}</p>
                     <p class="break-words text-xs text-studio-muted">{{ context?.user.email }}</p>
                   </div>
-                  <DropdownMenuSeparator class="my-1 h-px bg-studio-rule" /><DropdownMenuItem
+                  <DropdownMenuSeparator class="my-1 h-px bg-studio-rule" />
+                  <DropdownMenuItem
+                    v-if="context"
                     class="portal-menu-item"
-                    @select="signOut"
+                    @select="navigateTo('/portal/security')"
+                  >
+                    <LockKeyhole :size="16" aria-hidden="true" />Change password
+                  </DropdownMenuItem>
+                  <DropdownMenuItem class="portal-menu-item" @select="signOut"
                     ><LogOut :size="16" />Sign out</DropdownMenuItem
                   ></DropdownMenuContent
                 ></DropdownMenuPortal

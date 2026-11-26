@@ -339,8 +339,8 @@ export default applicationRoute('/api/membership/[...path]', async (event) => {
       try {
         await sendAccountEmail(
           email,
-          `Invitation to ${account.name}`,
           `${new URL(process.env.BETTER_AUTH_URL || 'http://localhost:3000').origin}/invite/${token}`,
+          { kind: 'invitation', organisationName: account.name },
         )
       } catch {
         delivery = 'failed'
@@ -497,8 +497,8 @@ export default applicationRoute('/api/membership/[...path]', async (event) => {
       try {
         await sendAccountEmail(
           email,
-          `Ownership transfer for ${account.name}`,
           `${new URL(process.env.BETTER_AUTH_URL || 'http://localhost:3000').origin}/invite/${token}`,
+          { kind: 'ownership-transfer', organisationName: account.name },
         )
       } catch {
         delivery = 'failed'

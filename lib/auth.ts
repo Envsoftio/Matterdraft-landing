@@ -16,6 +16,27 @@ if (process.env.NODE_ENV === 'production' && !process.env.BETTER_AUTH_SECRET) {
   throw new Error('BETTER_AUTH_SECRET is required in production')
 }
 
+async function sendWelcomeEmail(user: { id: string; email: string }) {
+  try {
+    // Concurrent verification requests can both reach this hook. Only one claims delivery.
+    const { rowsAffected } = await client.execute({
+      sql: `INSERT INTO account_welcome_email (user_id, attempted_at) VALUES (?, ?)
+            ON CONFLICT(user_id) DO NOTHING`,
+      args: [user.id, Date.now()],
+    })
+    if (!rowsAffected) return
+
+    await sendAccountEmail(user.email, new URL('/portal', baseURL).href, { kind: 'welcome' })
+    await client.execute({
+      sql: 'UPDATE account_welcome_email SET sent_at = ? WHERE user_id = ?',
+      args: [Date.now(), user.id],
+    })
+  } catch {
+    // Verification has already succeeded. Keep the claim if SMTP acceptance is uncertain.
+    console.error('Could not complete MatterDraft welcome email delivery', { userId: user.id })
+  }
+}
+
 async function requireDesktopCustomer(user?: { id: string; emailVerified: boolean } | null) {
   if (!user?.emailVerified || (await getStaffAccess(user.id))) {
     const message = 'Use a verified customer account to connect the desktop app.'
@@ -37,13 +58,14 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) =>
-      sendAccountEmail(user.email, 'Reset your MatterDraft password', url),
+      sendAccountEmail(user.email, url, { kind: 'password-reset' }),
   },
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: false,
     sendVerificationEmail: async ({ user, url }) =>
-      sendAccountEmail(user.email, 'Verify your MatterDraft email', url),
+      sendAccountEmail(user.email, url, { kind: 'verification' }),
+    afterEmailVerification: sendWelcomeEmail,
   },
   disabledPaths: ['/token'],
   plugins: [

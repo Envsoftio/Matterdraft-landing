@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <title>{{subject}}</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        supported-color-schemes: light dark;
+      }
+      @font-face {
+        font-family: 'Plus Jakarta Sans';
+        font-style: normal;
+        font-weight: 400 800;
+        src: url('{{origin}}/fonts/plus-jakarta-sans-latin-variable.woff2') format('woff2');
+      }
+      @media only screen and (max-width: 480px) {
+        .mail-frame {
+          padding: 24px 16px !important;
+        }
+        .mail-header,
+        .mail-content,
+        .mail-footer {
+          padding-left: 24px !important;
+          padding-right: 24px !important;
+        }
+        .mail-title {
+          font-size: 24px !important;
+          line-height: 32px !important;
+        }
+      }
+      @media (prefers-color-scheme: dark) {
+        .mail-canvas {
+          background-color: #090d16 !important;
+        }
+        .mail-card {
+          background-color: #0f172a !important;
+          border-color: #334155 !important;
+        }
+        .mail-header {
+          background-color: #0d2446 !important;
+        }
+        .mail-inset {
+          background-color: #0b1222 !important;
+          border-color: #334155 !important;
+        }
+        .mail-title,
+        .mail-org {
+          color: #f8fafc !important;
+        }
+        .mail-copy {
+          color: #cbd5e1 !important;
+        }
+        .mail-link {
+          color: #7dd3fc !important;
+        }
+      }
+    </style>
+    <!--[if mso]>
+      <style>
+        body,
+        table,
+        td,
+        a,
+        h1,
+        p {
+          font-family: 'Segoe UI', sans-serif !important;
+        }
+      </style>
+    <![endif]-->
+  </head>
+  <body
+    class="mail-canvas"
+    style="
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7fc;
+      font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    "
+  >
+    <div
+      aria-hidden="true"
+      style="
+        display: none;
+        max-height: 0;
+        max-width: 0;
+        overflow: hidden;
+        opacity: 0;
+        mso-hide: all;
+      "
+    >
+      {{preheader}}
+    </div>
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      bgcolor="#f4f7fc"
+      class="mail-canvas"
+      style="background-color: #f4f7fc"
+    >
+      <tr>
+        <td align="center" class="mail-frame" style="padding: 48px 24px">
+          <!--[if mso]><table role="presentation" width="584" cellspacing="0" cellpadding="0" border="0"><tr><td><![endif]-->
+          <table
+            role="presentation"
+            width="100%"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            style="width: 100%; max-width: 584px; table-layout: fixed"
+          >
+            <tr>
+              <td>
+                <table
+                  role="presentation"
+                  width="100%"
+                  cellspacing="0"
+                  cellpadding="0"
+                  border="0"
+                  bgcolor="#ffffff"
+                  class="mail-card"
+                  style="
+                    width: 100%;
+                    table-layout: fixed;
+                    background-color: #ffffff;
+                    border: 1px solid #d0dcef;
+                    border-radius: 16px;
+                  "
+                >
+                  <tr>
+                    <td
+                      bgcolor="#071b37"
+                      class="mail-header"
+                      style="
+                        padding: 24px 40px;
+                        background-color: #071b37;
+                        border-radius: 15px 15px 0 0;
+                      "
+                    >
+                      <img
+                        src="{{origin}}/brand/studio-wordmark-dark.png"
+                        width="184"
+                        height="39"
+                        alt="MatterDraft Studio"
+                        style="
+                          display: block;
+                          width: 184px;
+                          max-width: 100%;
+                          height: auto;
+                          border: 0;
+                          color: #ffffff;
+                          font-size: 16px;
+                          font-weight: 700;
+                        "
+                      />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="mail-content" style="padding: 32px 40px">
+                      <h1
+                        class="mail-title"
+                        style="
+                          margin: 0 0 12px;
+                          color: #0a2a54;
+                          font-size: 30px;
+                          line-height: 36px;
+                          font-weight: 700;
+                          letter-spacing: -0.03em;
+                        "
+                      >
+                        {{heading}}
+                      </h1>
+                      <p
+                        class="mail-copy"
+                        style="margin: 0 0 24px; color: #44474e; font-size: 16px; line-height: 24px"
+                      >
+                        {{message}}
+                      </p>
+                      {{#if organisationName}}
+                      <table
+                        role="presentation"
+                        width="100%"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        style="width: 100%; table-layout: fixed"
+                      >
+                        <tr>
+                          <td
+                            bgcolor="#eff4ff"
+                            class="mail-inset"
+                            style="
+                              padding: 12px 16px;
+                              background-color: #eff4ff;
+                              border: 1px solid #dce5f5;
+                              border-radius: 8px;
+                            "
+                          >
+                            <p
+                              class="mail-copy"
+                              style="
+                                margin: 0 0 4px;
+                                color: #44474e;
+                                font-size: 12px;
+                                line-height: 16px;
+                              "
+                            >
+                              Organisation
+                            </p>
+                            <p
+                              class="mail-org"
+                              style="
+                                margin: 0;
+                                color: #0a2a54;
+                                font-size: 16px;
+                                line-height: 24px;
+                                font-weight: 700;
+                                overflow-wrap: anywhere;
+                              "
+                            >
+                              {{organisationName}}
+                            </p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td height="24" style="font-size: 0; line-height: 0">&nbsp;</td>
+                        </tr>
+                      </table>
+                      {{/if}}
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                        <tr>
+                          <td
+                            bgcolor="#1156da"
+                            style="
+                              background-color: #1156da;
+                              border-radius: 8px;
+                              mso-padding-alt: 12px 24px;
+                            "
+                          >
+                            <a
+                              href="{{url}}"
+                              style="
+                                display: inline-block;
+                                padding: 12px 24px;
+                                border-radius: 8px;
+                                background-color: #1156da;
+                                color: #ffffff;
+                                font-size: 16px;
+                                line-height: 24px;
+                                font-weight: 700;
+                                text-decoration: none;
+                                mso-padding-alt: 0;
+                              "
+                              >{{action}}</a
+                            >
+                          </td>
+                        </tr>
+                      </table>
+                      <table
+                        role="presentation"
+                        width="100%"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        style="width: 100%; table-layout: fixed"
+                      >
+                        <tr>
+                          <td height="24" style="font-size: 0; line-height: 0">&nbsp;</td>
+                        </tr>
+                        <tr>
+                          <td
+                            bgcolor="#eff4ff"
+                            class="mail-inset"
+                            style="
+                              padding: 12px 16px;
+                              background-color: #eff4ff;
+                              border: 1px solid #dce5f5;
+                              border-radius: 8px;
+                            "
+                          >
+                            <p
+                              class="mail-copy"
+                              style="
+                                margin: 0 0 4px;
+                                color: #44474e;
+                                font-size: 12px;
+                                line-height: 16px;
+                              "
+                            >
+                              If the button doesn’t work, copy and paste this link into your
+                              browser.
+                            </p>
+                            <a
+                              href="{{url}}"
+                              class="mail-link"
+                              style="
+                                color: #0054ca;
+                                font-size: 12px;
+                                line-height: 16px;
+                                text-decoration: underline;
+                                word-break: break-all;
+                                overflow-wrap: anywhere;
+                              "
+                              >{{url}}</a
+                            >
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td class="mail-footer" style="padding: 16px 40px 0">
+                <p
+                  class="mail-copy"
+                  style="margin: 0; color: #44474e; font-size: 12px; line-height: 16px"
+                >
+                  {{footer}}
+                </p>
+              </td>
+            </tr>
+          </table>
+          <!--[if mso]></td></tr></table><![endif]-->
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

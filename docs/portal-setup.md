@@ -28,7 +28,13 @@ Verified in Chrome at desktop and 390 px mobile widths, including the expanded f
 
 ## Account email
 
-The Nuxt server uses Nodemailer to send verification, password reset, organisation invitation and ownership transfer emails. It connects to `smtp.zeptomail.com` on port 587, requires STARTTLS, and authenticates as `emailapikey`. Set these variables in the ignored local `.env` for a delivery check or in the hosting server environment for deployment. [ZeptoMail SMTP setup](https://www.zoho.com/cpaas/help/smtp-home.html)
+The Nuxt server uses Nodemailer to send verification, welcome, password reset, organisation invitation and ownership transfer emails. It connects to `smtp.zeptomail.com` on port 587, requires STARTTLS, and authenticates as `emailapikey`. Set these variables in the ignored local `.env` for a delivery check or in the hosting server environment for deployment. [ZeptoMail SMTP setup](https://www.zoho.com/cpaas/help/smtp-home.html)
+
+Account emails use `server/assets/email/account-email.hbs`. With SMTP disabled in development, the preview JSON includes the rendered `html` and plain `text`. To see the design in a browser, save the `html` value as a local `.html` file and open it while the Nuxt server is running. Preview files contain private account links.
+
+Apply migration `0018_account_welcome_email.sql` before deploying. Successful email verification claims one welcome email per account. Delivery failure is logged after verification, and the account can still sign in.
+
+Signed-in users can change their password from the profile menu. The portal checks the current password and ends other portal sessions. **Forgot password?** on the sign-in page sends a reset link.
 
 | Variable | Value |
 | --- | --- |
