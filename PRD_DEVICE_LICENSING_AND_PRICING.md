@@ -102,8 +102,8 @@ The owner selected a seven-day trial and requested strong protection across lice
 
 Implementation defaults proposed for the selected trial:
 
-- Start at the first successful desktop activation, with a server-recorded UTC end exactly 168 hours later. A retried activation returns the original grant and expiry. Reinstall, transfer and refresh never restart the trial. The existing Nuxt portal starts the clock when the account owner clicks **Start free trial**. The proposed behaviour requires a change to that flow.
-- Require a verified account and online activation; allow one trial grant per account and one active trial device. Rate-limit grant and recovery operations. Multiple accounts remain an abuse limitation; do not introduce invasive hardware fingerprinting to claim otherwise.
+- Start at the first successful desktop activation, with a server-recorded UTC end exactly 168 hours later. A retried activation issues a signed grant with the original expiry. Reinstall, transfer and refresh never restart the trial. The desktop requests activation when the verified owner opens the workspace after signing in.
+- Require a verified account and online activation; allow one trial period per account across devices. Rate-limit grant and recovery operations. Multiple accounts remain an abuse limitation; do not introduce invasive hardware fingerprinting to claim otherwise.
 - Offer core preparation and export features without a payment method or artificial page quota. These are proposed trial defaults, not published customer terms.
 - Allow offline work within the signed trial validity. Trial expiry receives no automatic paid-plan connectivity grace. Display the exact local expiry time and warnings in advance.
 - Preserve reading, backups and retrieval of previously generated files after expiry. Gate new matter creation, import, edits, OCR, builds and newly generated exports until activation or renewal.

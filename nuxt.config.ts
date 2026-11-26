@@ -7,6 +7,7 @@ const settings = loadSiteConfig()
 const seoHeaders = discoveryHeaders(settings)
 
 export default defineNuxtConfig({
+  buildDir: process.env.MATTERDRAFT_LOCAL_TRIAL_BUILD_DIR || '.nuxt',
   compatibilityDate: '2026-10-30',
   devtools: { enabled: false },
   telemetry: false,

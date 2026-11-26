@@ -1,6 +1,6 @@
 // Opt-in checks against an isolated local portal, never a hosted database.
 import assert from 'node:assert/strict'
-import { createHash, generateKeyPairSync, randomBytes, randomUUID, sign, verify } from 'node:crypto'
+import { createHash, randomBytes, randomUUID, verify } from 'node:crypto'
 import { createClient } from '@libsql/client'
 
 const origin = process.env.PORTAL_CHECK_URL || 'http://127.0.0.1:3012'
@@ -90,7 +90,7 @@ try {
     method: 'POST',
     body: { name: 'Desktop verification', email, password },
   })
-  assert.equal(signup.status, 200)
+  assert.equal(signup.status, 200, await signup.clone().text())
   const user = (await db.execute({ sql: 'SELECT id FROM user WHERE email = ?', args: [email] }))
     .rows[0]
   assert.ok(user, 'The server must use this disposable database')
@@ -201,34 +201,18 @@ try {
 
   const trialVerifyKey = process.env.PORTAL_CHECK_TRIAL_PUBLIC_KEY
   if (trialVerifyKey) {
-    const device = generateKeyPairSync('ed25519')
-    const publicKey = device.publicKey
-      .export({ format: 'der', type: 'spki' })
-      .subarray(-32)
-      .toString('base64url')
-    const requestTrial = (body, token = tokens.access_token) =>
+    const requestTrial = (token = tokens.access_token) =>
       fetch(`${origin}/api/desktop/trial`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ accountId: personal.id, ...body }),
+        body: JSON.stringify({ accountId: personal.id, action: 'activate' }),
       })
-    assert.equal((await requestTrial({ action: 'challenge', publicKey }, '')).status, 401)
-    assert.equal(
-      (await requestTrial({ action: 'challenge', publicKey }, 'invalid-token')).status,
-      401,
-    )
-    const challenge = await requestTrial({ action: 'challenge', publicKey })
-    assert.equal(challenge.status, 200, await challenge.clone().text())
-    const { nonce } = await challenge.json()
-    const proof = sign(
-      null,
-      Buffer.from(`matterdraft-desktop-trial-proof-v1:${nonce}`),
-      device.privateKey,
-    ).toString('base64url')
-    const activation = await requestTrial({ action: 'activate', nonce, proof })
+    assert.equal((await requestTrial('')).status, 401)
+    assert.equal((await requestTrial('invalid-token')).status, 401)
+    const activation = await requestTrial()
     assert.equal(activation.status, 200, await activation.clone().text())
     const { status, grant, expiresAt, serverTime } = await activation.json()
     assert.equal(status, 'active')
@@ -247,8 +231,10 @@ try {
         Buffer.from(signature, 'base64url'),
       ),
     )
-    assert.equal((await requestTrial({ action: 'activate', nonce, proof })).status, 403)
-    console.log('PASS desktop OAuth routes issue a signed device-bound grant and reject replay')
+    const repeated = await requestTrial()
+    assert.equal(repeated.status, 200)
+    assert.equal((await repeated.json()).expiresAt, expiresAt)
+    console.log('PASS desktop OAuth routes issue a signed account grant and preserve expiry on retry')
   }
 
   const wrongVerifier = await exchange(await codeFor(), {

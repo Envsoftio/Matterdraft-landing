@@ -77,11 +77,11 @@ For a focused regression run against an isolated local server, run `PORTAL_CHECK
 
 ### Desktop trial activation
 
-Apply migration `0016_desktop_trial_activation.sql` before enabling activation. Set `DESKTOP_TRIAL_SIGNING_KEY_ID` and provide the Ed25519 PKCS#8 PEM in the server secret `DESKTOP_TRIAL_SIGNING_KEY`. Set `LICENCE_TRIALS_ENABLED=true` to allow desktop owners to start new trials. An existing portal trial keeps its original expiry.
+Desktop activation uses the existing account trial records. Set `DESKTOP_TRIAL_SIGNING_KEY_ID` and provide the Ed25519 PKCS#8 PEM in the server secret `DESKTOP_TRIAL_SIGNING_KEY`. Set `LICENCE_TRIALS_ENABLED=true` to allow desktop owners to start new trials. An existing portal trial keeps its original expiry.
 
-Build the macOS app with `MATTERDRAFT_TRIAL_VERIFY_KEYS` set to the matching key ID and unpadded base64url encoding of the raw 32-byte Ed25519 public key, in the form `key-id:public-key`. The build accepts a comma-separated list for overlapping key rotations. Keep the private key on the server. For the isolated OAuth smoke test, set `PORTAL_CHECK_TRIAL_PUBLIC_KEY` to the matching public PEM to exercise challenge, activation and replay rejection.
+Build the macOS app with `MATTERDRAFT_TRIAL_VERIFY_KEYS` set to the matching key ID and unpadded base64url encoding of the raw 32-byte Ed25519 public key, in the form `key-id:public-key`. The build accepts a comma-separated list for overlapping key rotations. Keep the private key on the server. For the isolated OAuth smoke test, set `PORTAL_CHECK_TRIAL_PUBLIC_KEY` to the matching public PEM to exercise activation and verify that retries keep the original expiry.
 
-New trials start only after desktop activation. The former portal trial-start POST returns 404, and the portal continues showing existing trial dates. Configure the matching GitHub repository variable `MATTERDRAFT_TRIAL_VERIFY_KEYS` before releasing the macOS package. Verify the staged portal and packaged app together before distributing the enforced build.
+The desktop starts or resumes the trial when the owner opens the workspace after signing in. For local testing, run `./dev.sh --local-trial` from the desktop checkout to start a loopback portal with an isolated database and matching signing and verification keys. Use a synthetic account and local mail previews. The former portal trial-start POST returns 404, and the portal continues showing existing trial dates. Configure the matching GitHub repository variable `MATTERDRAFT_TRIAL_VERIFY_KEYS` before releasing the macOS package. Verify the staged portal and packaged app together before distributing the enforced build. Roll out the desktop and portal together. An updated desktop can still read its cached device-bound grant until expiry, while older builds need the desktop update to activate against this portal.
 
 
 ## Deployment prerequisites
