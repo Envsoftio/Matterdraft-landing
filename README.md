@@ -80,6 +80,20 @@ The content generator and Nuxt configuration use the same settings loader. It re
 
 **All `NUXT_PUBLIC_*` values are public.** Never put passwords or secret API keys in them.
 
+### Desktop vault recovery
+
+Apply migration `0017_vault_recovery` before enabling account recovery. Set
+`DESKTOP_VAULT_RECOVERY_ENCRYPTION_KEY` in the portal secret store to a dedicated 32-byte
+hexadecimal secret. Generate it with `openssl rand -hex 32` and keep a secure backup
+separate from the database. Existing ciphertext requires this secret, so retain it
+until records have been re-encrypted during a key rotation.
+
+The desktop saves a copy of the vault recovery key after the vault opens. The portal
+stores it encrypted with AES-256-GCM and releases it only to the verified desktop user
+with current workspace membership and a correct account password. Releases are audited.
+Matter files stay local. Account recovery requires a previously saved key and access to
+the encrypted vault files.
+
 ### Early access with Google Sheets
 
 The on-page form submits to the existing Google Apps Script receiver through `/.netlify/functions/early-access`. A GET checks whether the running server has the webhook URL and shared secret. A POST validates the fields and waits for the receiver to confirm the Sheet write. Only the availability flag and submission result reach the browser.

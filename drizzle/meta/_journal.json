@@ -120,6 +120,13 @@
       "when": 1795636267314,
       "tag": "0016_desktop_trial_activation",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1795685201678,
+      "tag": "0017_vault_recovery",
+      "breakpoints": true
     }
   ]
 }

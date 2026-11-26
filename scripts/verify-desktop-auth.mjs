@@ -180,6 +180,30 @@ try {
     'PASS migrated public client: sign-in, PKCE, workspace claims, and portal trial expiry',
   )
 
+  if (process.env.PORTAL_CHECK_VAULT_RECOVERY === 'true') {
+    const vaultId = randomBytes(32).toString('hex')
+    const recoveryKey = randomBytes(32).toString('hex')
+    const vaultRequest = (body, token = tokens.access_token) =>
+      fetch(`${origin}/api/desktop/vault-recovery`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ accountId: personal.id, vaultId, ...body }),
+      })
+    assert.equal((await vaultRequest({ action: 'save', recoveryKey }, '')).status, 401)
+    const saved = await vaultRequest({ action: 'save', recoveryKey })
+    assert.equal(saved.status, 200, await saved.clone().text())
+    assert.deepEqual(await saved.json(), { saved: true })
+    assert.equal((await vaultRequest({ action: 'recover', password: 'incorrect' })).status, 403)
+    const recovered = await vaultRequest({ action: 'recover', password })
+    assert.equal(recovered.status, 200, await recovered.clone().text())
+    assert.match(recovered.headers.get('cache-control'), /no-store/)
+    assert.equal((await recovered.json()).recoveryKey === recoveryKey, true)
+    console.log('PASS desktop vault recovery requires the current account password')
+  }
+
   const trialVerifyKey = process.env.PORTAL_CHECK_TRIAL_PUBLIC_KEY
   if (trialVerifyKey) {
     const device = generateKeyPairSync('ed25519')

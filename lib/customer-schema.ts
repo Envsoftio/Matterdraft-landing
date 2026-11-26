@@ -278,3 +278,27 @@ export const desktopDownload = sqliteTable(
   },
   (table) => [index('desktop_download_requested_idx').on(table.requestedAt, table.id)],
 )
+
+export const vaultRecoveryKey = sqliteTable(
+  'vault_recovery_key',
+  {
+    accountId: text('account_id')
+      .notNull()
+      .references(() => customerAccount.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    vaultId: text('vault_id').notNull(),
+    ciphertext: text('ciphertext').notNull(),
+    createdAt: integer('created_at').notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.accountId, table.userId, table.vaultId] })],
+)
+
+export const vaultRecoveryAttempt = sqliteTable('vault_recovery_attempt', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  windowStartedAt: integer('window_started_at').notNull(),
+  attempts: integer('attempts').notNull(),
+})
