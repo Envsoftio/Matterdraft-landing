@@ -197,19 +197,6 @@ onMounted(() => {
     { immediate: true },
   )
 })
-
-async function startTrial() {
-  busy.value = true
-  problem.value = ''
-  try {
-    await $fetch(`/api/accounts/${accountId}/trial`, { method: 'POST', body: {} })
-    await refresh()
-  } catch (reason) {
-    problem.value = parseApiError(reason).text
-  } finally {
-    busy.value = false
-  }
-}
 </script>
 
 <template>
@@ -324,21 +311,11 @@ async function startTrial() {
               <NuxtTime :datetime="trial.expiresAt" date-style="medium" time-style="short" />.
             </p>
             <p v-else class="body-6">
-              Your trial begins when you start it. No payment details required.
+              Activate your trial in MatterDraft Studio on your computer. No payment details
+              required.
             </p>
           </div>
-          <button
-            v-if="data.canStartTrial"
-            type="button"
-            class="portal-button-secondary button-sm"
-            :disabled="busy"
-            :aria-busy="busy"
-            @click="startTrial()"
-          >
-            Start free trial
-          </button>
           <span
-            v-else
             class="customer-status caption-3"
             :class="trial.status === 'active' ? 'status-positive' : undefined"
             >{{

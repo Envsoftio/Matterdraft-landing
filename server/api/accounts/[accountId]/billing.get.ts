@@ -29,7 +29,7 @@ export default applicationRoute('/api/accounts/[accountId]/billing', async (even
     maxDeviceQuantity,
     plans: plans.map(publicPlan),
     discounts: discounts.map(publicDiscount),
-    trial: trialsEnabled || trial.status !== 'available' ? trial : null,
-    canStartTrial: trialsEnabled && account.role === 'owner' && trial.status === 'available',
+    trial:
+      trial.status !== 'available' || (trialsEnabled && account.role === 'owner') ? trial : null,
   }
 })

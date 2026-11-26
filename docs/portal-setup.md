@@ -81,6 +81,8 @@ Apply migration `0016_desktop_trial_activation.sql` before enabling activation. 
 
 Build the macOS app with `MATTERDRAFT_TRIAL_VERIFY_KEYS` set to the matching key ID and unpadded base64url encoding of the raw 32-byte Ed25519 public key, in the form `key-id:public-key`. The build accepts a comma-separated list for overlapping key rotations. Keep the private key on the server. For the isolated OAuth smoke test, set `PORTAL_CHECK_TRIAL_PUBLIC_KEY` to the matching public PEM to exercise challenge, activation and replay rejection.
 
+New trials start only after desktop activation. The former portal trial-start POST returns 404, and the portal continues showing existing trial dates. Configure the matching GitHub repository variable `MATTERDRAFT_TRIAL_VERIFY_KEYS` before releasing the macOS package. Verify the staged portal and packaged app together before distributing the enforced build.
+
 
 ## Deployment prerequisites
 

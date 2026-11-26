@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Check, ChevronRight, CreditCard, Download, LifeBuoy, ScrollText, Users } from '@lucide/vue'
-import { parseApiError } from '~/utils/api-error'
 
 definePageMeta({
   layout: false,
@@ -13,20 +12,17 @@ const accountId = String(route.params.accountId)
 const accountPath = `/a/${accountId}`
 const { data, error, refresh, pending } = useDashboardFetch(`/api/accounts/${accountId}/overview`)
 const trial = computed(() => data.value?.trial)
-const busy = ref(false)
-const problem = ref('')
-const accessHeading = ref<HTMLElement | null>(null)
 
 const accessTitle = computed(() => {
   if (trial.value?.status === 'active') return 'Your trial is active'
   if (trial.value?.status === 'ended') return 'Your trial has ended'
-  if (data.value?.canStartTrial) return 'Start your free trial'
+  if (data.value?.canActivateDesktopTrial) return 'Activate your trial in MatterDraft Studio'
   return 'Use the desktop app'
 })
 const accessStatus = computed(() => {
   if (trial.value?.status === 'active') return 'Trial active'
   if (trial.value?.status === 'ended') return 'Trial ended'
-  if (data.value?.canStartTrial) return 'Not started'
+  if (data.value?.canActivateDesktopTrial) return 'Not started'
   return ''
 })
 const roleLabel = computed(() => {
@@ -76,27 +72,6 @@ const workspaceLinks = computed(() => {
   })
   return links
 })
-
-async function startTrial() {
-  if (busy.value) return
-  busy.value = true
-  problem.value = ''
-  try {
-    await $fetch(`/api/accounts/${accountId}/trial`, { method: 'POST', body: {} })
-    const restoreFocus =
-      document.activeElement === document.body ||
-      document.activeElement?.classList.contains('workspace-primary')
-    await refresh()
-    if (restoreFocus) {
-      await nextTick()
-      accessHeading.value?.focus()
-    }
-  } catch (cause) {
-    problem.value = parseApiError(cause).text
-  } finally {
-    busy.value = false
-  }
-}
 </script>
 
 <template>
@@ -140,12 +115,12 @@ async function startTrial() {
               </div>
               <div class="dashboard-access-body">
                 <div aria-live="polite">
-                  <h3 id="workspace-access" ref="accessHeading" tabindex="-1" class="heading-5">
+                  <h3 id="workspace-access" class="heading-5">
                     {{ accessTitle }}
                   </h3>
-                  <p v-if="data.canStartTrial" class="body-3">
-                    Your seven days begin immediately. Start when you’re ready to use the desktop
-                    app.
+                  <p v-if="data.canActivateDesktopTrial" class="body-3">
+                    Sign in to MatterDraft Studio and activate your seven-day trial on your
+                    computer.
                   </p>
                   <p v-else-if="trial?.status === 'active'" class="body-3">
                     Open MatterDraft Studio on your computer and sign in with this account. Full
@@ -171,24 +146,13 @@ async function startTrial() {
                     </template>
                   </p>
                 </div>
-                <button
-                  v-if="data.canStartTrial"
-                  type="button"
-                  class="workspace-primary button-sm"
-                  :disabled="busy"
-                  :aria-busy="busy"
-                  @click="startTrial"
-                >
-                  {{ busy ? 'Starting…' : 'Start free trial' }}
-                </button>
                 <NuxtLink
-                  v-else-if="trial?.status === 'ended' && data.canBill"
+                  v-if="trial?.status === 'ended' && data.canBill"
                   :to="`${accountPath}/billing`"
                   class="workspace-primary button-sm"
                 >
                   View plans
                 </NuxtLink>
-                <p v-if="problem" class="portal-error" role="alert">{{ problem }}</p>
               </div>
             </section>
 

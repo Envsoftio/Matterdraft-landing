@@ -26,7 +26,8 @@ export default applicationRoute('/api/accounts/[accountId]/overview', async (eve
     memberCount: members ? Number(members.rows[0]?.count || 0) : null,
     canBill,
     trial: trial && (trialsEnabled || trial.status !== 'available') ? trial : null,
-    canStartTrial: trialsEnabled && account.role === 'owner' && trial?.status === 'available',
+    canActivateDesktopTrial:
+      trialsEnabled && account.role === 'owner' && trial?.status === 'available',
     plans: plans
       .slice(0, 3)
       .map(publicPlan)

@@ -167,18 +167,13 @@ try {
     method: 'POST',
     body: {},
   })
-  assert.equal(trialResponse.status, 200)
-  const { trial } = await trialResponse.json()
+  assert.equal(trialResponse.status, 404)
   const trialProfileResponse = await fetch(`${origin}/api/auth/oauth2/userinfo`, {
     headers: { Authorization: `Bearer ${tokens.access_token}` },
   })
   assert.equal(trialProfileResponse.status, 200)
-  const trialProfile = await trialProfileResponse.json()
-  assert.deepEqual(trialProfile.matterdraft_trials.expiries, { [personal.id]: trial.expiresAt })
-  assert.ok(trialProfile.matterdraft_trials.serverTime >= trial.startedAt)
-  console.log(
-    'PASS migrated public client: sign-in, PKCE, workspace claims, and portal trial expiry',
-  )
+  assert.deepEqual((await trialProfileResponse.json()).matterdraft_trials.expiries, {})
+  console.log('PASS migrated public client and retired portal trial-start route')
 
   if (process.env.PORTAL_CHECK_VAULT_RECOVERY === 'true') {
     const vaultId = randomBytes(32).toString('hex')
@@ -235,9 +230,14 @@ try {
     ).toString('base64url')
     const activation = await requestTrial({ action: 'activate', nonce, proof })
     assert.equal(activation.status, 200, await activation.clone().text())
-    const { status, grant, expiresAt } = await activation.json()
+    const { status, grant, expiresAt, serverTime } = await activation.json()
     assert.equal(status, 'active')
-    assert.equal(expiresAt, trial.expiresAt)
+    assert.equal(expiresAt - serverTime, 7 * 24 * 60 * 60 * 1000)
+    const updatedProfile = await fetch(`${origin}/api/auth/oauth2/userinfo`, {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
+    })
+    assert.equal(updatedProfile.status, 200)
+    assert.equal((await updatedProfile.json()).matterdraft_trials.expiries[personal.id], expiresAt)
     const [header, payload, signature] = grant.split('.')
     assert.ok(
       verify(
