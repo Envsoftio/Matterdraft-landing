@@ -25,7 +25,8 @@ const installer = computed(
     data.value?.installers.find((entry) => entry.platform === platform.value) ??
     data.value?.installers[0],
 )
-const isMac = computed(() => installer.value?.platform !== 'windows-x64')
+const isMac = computed(() => installer.value?.platform.startsWith('macos-'))
+const isLinux = computed(() => installer.value?.platform === 'linux-x64')
 const busy = ref(false)
 const message = ref('')
 const downloadRequested = ref(false)
@@ -37,12 +38,15 @@ watch(platform, () => {
 
 async function download() {
   if (!installer.value || busy.value) return
-  const { platform, version } = installer.value
+  const { platform, version, releaseTag } = installer.value
   busy.value = true
   message.value = ''
   downloadRequested.value = false
   try {
-    const { url } = await $fetch(downloadPath, { method: 'POST', body: { platform, version } })
+    const { url } = await $fetch(downloadPath, {
+      method: 'POST',
+      body: { platform, version, releaseTag },
+    })
     const link = document.createElement('a')
     link.href = url
     link.rel = 'noreferrer'
@@ -100,9 +104,7 @@ async function download() {
                     <span class="title-4">{{
                       desktopDownloadPlatforms[option.platform].label
                     }}</span>
-                    <span class="installer-extension caption-5"
-                      >.{{ desktopDownloadPlatforms[option.platform].extension }}</span
-                    >
+                    <span class="installer-extension caption-5">.{{ option.extension }}</span>
                   </label>
                 </fieldset>
                 <div class="installer-selection" aria-live="polite">
@@ -112,12 +114,20 @@ async function download() {
                       <dd>{{ installer.version }}</dd>
                     </div>
                     <div>
+                      <dt>Build</dt>
+                      <dd>{{ installer.releaseTag }}</dd>
+                    </div>
+                    <div>
                       <dt>Requirements</dt>
                       <dd>{{ installer.requirements }}</dd>
                     </div>
                   </dl>
                   <p v-if="installer.notarized === false" class="customer-muted body-6">
                     This version has not been notarized by Apple.
+                  </p>
+                  <p v-if="installer.unsigned" class="customer-muted body-6">
+                    This is an unsigned preview. Your computer may ask you to confirm installation.
+                    Updates are installed manually.
                   </p>
                 </div>
                 <div class="customer-form-actions">
@@ -152,8 +162,15 @@ async function download() {
                   ><span>Use the same email address you used here.</span>
                 </li>
               </ol>
+              <ol v-else-if="isLinux" class="installation-steps body-6">
+                <li><strong>Download the .AppImage file.</strong></li>
+                <li><strong>Allow the file to run as a program.</strong></li>
+                <li><strong>Open MatterDraft Studio and sign in.</strong></li>
+              </ol>
               <ol v-else class="installation-steps body-6">
-                <li><strong>Open the downloaded .msi file.</strong></li>
+                <li>
+                  <strong>Open the downloaded .{{ installer.extension }} file.</strong>
+                </li>
                 <li><strong>Follow the installation wizard.</strong></li>
                 <li>
                   <strong>Open MatterDraft Studio from the Start menu.</strong

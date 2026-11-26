@@ -362,42 +362,46 @@ try {
   )
   const catalog = await api(owner, installerApi)
   if (process.env.PORTAL_CHECK_INSTALLERS === '1') {
-    const sample = { platform: 'macos-arm64', version: '1.2.3' }
-    assert.equal(catalog.installers.length, 3)
-    assert.ok(catalog.installers.every((entry) => !Object.hasOwn(entry, 'objectKey')))
+    const sample = { platform: 'macos-arm64', version: '0.1.1', releaseTag: 'v0.1.1-unsigned.7' }
+    assert.equal(catalog.installers.length, 4)
+    assert.ok(catalog.installers.every((entry) => !Object.hasOwn(entry, 'url')))
+    assert.ok(catalog.installers.every((entry) => entry.unsigned))
     await api(owner, installerApi, 'POST', sample, 403, { Origin: 'https://other.example.test' })
     await api(owner, installerApi, 'POST', { ...sample, version: '0.1.0' }, 409)
-    await api(owner, installerApi, 'POST', { ...sample, platform: 'macos-x64' }, 503)
+    await api(owner, installerApi, 'POST', { ...sample, releaseTag: 'v0.1.1-unsigned.6' }, 409)
     await screen(owner, installerPage, 'installer-mac')
     await owner.page
       .getByText('Drag', { exact: false })
       .filter({ hasText: 'into Applications' })
       .waitFor()
-    const installerHost = 'https://matterdraft-portal-test.s3.ap-south-1.amazonaws.com/'
+    const installerHost = 'https://github.com/Envsoftio/advocate_app/releases/download/'
     await owner.page.route(installerHost + '**', async (intercept) => {
       const downloadUrl = new URL(intercept.request().url())
-      assert.equal(downloadUrl.searchParams.get('X-Amz-Expires'), '120')
-      assert.match(downloadUrl.searchParams.get('X-Amz-Signature'), /^[a-f0-9]{64}$/)
-      assert.ok(!intercept.request().headers().referer)
+      assert.equal(downloadUrl.pathname.split('/')[5], 'v0.1.1-unsigned.7')
       await intercept.fulfill({
         status: 200,
         contentType: 'application/octet-stream',
         headers: {
-          'Content-Disposition': downloadUrl.searchParams.get('response-content-disposition'),
+          'Content-Disposition': `attachment; filename="${downloadUrl.pathname.split('/').at(-1)}"`,
         },
-        body: 'isolated installer test fixture',
+        body: 'isolated GitHub release fixture',
       })
     })
     for (const fixture of [
       {
         label: 'Mac with Apple silicon',
         step: 'Open the downloaded .dmg file.',
-        package: 'macos-arm64.dmg',
+        package: 'macOS-arm64-unsigned.dmg',
       },
       {
         label: 'Windows 64-bit',
         step: 'Follow the installation wizard.',
-        package: 'windows-x64.msi',
+        package: 'Windows-x64-unsigned.exe',
+      },
+      {
+        label: 'Linux 64-bit',
+        step: 'Allow the file to run as a program.',
+        package: 'Linux-x64-unsigned.AppImage',
       },
     ]) {
       await owner.page.getByRole('radio', { name: fixture.label }).check()
@@ -406,8 +410,8 @@ try {
         owner.page.waitForEvent('download'),
         owner.page.getByRole('button', { name: 'Download installer' }).click(),
       ])
-      assert.equal(transfer.suggestedFilename(), `MatterDraft-Studio-1.2.3-${fixture.package}`)
-      assert.equal(await readFile(await transfer.path(), 'utf8'), 'isolated installer test fixture')
+      assert.equal(transfer.suggestedFilename(), `MatterDraft-Studio-0.1.1-${fixture.package}`)
+      assert.equal(await readFile(await transfer.path(), 'utf8'), 'isolated GitHub release fixture')
     }
     const downloads = await db.execute({
       sql: 'SELECT platform, version FROM desktop_download WHERE user_id = ? ORDER BY platform',
@@ -416,13 +420,14 @@ try {
     assert.deepEqual(
       downloads.rows.map(({ platform, version }) => [platform, version]),
       [
-        ['macos-arm64', '1.2.3'],
-        ['windows-x64', '1.2.3'],
+        ['linux-x64', 'v0.1.1-unsigned.7'],
+        ['macos-arm64', 'v0.1.1-unsigned.7'],
+        ['windows-x64', 'v0.1.1-unsigned.7'],
       ],
     )
     await owner.page.unrouteAll()
     note(
-      'Verified download authorization, storage failure, Mac and Windows package handoff and download records',
+      'Verified download authorization, release tag validation, Mac, Windows and Linux package handoff and download records',
     )
   } else {
     assert.deepEqual(catalog.installers, [])
@@ -707,7 +712,7 @@ try {
     assert.ok(recorded)
     assert.equal(recorded.email, owner.email)
     assert.equal(recorded.platform, 'windows-x64')
-    assert.equal(recorded.version, '1.2.3')
+    assert.equal(recorded.version, 'v0.1.1-unsigned.7')
     assert.ok(Math.abs(Date.now() - recorded.requestedAt) < 300000)
     await screen(staff, '/internal/downloads', 'installer-history')
     await staff.page

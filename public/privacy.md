@@ -3,7 +3,7 @@ title: Privacy Policy
 description: How MatterDraft Studio keeps legal files on your device and handles account, early access and support information.
 ---
 **Effective date:** 19 November 2026\
-**Last updated:** 19 November 2026
+**Last updated:** 26 November 2026
 
 Envsoft Solutions LLP, based in India, operates MatterDraft Studio and matterdraft.legal. This policy covers the website, account portal, and MatterDraft Studio desktop app.
 
@@ -28,7 +28,7 @@ The account portal uses cookies to keep you signed in, protect your session and 
 
 ## Service providers and disclosures
 
-Netlify hosts the website and its server functions. Turso stores account, organisation, support, and installer request records. When installers are available, Amazon S3 delivers the files. Google Apps Script and Google Sheets handle early-access registrations, and Google Forms hosts the optional survey. Our email service sends verification and password-reset messages and delivers correspondence. These providers handle the information needed for their service. Account and website information may be processed outside India.
+Netlify hosts the website and its server functions. Turso stores account, organisation, support, and installer request records. GitHub hosts public desktop preview installers. Google Apps Script and Google Sheets handle early-access registrations, and Google Forms hosts the optional survey. Our email service sends verification and password-reset messages and delivers correspondence. These providers handle the information needed for their service. Account and website information may be processed outside India.
 
 We may share relevant information when required by law or to protect legal rights. We do not sell personal information.
 

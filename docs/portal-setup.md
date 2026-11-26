@@ -47,31 +47,15 @@ See [Licence catalogue and test checkout](#licence-catalogue-and-test-checkout) 
 
 Account owners and billing managers see the published plans for their selected account in **Plans & billing**. Owners can start the trial from Home or Plans & billing. The server records a 168 hour trial and returns the original grant on retries. The trial requires no payment details and ends automatically. Device assignments, signed offline entitlements and feature enforcement require the separate desktop integration.
 
-## Private desktop installers
+## Desktop installers
 
-Home links to **Download and install** inside the signed-in workspace. The release list and download request both require a verified customer with access to that workspace. Configure only release builds that have been approved for registered customers. Pilot-only builds should stay off this release list until they are approved for that audience.
+Home links to **Download and install** inside the signed-in workspace. The server reads the newest complete unsigned prerelease from the public [`Envsoftio/advocate_app` GitHub Releases](https://github.com/Envsoftio/advocate_app/releases) API. It requires the expected Apple Silicon, Intel Mac, Windows x64 and Linux x64 installer assets with exact GitHub download URLs before offering the release. The page displays the actual `.dmg`, `.exe` or `.AppImage` file type, warns that the preview is unsigned, and explains that updates are installed manually. The server caches the release list for five minutes.
 
-1. Apply the database migrations with `npm run db:migrate`. Migration `0008_desktop_downloads.sql` adds the download history.
-2. Upload the approved package to a private Amazon S3 bucket with Block Public Access enabled. Use versioned object keys and leave old keys unchanged. Grant the portal's credentials `s3:GetObject` only for the installer objects or release prefix. From a signed-out session, confirm the unsigned object URL fails.
-3. Set the server-only `DESKTOP_DOWNLOAD_S3_BUCKET`, `DESKTOP_DOWNLOAD_S3_REGION`, `DESKTOP_DOWNLOAD_S3_ACCESS_KEY_ID`, and `DESKTOP_DOWNLOAD_S3_SECRET_ACCESS_KEY` in the hosting environment. Set `DESKTOP_DOWNLOAD_S3_SESSION_TOKEN` when credentials are temporary. Use a bucket name without dots.
-4. Set `DESKTOP_INSTALLERS` to a JSON object keyed by platform. The example below illustrates the format. Replace the example version, object key, signing status, and requirements with the approved build's values.
+The list and download request require a verified customer with access to the selected account. The request records the user, platform, exact release tag and request time in `desktop_download`; apply migration `0008_desktop_downloads.sql` with `npm run db:migrate` before deployment. Super Admins can review link requests under **Installer downloads**. The files themselves are public on GitHub, so a direct GitHub link bypasses portal sign-in and is not private distribution. The portal can record link issuance, not completed transfers or installations.
 
-```json
-{
-  "macos-arm64": {
-    "objectKey": "desktop/1.2.3/MatterDraft-aarch64.dmg",
-    "version": "1.2.3",
-    "requirements": "macOS 14 or later",
-    "notarized": true
-  }
-}
-```
+If GitHub is unavailable, the page shows an error and retry action. When there is no complete unsigned release, the page shows an unavailable state. Verify a signed-in browser download and a clean-device installation for each published build. For an isolated browser check, start the disposable Nuxt portal with `--import ./scripts/mock-github-release.mjs` immediately after `node`, then run the harness with `PORTAL_CHECK_INSTALLERS=1`. The fixture returns a synthetic release and dummy download bytes without publishing them.
 
-Available platform keys are `macos-arm64` and `macos-x64` for drag-to-Applications DMGs and `windows-x64` for an MSI. Omit platforms without an approved build. The optional `notarized` field applies only to Mac. Leave the manifest unset to show the unavailable state. The signed-in page presents install steps for the published package type.
-
-The portal checks that the object exists and records the verified user, selected platform, version, and request time before returning an S3 link valid for two minutes. Super Admins can review the records under **Installer downloads**. Records show link issuance. Installer transfers go directly through S3, so the portal cannot confirm completed transfers or installations. Verify a signed-in browser download and a clean-device installation for each published build.
-
-For local verification without AWS, add `--import ./scripts/mock-installer-storage.mjs` immediately after `node` in the isolated Nuxt start command below, then run the browser harness with `PORTAL_CHECK_INSTALLERS=1`. The fixture uses simulated storage and dummy installer contents.
+Local verification on 26 November 2026: the production build, type check, 43 unit tests, changed-file formatting and direct execution of the packaged release selector passed. The selector returned all four verified public `v0.1.1-unsigned.7` URLs and omitted the direct URLs from the list API response. The broader browser harness stopped during its production-mode account email setup before reaching downloads, so authenticated browser handoff and visual review of this change remain unverified.
 
 ## Desktop authorization contract
 
