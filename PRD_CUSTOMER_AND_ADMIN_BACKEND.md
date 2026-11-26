@@ -5,7 +5,7 @@
 **Status:** Product scope; account and administration foundation in development  
 **Related:** [Device licensing and pricing](PRD_DEVICE_LICENSING_AND_PRICING.md) · [Billing, licensing and invoice architecture](ARCHITECTURE_BILLING_AND_LICENSING.md) · [UI/UX design prompt](PROMPT_BACKEND_PORTAL_UI_UX.md)
 
-The [desktop onboarding and Apple Silicon pilot PRD](PRD_DESKTOP_ONBOARDING.md) covers signup through the first desktop export. Track its delivery in the [onboarding task list](TASKS_DESKTOP_ONBOARDING.md).
+The [desktop onboarding task list](TASKS_DESKTOP_ONBOARDING.md) tracks the Apple Silicon pilot from signup through the first desktop export.
 
 ## 1. Product boundary
 
