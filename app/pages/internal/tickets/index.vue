@@ -6,7 +6,7 @@ const route = useRoute()
 const searchInput = ref(typeof route.query.search === 'string' ? route.query.search : '')
 const search = computed(() => (typeof route.query.search === 'string' ? route.query.search : ''))
 const page = computed(() => Math.max(1, Number(route.query.page || 1) || 1))
-const { data, error, pending, refresh } = useLazyFetch<{
+const { data, error, pending, refresh } = useDashboardFetch<{
   tickets: {
     id: string
     subject: string
@@ -50,7 +50,7 @@ function goToPage(next: number) {
         <button class="portal-button-secondary mt-3" @click="refresh()">Try again</button>
       </div>
       <div v-else class="mt-8" aria-live="polite">
-        <p v-if="pending" role="status">Loading tickets…</p>
+        <p v-if="pending && !data" role="status">Loading tickets…</p>
         <p v-else-if="!data?.tickets.length" class="text-sm text-studio-muted">
           {{ search ? 'No tickets match this search.' : 'No tickets yet.' }}
         </p>

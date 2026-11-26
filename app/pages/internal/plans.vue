@@ -7,7 +7,7 @@ import { licencePrice } from '~/utils/licence-price'
 definePageMeta({ layout: false, pageTransition: false })
 usePrivatePageSeo('Licence plans', 'Manage the MatterDraft Studio licence catalogue.')
 
-const { data, error, refresh, pending } = useLazyFetch('/api/internal/plans')
+const { data, error, refresh, pending } = useDashboardFetch('/api/internal/plans')
 type Plan = NonNullable<typeof data.value>['plans'][number]
 
 const editor = ref<{

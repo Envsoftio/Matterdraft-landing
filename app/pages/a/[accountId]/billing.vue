@@ -17,7 +17,7 @@ usePrivatePageSeo('Plans & billing', 'View your MatterDraft Studio trial and dev
 const route = useRoute()
 const accountId = String(route.params.accountId)
 const billingUrl = `/api/accounts/${accountId}/billing` as const
-const { data, error, pending, refresh } = useLazyFetch(billingUrl)
+const { data, error, pending, refresh } = useDashboardFetch(billingUrl)
 const trial = computed(() => data.value?.trial)
 type Plan = NonNullable<typeof data.value>['plans'][number]
 const quantities = reactive<Record<string, number | ''>>({})
@@ -202,8 +202,8 @@ async function startTrial() {
   busy.value = true
   problem.value = ''
   try {
-    const { trial } = await $fetch(`/api/accounts/${accountId}/trial`, { method: 'POST', body: {} })
-    if (data.value) data.value = { ...data.value, trial, canStartTrial: false }
+    await $fetch(`/api/accounts/${accountId}/trial`, { method: 'POST', body: {} })
+    await refresh()
   } catch (reason) {
     problem.value = parseApiError(reason).text
   } finally {

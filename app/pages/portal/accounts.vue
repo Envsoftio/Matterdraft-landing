@@ -11,7 +11,7 @@ const {
   refresh,
   error: loadError,
   pending,
-} = useLazyFetch('/api/portal/context', { key: 'portal-context' })
+} = useDashboardFetch('/api/portal/context', { key: 'portal-context' })
 const name = ref('')
 const busy = ref(false)
 const error = ref('')

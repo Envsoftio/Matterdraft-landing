@@ -7,7 +7,7 @@ usePrivatePageSeo('Account activity', 'Review a MatterDraft customer account’s
 const route = useRoute()
 const accountId = computed(() => String(route.params.accountId))
 const page = computed(() => Math.max(1, Math.trunc(Number(route.query.page || 1)) || 1))
-const { data, error, pending, refresh } = useLazyFetch(
+const { data, error, pending, refresh } = useDashboardFetch(
   () => `/api/internal/account-activity/${accountId.value}`,
   { query: { page } },
 )
@@ -70,10 +70,7 @@ function goToPage(next: number) {
           <h2 id="activity-heading" class="font-heading text-xl font-semibold">
             Activity timeline
           </h2>
-          <p v-if="pending" role="status" class="mt-4 text-sm text-studio-muted">
-            Loading activity…
-          </p>
-          <p v-else-if="!data.events.length" class="mt-4 text-sm text-studio-muted">
+          <p v-if="!data.events.length" class="mt-4 text-sm text-studio-muted">
             No activity on this page.
           </p>
           <ol v-else class="mt-4 divide-y divide-studio-rule border-y border-studio-rule">

@@ -22,7 +22,7 @@ type Detail = {
 }
 const route = useRoute()
 const accountId = computed(() => String(route.params.accountId))
-const { data, error, refresh, pending } = useLazyFetch<Detail>(
+const { data, error, refresh, pending } = useDashboardFetch<Detail>(
   () => `/api/internal/organisations/${encodeURIComponent(accountId.value)}`,
   { watch: [accountId] },
 )

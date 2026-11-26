@@ -10,7 +10,7 @@ usePrivatePageSeo('Installer downloads', 'Review MatterDraft Studio installer do
 
 const route = useRoute()
 const before = computed(() => route.query.before)
-const { data, error, refresh, pending } = useLazyFetch('/api/internal/downloads', {
+const { data, error, refresh, pending } = useDashboardFetch('/api/internal/downloads', {
   query: { before },
 })
 
@@ -28,7 +28,9 @@ function platformLabel(platform: string) {
     description="Each entry shows when a customer requested an installer link."
   >
     <div class="portal-content">
-      <p v-if="pending" role="status" class="mt-6 text-sm text-studio-muted">Loading downloads…</p>
+      <p v-if="pending && !data" role="status" class="mt-6 text-sm text-studio-muted">
+        Loading downloads…
+      </p>
       <div v-else-if="error" role="alert" class="portal-error mt-6">
         {{ parseApiError(error).text }}
         <button type="button" class="portal-link ml-2" @click="refresh()">Try again</button>

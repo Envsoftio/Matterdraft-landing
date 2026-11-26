@@ -2,7 +2,7 @@
 definePageMeta({ layout: false, pageTransition: false })
 usePrivatePageSeo('Workspace', 'Open your MatterDraft Studio workspace.')
 
-const request = useLazyFetch('/api/portal/context', { key: 'portal-context' })
+const request = useDashboardFetch('/api/portal/context', { key: 'portal-context' })
 const { data } = request
 async function openWorkspace() {
   if (!data.value) return

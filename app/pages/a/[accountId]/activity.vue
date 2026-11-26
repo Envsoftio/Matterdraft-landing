@@ -7,7 +7,7 @@ usePrivatePageSeo(
 )
 const route = useRoute()
 const id = String(route.params.accountId)
-const { data, error, pending, refresh } = useLazyFetch<{
+const { data, error, pending, refresh } = useDashboardFetch<{
   events: {
     event_type: string
     subject_id: string

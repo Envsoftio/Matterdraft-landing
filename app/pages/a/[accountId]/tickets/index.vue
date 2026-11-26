@@ -7,7 +7,7 @@ const route = useRoute()
 const router = useRouter()
 const accountId = computed(() => String(route.params.accountId))
 const page = ref(1)
-const { data, error, pending, refresh } = useLazyFetch<{
+const { data, error, pending, refresh } = useDashboardFetch<{
   tickets: { id: string; subject: string; category: string; status: string; updatedAt: number }[]
   hasMore: boolean
 }>(() => `/api/accounts/${accountId.value}/tickets`, { query: { page }, watch: [accountId, page] })
@@ -89,7 +89,12 @@ async function checkTickets() {
             </button>
           </div>
           <div v-else class="support-ticket-list" aria-live="polite">
-            <div v-if="pending" class="customer-loading-panel" role="status" aria-busy="true">
+            <div
+              v-if="pending && !data"
+              class="customer-loading-panel"
+              role="status"
+              aria-busy="true"
+            >
               <span class="sr-only">Loading tickets</span>
             </div>
             <div v-else-if="!data?.tickets.length" class="customer-empty">

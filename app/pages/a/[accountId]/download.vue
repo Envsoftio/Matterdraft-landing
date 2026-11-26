@@ -18,7 +18,7 @@ usePrivatePageSeo(
 const accountId = String(useRoute().params.accountId)
 const accountPath = `/a/${accountId}`
 const downloadPath = `/api/accounts/${accountId}/download` as const
-const { data, error, refresh, pending } = useLazyFetch(downloadPath)
+const { data, error, refresh, pending } = useDashboardFetch(downloadPath)
 const platform = ref<DesktopDownloadPlatform>()
 const installer = computed(
   () =>
@@ -73,7 +73,12 @@ async function download() {
         {{ parseApiError(error).text }}
         <button type="button" class="portal-link ml-2" @click="refresh()">Try again</button>
       </div>
-      <div v-else-if="pending" class="customer-loading-panel" role="status" aria-busy="true">
+      <div
+        v-else-if="pending && !data"
+        class="customer-loading-panel"
+        role="status"
+        aria-busy="true"
+      >
         <span class="sr-only">Loading installers</span>
       </div>
       <template v-else-if="installer && data">

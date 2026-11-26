@@ -33,17 +33,19 @@ withDefaults(
   defineProps<{ title?: string; description?: string; loading?: boolean; pending?: boolean }>(),
   { title: 'Workspace' },
 )
+const nuxtApp = useNuxtApp()
 const slots = useSlots()
 const route = useRoute()
 const router = useRouter()
 const currentPath = computed(() => router.currentRoute.value.path)
 const isInternal = computed(() => route.path.startsWith('/internal/'))
-const contextRequest = useLazyFetch('/api/portal/context', {
+const contextRequest = useDashboardFetch('/api/portal/context', {
   key: 'portal-context',
 })
 const { data: context, error, refresh: refreshContext, pending: loadingContext } = contextRequest
 async function checkAccess() {
   if (error.value && (error.value as { statusCode?: number }).statusCode === 401) {
+    clearDashboardData()
     await navigateTo({ path: '/sign-in', query: { returnTo: route.fullPath } })
   } else if (context.value?.isStaff && !isInternal.value && route.path !== '/portal') {
     await navigateTo('/internal/overview', { replace: true })
@@ -125,6 +127,11 @@ watch(
   },
 )
 
+function clearDashboardData() {
+  // Include requests that are still in flight and have no payload data yet.
+  clearNuxtData([...Object.keys(nuxtApp.payload.data), ...Object.keys(nuxtApp.payload._errors)])
+}
+
 async function signOut() {
   signOutError.value = ''
   try {
@@ -133,7 +140,7 @@ async function signOut() {
       signOutError.value = 'Sign out could not be confirmed. Please try again.'
       return
     }
-    clearNuxtData()
+    clearDashboardData()
     await navigateTo('/sign-in')
   } catch {
     signOutError.value = 'Sign out could not be confirmed. Check your connection and try again.'

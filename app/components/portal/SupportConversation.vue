@@ -21,7 +21,7 @@ type Conversation = {
   }[]
   hasMoreMessages: boolean
 }
-const { data, error, pending, refresh } = useLazyFetch<Conversation>(() => props.apiPath, {
+const { data, error, pending, refresh } = useDashboardFetch<Conversation>(() => props.apiPath, {
   watch: [() => props.apiPath],
 })
 const body = ref(''),

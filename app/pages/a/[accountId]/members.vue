@@ -32,7 +32,7 @@ const {
   error: loadError,
   pending,
   refresh,
-} = useLazyFetch<Data>(() => `/api/membership/accounts/${accountId.value}/members`)
+} = useDashboardFetch<Data>(() => `/api/membership/accounts/${accountId.value}/members`)
 const email = ref('')
 const role = ref('member')
 const busy = ref(false)

@@ -23,9 +23,9 @@ const [
   { data: activity, error: activityError, pending: loadingActivity, refresh: refreshActivity },
   { data: desktop, error: desktopError, refresh: refreshDesktop },
 ] = [
-  useLazyFetch('/api/internal/overview', { query: { days } }),
-  useLazyFetch('/api/internal/account-activity', { query: { search, type, page } }),
-  useLazyFetch('/api/internal/desktop-client'),
+  useDashboardFetch('/api/internal/overview', { query: { days } }),
+  useDashboardFetch('/api/internal/account-activity', { query: { search, type, page } }),
+  useDashboardFetch('/api/internal/desktop-client'),
 ]
 
 function filterActivity(next = 1) {

@@ -15,7 +15,7 @@ const page = computed(() => {
   const value = Number(route.query.page || 1)
   return Number.isSafeInteger(value) && value > 0 ? value : 1
 })
-const { data, error, pending, refresh } = useLazyFetch<{
+const { data, error, pending, refresh } = useDashboardFetch<{
   organisations: Organisation[]
   page: number
   hasMore: boolean
@@ -65,7 +65,9 @@ function goToPage(nextPage: number) {
         <button class="portal-button-secondary mt-3" @click="refresh()">Try again</button>
       </div>
       <div v-else class="mt-8">
-        <p v-if="pending" role="status" class="text-sm text-studio-muted">Loading organisations…</p>
+        <p v-if="pending && !data" role="status" class="text-sm text-studio-muted">
+          Loading organisations…
+        </p>
         <div v-else-if="data" class="overflow-x-auto border-y border-studio-rule">
           <table class="w-full text-left text-sm">
             <thead class="bg-studio-tint">

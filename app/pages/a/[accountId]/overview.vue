@@ -11,7 +11,7 @@ usePrivatePageSeo('Workspace', 'View your access to MatterDraft Studio and get s
 const route = useRoute()
 const accountId = String(route.params.accountId)
 const accountPath = `/a/${accountId}`
-const { data, error, refresh, pending } = useLazyFetch(`/api/accounts/${accountId}/overview`)
+const { data, error, refresh, pending } = useDashboardFetch(`/api/accounts/${accountId}/overview`)
 const trial = computed(() => data.value?.trial)
 const busy = ref(false)
 const problem = ref('')
@@ -82,11 +82,11 @@ async function startTrial() {
   busy.value = true
   problem.value = ''
   try {
-    const result = await $fetch(`/api/accounts/${accountId}/trial`, { method: 'POST', body: {} })
+    await $fetch(`/api/accounts/${accountId}/trial`, { method: 'POST', body: {} })
     const restoreFocus =
       document.activeElement === document.body ||
       document.activeElement?.classList.contains('workspace-primary')
-    if (data.value) data.value = { ...data.value, trial: result.trial, canStartTrial: false }
+    await refresh()
     if (restoreFocus) {
       await nextTick()
       accessHeading.value?.focus()
@@ -150,15 +150,7 @@ async function startTrial() {
                   <p v-else-if="trial?.status === 'active'" class="body-3">
                     Open MatterDraft Studio on your computer and sign in with this account. Full
                     access ends
-                    <NuxtTime
-                      :datetime="trial.expiresAt"
-                      year="numeric"
-                      month="short"
-                      day="numeric"
-                      hour="numeric"
-                      minute="2-digit"
-                      time-zone-name="short"
-                    />.
+                    <NuxtTime :datetime="trial.expiresAt" date-style="medium" time-style="short" />.
                   </p>
                   <p v-else-if="trial?.status === 'ended'" class="body-3">
                     {{
