@@ -1,5 +1,5 @@
-import { type DesktopDownloadPlatform } from '../../lib/desktop-download-platforms'
-import { applicationFailure } from './application-error'
+import type { DesktopDownloadPlatform } from '../../lib/desktop-download-platforms'
+import { applicationFailure } from './application-error.ts'
 
 type Installer = {
   platform: DesktopDownloadPlatform
@@ -16,28 +16,28 @@ const releaseApi = 'https://api.github.com/repos/Envsoftio/advocate_app/releases
 const releaseBase = 'https://github.com/Envsoftio/advocate_app/releases/download'
 const publicPackages = {
   'macos-arm64': {
-    name: (version: string) => `MatterDraft-Studio-${version}-macOS-arm64-unsigned.dmg`,
+    label: 'macOS-arm64',
     requirements: 'macOS 14 or later',
     extension: 'dmg',
   },
   'macos-x64': {
-    name: (version: string) => `MatterDraft-Studio-${version}-macOS-x64-unsigned.dmg`,
+    label: 'macOS-x64',
     requirements: 'macOS 14 or later',
     extension: 'dmg',
   },
   'windows-x64': {
-    name: (version: string) => `MatterDraft-Studio-${version}-Windows-x64-unsigned.exe`,
+    label: 'Windows-x64',
     requirements: '64-bit Windows',
     extension: 'exe',
   },
   'linux-x64': {
-    name: (version: string) => `MatterDraft-Studio-${version}-Linux-x64-unsigned.AppImage`,
+    label: 'Linux-x64',
     requirements: '64-bit Linux with AppImage support',
     extension: 'AppImage',
   },
 } as const satisfies Record<
   DesktopDownloadPlatform,
-  { name: (version: string) => string; requirements: string; extension: string }
+  { label: string; requirements: string; extension: string }
 >
 
 let cached: { expires: number; installers: Installer[] } | undefined
@@ -64,7 +64,6 @@ export async function getDesktopInstallers(): Promise<Installer[]> {
         release &&
         typeof release === 'object' &&
         !release.draft &&
-        release.prerelease &&
         /^v\d+\.\d+\.\d+-unsigned\.[1-9]\d*$/.test(release.tag_name) &&
         Array.isArray(release.assets),
     )
@@ -72,8 +71,9 @@ export async function getDesktopInstallers(): Promise<Installer[]> {
 
   for (const release of candidates) {
     const version = release.tag_name.slice(1).split('-')[0]
+    const suffix = release.prerelease ? '-unsigned' : ''
     const installers = Object.entries(publicPackages).map(([platform, config]) => {
-      const name = config.name(version)
+      const name = `MatterDraft-Studio-${version}-${config.label}${suffix}.${config.extension}`
       const url = `${releaseBase}/${release.tag_name}/${name}`
       const asset = release.assets.find(
         (entry: { name?: string; browser_download_url?: string; size?: number }) =>
