@@ -131,8 +131,7 @@ async function download() {
                     This version has not been notarized by Apple.
                   </p>
                   <p v-if="installer.unsigned" class="customer-muted body-6">
-                    This is an unsigned preview. Your computer may ask you to confirm installation.
-                    Updates are installed manually.
+                    Your computer may ask you to confirm installation.
                   </p>
                 </div>
                 <div class="customer-form-actions">
